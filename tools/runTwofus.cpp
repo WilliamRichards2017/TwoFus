@@ -4,8 +4,8 @@
 #include <iostream>
 #include <stdexcept>
 
-#include "contigs.hpp"
-#include "input.hpp"
+#include "src/contigs.hpp"
+#include "src/input.hpp"
 
 
 int main(int argc, char * argv[] ){

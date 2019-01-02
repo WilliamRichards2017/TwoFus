@@ -2,6 +2,7 @@
 #define __SRC_CONTIGS_HPP__
 
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "api/BamMultiReader.h"
@@ -23,8 +24,8 @@ private:
   std::vector<BamTools::BamAlignment> contigVec_;
   std::vector<groupedContigs> groupedContigsVec_;
 
-  std::vector<groupedContigs> groupedInsertionContigVec_;
   std::vector<groupedContigs> groupedMobileElementContigVec_;
+  std::vector<groupedContigs> groupedInsertionContigVec_;
   std::vector<groupedContigs> groupedTranslocationContigVec_;
 
 
@@ -34,7 +35,9 @@ private:
   void findMobileElementContigs();
   void findTranslocationContigs();
 
-  bool alignContigToMEList(BamTools::BamAlignment);
+  void alignContigsToMEList();
+
+  std::unordered_map<std::string, int32_t> contigsAlignedToMEList_;
   
   
 };
