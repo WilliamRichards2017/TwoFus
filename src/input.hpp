@@ -7,24 +7,26 @@
 class input{
 
  public:
-  input(const int, const char **);
+  input(const int, char **);
   ~input();
 
   std::string probandBamPath_;
-  std::string contigFastaPath_;
+  std::string contigFastqPath_;
   std::string contigBamPath_;
-  std::string mobileElementFastqPath_;
+  std::string mobileElementFastaPath_;
   std::string mobileElementIndexPath_;
   std::string referencePath_;
   std::string referenceIndexPath_;
   std::string vcfOutPath_;
 
-  const std::vector<std::string> parentBamPaths_;
+  std::vector<std::string> parentBamPaths_;
+
+  void printArgs();
 
  private:
   
   const int argc_;
-  const char ** argv_;
+  char ** argv_;
 
   void parseArgs();
 
