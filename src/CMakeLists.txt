@@ -13,6 +13,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
 add_library(twofus_core STATIC
 	util.cpp
 	input.cpp	
+	MEHead.cpp
 	mobileElement.cpp
 	contigs.cpp
 )

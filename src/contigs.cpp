@@ -119,12 +119,6 @@ void contigs::alignContigsToMEList(){
 
 
 std::pair<BamTools::BamAlignment, MEHit> contigs::getMEAlignment(const BamTools::BamAlignment & al){
-  
-  //auto it = contigsAlignedToMEList_.find(al);
-  //if(it != contigsAlignedToMEList_.end)(){
-  //   return *it;
-  //}
-
   for(auto & c : contigsAlignedToMEList_){
     if(al.Name.compare(c.first.Name) == 0 and al.RefID == c.first.RefID and al.Position == c.first.Position){
       return c;
@@ -132,6 +126,7 @@ std::pair<BamTools::BamAlignment, MEHit> contigs::getMEAlignment(const BamTools:
   }
   return std::make_pair(al, std::make_pair("",-1));
 }
+
 
 bool contigs::vecHasAlignment(const std::vector<std::pair<BamTools::BamAlignment, MEHit> > & alVec){
   for(const auto & p : alVec){
@@ -157,7 +152,7 @@ void contigs::findMobileElementContigs(){
       alignedContigs.push_back(contigs::getMEAlignment(c));
     }
     if(contigs::vecHasAlignment(alignedContigs)){
-      mobileElement ME = {alignedContigs};
+      mobileElement ME = {alignedContigs, i_};
       ++count;
     }
   }
