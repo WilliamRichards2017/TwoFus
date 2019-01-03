@@ -16,6 +16,14 @@ public:
 
 private:
 
+  input i_;
+
+  BamTools::BamAlignment al_;
+  std::string clippedSeq_;
+  MEHit MEHit_;
+
+  
+
 };
 
 #endif // __SRC_ME-HEAD_HPP

@@ -8,7 +8,6 @@ bool mobileElement::checkContigForTail(const BamTools::BamAlignment & al){
 
   std::string aStr = std::string(tailSize_, 'A');
   std::string tStr = std::string(tailSize_, 'T');
-
   std::vector<std::string> clipSeqs = util::getClipSeqs(al);
 
   for(const auto & c : clipSeqs){
@@ -21,7 +20,6 @@ bool mobileElement::checkContigForTail(const BamTools::BamAlignment & al){
 }
 
 void mobileElement::classifyContig(const std::pair<BamTools::BamAlignment, MEHit> & contig){
-
   if(contig.second.first.compare("") != 0){
     MEHead head = {contig, i_};
     headContigs_.push_back(head);
@@ -33,7 +31,6 @@ void mobileElement::classifyContig(const std::pair<BamTools::BamAlignment, MEHit
   else{
     unknownContigs_.push_back(contig.first);
   }
-
 }
 
 void mobileElement::printGroupedContigHits(){
