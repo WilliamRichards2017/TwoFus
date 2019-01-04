@@ -1,6 +1,7 @@
 #ifndef __SRC_CLIPCOORDS_HPP__
 #define __SRC_CLIPCOORDS_HPP__
 
+#include <string>
 #include <vector>
 
 #include "api/BamMultiReader.h"
@@ -19,6 +20,11 @@ public:
   int32_t rightPos_;
   int32_t globalOffset_;
   direction clipDir_;
+
+  std::string clippedSeq_;
+
+  void printCoords();
+
  
 
 private:
@@ -27,7 +33,6 @@ private:
   int32_t clipIndex_;
 
   void setCoords();
-  void printCoords();
   int8_t getLargestClipIndex(const std::vector<int> &);
 };
 

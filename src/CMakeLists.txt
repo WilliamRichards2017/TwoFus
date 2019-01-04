@@ -15,6 +15,7 @@ add_library(twofus_core STATIC
 	util.cpp
 	input.cpp	
 	MEHead.cpp
+	polyTail.cpp
 	mobileElement.cpp
 	contigs.cpp
 )

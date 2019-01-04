@@ -38,16 +38,14 @@ void clipCoords::setCoords(){
     rightPos_ = leftPos_ + clipSizes[clipIndex_];
   }
   globalOffset_ = genomePositions[clipIndex_]-readPositions[clipIndex_];
-  
+  refID_ = al_.RefID;
+  clippedSeq_ = al_.QueryBases.substr(readPositions[clipIndex_]+insertionVec[clipIndex_], clipSizes[clipIndex_]);  
 }
 
 void clipCoords::printCoords(){
   std::cout << "refID_ : " << refID_ << ", leftPos_ : " << leftPos_ << ", rightPos_ : " 
 	    << rightPos_ << ", globalOffset_ : " << globalOffset_ << ", clipDir_ : " 
-	    << clipDir_ << std::endl; 
-}
-
-clipCoords::clipCoords(){
+	    << clipDir_ << ", clippedSeq_ : " << clippedSeq_ << std::endl; 
 }
 
 clipCoords::clipCoords(const BamTools::BamAlignment & al) : al_(al){

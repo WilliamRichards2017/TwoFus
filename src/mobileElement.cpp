@@ -3,9 +3,8 @@
 #include "MEHead.hpp"
 #include "util.hpp"
 
+
 bool mobileElement::checkContigForTail(const BamTools::BamAlignment & al){
-
-
   std::string aStr = std::string(tailSize_, 'A');
   std::string tStr = std::string(tailSize_, 'T');
   std::vector<std::string> clipSeqs = util::getClipSeqs(al);
@@ -21,12 +20,12 @@ bool mobileElement::checkContigForTail(const BamTools::BamAlignment & al){
 
 void mobileElement::classifyContig(const std::pair<BamTools::BamAlignment, MEHit> & contig){
   if(contig.second.first.compare("") != 0){
-    MEHead head = {contig};
+    MEHead head = {contig, i_};
     headContigs_.push_back(head);
   }
   else if(mobileElement::checkContigForTail(contig.first)){
-    //polyTail tail = {contig.first};
-    //tailContigs_.push_back(tail);
+    polyTail tail = {contig.first};
+    tailContigs_.push_back(tail);
   }
   else{
     unknownContigs_.push_back(contig.first);
