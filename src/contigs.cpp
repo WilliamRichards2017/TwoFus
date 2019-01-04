@@ -40,10 +40,9 @@ void contigs::findAllContigs(){
   }
 
   while(reader.GetNextAlignment(al)){
-    contigVec_.push_back(al);
-    
-    std::cout << "pushing back contig: " << al.Name << " at position: " << al.RefID << ',' << al.Position << std::endl;
-    
+    if(al.RefID != -1){
+      contigVec_.push_back(al);
+    }
   }
   reader.Close();
 }
@@ -162,35 +161,61 @@ void contigs::findMobileElementContigs(){
 void contigs::findTranslocationContigs(){
 }
 
+bool contigs::isNearby(const BamTools::BamAlignment & al1, const BamTools::BamAlignment & al2){
+  int32_t maxDist = 100;
+
+  if(al1.RefID == al2.RefID and std::abs(al1.Position-al2.Position) < maxDist){
+    return true;
+  }
+  return false;
+}
+
 void contigs::groupNearbyContigs(){
 
   BamTools::BamAlignment previousContig;
-  int32_t maxDist = 100;
-
-  for(const auto & c : contigVec_){
+  BamTools::BamAlignment currentContig;
+  BamTools::BamAlignment nextContig;
+  
+  for(int i = 0; i < contigVec_.size()-1; ++i){
     groupedContigs g;
-
-    std::cout << "Current position: " <<  c.RefID << ',' << c.Position << std::endl;
-    std::cout << "Previous position: " << previousContig.RefID << ',' << previousContig.Position << std::endl;
     
-
-    if(c.RefID != -1){
-      if(previousContig.RefID == c.RefID && std::abs(c.Position-previousContig.Position) < maxDist){
-	g.push_back(previousContig);
-	g.push_back(c);
-      }
-      else{
-	g.push_back(c);
-      }
-    }
-      
-      std::cout << "pushing back grouped contigs" << std::endl;
-      for(const auto & c : g){
-	std::cout << c.Name << std::endl;
-      }
-      std::cout  << "~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
-      previousContig = c;
+    currentContig = contigVec_[i];
+    nextContig = contigVec_[i+1];
+    
+    
+    //Case 1 - No grouping
+    if(!contigs::isNearby(previousContig, currentContig) and !contigs::isNearby(currentContig, nextContig)){
+      g.push_back(currentContig);
       groupedContigsVec_.push_back(g);
+      
+      previousContig = currentContig;
+    }
+    //Case 2 - Current and Next only group
+    else if(!contigs::isNearby(previousContig, currentContig) and contigs::isNearby(currentContig, nextContig)){
+      g.push_back(currentContig);
+      g.push_back(nextContig);
+      groupedContigsVec_.push_back(g);
+
+      previousContig = nextContig;
+      ++i; // Dont double count contig thats in a single and double grouping
+    }
+    //case 3
+    else if(contigs::isNearby(previousContig, currentContig) and contigs::isNearby(currentContig, nextContig)){
+      groupedContigs g2;
+      g.push_back(previousContig);
+      g.push_back(currentContig);
+      groupedContigsVec_.push_back(g);
+      
+      g2.push_back(currentContig);
+      g2.push_back(nextContig);
+      groupedContigsVec_.push_back(g2);
+      
+      previousContig = nextContig;
+      ++i; //avoid double counting contigs
+    }
+    else{
+      std::cerr << "Warning: unhandled case in contigs::groupNearbyContigs()" << std::endl;
+    }
   }
 }
 

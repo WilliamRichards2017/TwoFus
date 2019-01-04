@@ -47,9 +47,12 @@ void clipCoords::printCoords(){
 	    << clipDir_ << std::endl; 
 }
 
+clipCoords::clipCoords(){
+}
+
 clipCoords::clipCoords(const BamTools::BamAlignment & al) : al_(al){
   clipCoords::setCoords();
-  clipCoords::printCoords();
+  //clipCoords::printCoords();
 }
 
 clipCoords::~clipCoords(){

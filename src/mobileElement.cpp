@@ -21,7 +21,7 @@ bool mobileElement::checkContigForTail(const BamTools::BamAlignment & al){
 
 void mobileElement::classifyContig(const std::pair<BamTools::BamAlignment, MEHit> & contig){
   if(contig.second.first.compare("") != 0){
-    MEHead head = {contig, i_};
+    MEHead head = {contig};
     headContigs_.push_back(head);
   }
   else if(mobileElement::checkContigForTail(contig.first)){
@@ -43,7 +43,10 @@ void mobileElement::printGroupedContigHits(){
 mobileElement::mobileElement(const std::vector<std::pair<BamTools::BamAlignment, MEHit> > & groupedContigHits, const input & i) : groupedContigHits_(groupedContigHits), i_(i){
   std::cout << "Size of groupedContigHits is " << groupedContigHits.size() << std::endl;
   mobileElement::printGroupedContigHits();
-  
+
+  for(const auto c : groupedContigHits){
+    mobileElement::classifyContig(c);
+  }
 }
 
 mobileElement::~mobileElement(){
