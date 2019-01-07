@@ -34,6 +34,7 @@ private:
   bool checkContigForTail(const BamTools::BamAlignment &);
   void classifyContig(const std::pair<BamTools::BamAlignment, MEHit> &);
 
+
 };
 
 #endif // __SRC_MOBILE_ELEMENT_HPP__

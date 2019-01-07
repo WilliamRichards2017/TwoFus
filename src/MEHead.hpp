@@ -4,23 +4,34 @@
 #include "api/BamMultiReader.h"
 #include "api/BamWriter.h"
 
+#include "clipCoords.hpp"
 #include "input.hpp"
 
 typedef std::pair<std::string, int32_t> MEHit;
 
+struct DS{
+  bool forwardStrand = false;
+  bool reverseStrand = false;
+};
+
 class MEHead{
 
 public:
-  MEHead(const std::pair<BamTools::BamAlignment, MEHit> &, const input &);
+  MEHead(const std::pair<BamTools::BamAlignment, MEHit> &, const input & i);
   ~MEHead();
 
 private:
 
   input i_;
-
-  BamTools::BamAlignment al_;
-  std::string clippedSeq_;
+  int32_t minHeadSize_ = 10;
+  std::vector<BamTools::BamAlignment> supportingReads_;
+  BamTools::BamAlignment contig_;
+  clipCoords clipCoords_;
   MEHit MEHit_;
+  DS DS_;
+
+  void findSupportingReads();
+  bool mapReadToMEHead(const BamTools::BamAlignment &);
 
   
 
