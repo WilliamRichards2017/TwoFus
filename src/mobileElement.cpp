@@ -19,6 +19,13 @@ bool mobileElement::checkContigForTail(const BamTools::BamAlignment & al){
 }
 
 void mobileElement::classifyContig(const std::pair<BamTools::BamAlignment, MEHit> & contig){
+
+  std::cout << "Inside mobileElement::classifyContig()" << std::endl;
+  std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+
+  std::cout << "contig Name is: " << contig.first.Name << std::endl;
+  std::cout << "contig Position is: " << contig.first.RefID << ':' << contig.first.Position << '-' << contig.first.GetEndPosition() << std::endl;
+
   if(contig.second.first.compare("") != 0){
     MEHead head = {contig, i_};
     headContigs_.push_back(head);
