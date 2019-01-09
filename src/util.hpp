@@ -10,6 +10,7 @@ public:
   static const bool isReadLeftBound(const std::vector<BamTools::CigarOp> &);
   static const std::vector<std::string> getClipSeqs(const BamTools::BamAlignment &);
   static const std::vector<int32_t> getInsertionVec(const BamTools::BamAlignment &);
+  static BamTools::BamReader openBamFile(const std::string &);
 
 private:
   

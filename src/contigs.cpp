@@ -21,24 +21,8 @@ KSEQ_INIT(gzFile, gzread)
 
 
 void contigs::findAllContigs(){
-  BamTools::BamReader reader;
+  BamTools::BamReader reader = util::openBamFile(i_.contigBamPath_);
   BamTools::BamAlignment al;
-
-  if(!reader.Open(i_.contigBamPath_)){
-    std::cout << "Could not open bam file in contigs::findAllContigs() for " << i_.contigBamPath_ << std::endl;
-    std::cout << "Exiting run with non-zero status..." << std::endl;
-    reader.Close();
-    exit (EXIT_FAILURE);
-  }
-
-  reader.LocateIndex();
-
-  if(!reader.HasIndex()){
-    std::cout << "Index for " << i_.contigBamPath_ << " could not be opened in contigs::findAllContigs()" << std::endl;
-    std::cout << "Exiting run with non-zero status..." << std::endl;
-    reader.Close();
-    exit (EXIT_FAILURE);
-  }
 
   while(reader.GetNextAlignment(al)){
     if(al.RefID != -1){
@@ -149,11 +133,6 @@ void contigs::findMobileElementContigs(){
       alignedContigs.push_back(contigs::getMEAlignment(c));
     }
     if(contigs::vecHasAlignment(alignedContigs)){
-      //std::cout << "Found contig alignment in alignedContigVec containing contigs: ";
-      for(const auto & c : alignedContigs){
-	std::cout << c.first.Name << ", ";
-      }
-      std::cout << std::endl;
       mobileElement ME = {alignedContigs, i_};
       vcfWriter writer = {ME, i_};
     }
@@ -167,7 +146,7 @@ bool contigs::isNearby(const BamTools::BamAlignment & al1, const BamTools::BamAl
   int32_t maxDist = 1000;
 
   if(al1.RefID == al2.RefID and std::abs(al1.Position-al2.Position) < maxDist){
-    std::cout << "Found Nearby contigs at: " << al1.RefID << ':' << al1.Position << '-' << al1.GetEndPosition() << std::endl;
+    //std::cout << "Found Nearby contigs at: " << al1.RefID << ':' << al1.Position << '-' << al1.GetEndPosition() << std::endl;
     return true;
   }
   return false;
@@ -221,9 +200,9 @@ void contigs::groupNearbyContigs(){
     }
     else{
       std::cerr << "Warning: unhandled case in contigs::groupNearbyContigs()" << std::endl;
-      std::cout << "PreviousContig coords: " << previousContig.RefID << ':' << previousContig.Position << '-' << previousContig.GetEndPosition() << std::endl;
-      std::cout << "CurrentContig coords: " << currentContig.RefID << ':' << currentContig.Position << '-' << currentContig.GetEndPosition() << std::endl;
-      std::cout << "NextContig coords: " << nextContig.RefID << ':' << nextContig.Position << '-' << nextContig.GetEndPosition() << std::endl;
+      std::cerr << "PreviousContig coords: " << previousContig.RefID << ':' << previousContig.Position << '-' << previousContig.GetEndPosition() << std::endl;
+      std::cerr << "CurrentContig coords: " << currentContig.RefID << ':' << currentContig.Position << '-' << currentContig.GetEndPosition() << std::endl;
+      std::cerr << "NextContig coords: " << nextContig.RefID << ':' << nextContig.Position << '-' << nextContig.GetEndPosition() << std::endl;
     }
   }
 }

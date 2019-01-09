@@ -11,10 +11,11 @@ void vcfWriter::printVCFLine(){
   std::cout << "~~~~~~~~~~~~~~PRINTING VCF LINE~~~~~~~~~~~~~~~~~~" << std::endl;
   std::cout << vcfLine_.CHROM << '\t' << vcfLine_.POS << '\t'  << vcfLine_.ID << '\t' << vcfLine_.REF << '\t' << vcfLine_.ALT
 	    << '\t' << vcfLine_.QUAL << '\t';
+  std::cout << std::endl << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
 }
 
 void vcfWriter::populateMELine(){
-  vcfLine_.CHROM = vcfContig_.RefID;
+  vcfLine_.CHROM = std::to_string(vcfContig_.RefID);
   vcfLine_.POS = vcfContig_.Position;
   vcfLine_.ID = "ME";
   vcfLine_.REF = "N";

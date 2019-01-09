@@ -12,6 +12,7 @@ typedef enum {ltr, rtl} direction;
 class clipCoords{
 
 public:
+  clipCoords();
   clipCoords(const BamTools::BamAlignment &);
   ~clipCoords();
 

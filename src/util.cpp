@@ -6,8 +6,30 @@
 
 #include "util.hpp"
 
-const bool util::fileExists( const std::string &Filename ){
-  return access( Filename.c_str(), 0 ) == 0;
+BamTools::BamReader util::openBamFile(const std::string & bamPath){
+
+  BamTools::BamReader reader;
+
+  if(!reader.Open(bamPath)){
+    std::cout << "could not open bamPath " << bamPath << std::endl;
+    std::cout << "Exiting run with non-zero status..." << std::endl;
+    reader.Close();
+    exit(EXIT_FAILURE);
+  }
+  
+  reader.LocateIndex();
+
+  if(!reader.HasIndex()){
+    std::cout << "Index for " << bamPath << " could not be located" << std::endl;
+    std::cout << "Exiting run with non-zero status..." << std::endl;
+    reader.Close();
+    exit(EXIT_FAILURE);
+  }
+  return reader;
+}
+
+const bool util::fileExists(const std::string & Filename){
+  return access(Filename.c_str(), 0) == 0;
 }
 
 const bool util::isReadLeftBound(const std::vector<BamTools::CigarOp> & cigOps){

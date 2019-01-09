@@ -10,17 +10,23 @@
 class polyTail{
 
 public:
+  polyTail(const BamTools::BamRegion &, const input &);
   polyTail(const BamTools::BamAlignment &, const input &);
   ~polyTail();
 
 private:
-
-  void findSupportingReads();
+  
+  void findSupportingReadsForContig();
+  void findSupportingReadsForRegion();
   bool mapReadToTail(const BamTools::BamAlignment &);
+  bool readHasTail(const BamTools::BamAlignment &);
+  void findConsensusTails();
 
   input i_;
   int32_t minTailSize_ = 10;
   BamTools::BamAlignment contig_;
+  BamTools::BamRegion region_;
+  std::vector<BamTools::BamAlignment> allTails_;
   std::vector<BamTools::BamAlignment> supportingReads_;
   clipCoords clipCoords_;
   

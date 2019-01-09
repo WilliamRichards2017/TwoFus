@@ -29,13 +29,17 @@ private:
   input i_;
   std::vector<std::pair<BamTools::BamAlignment, MEHit> > groupedContigHits_;
 
+  BamTools::BamRegion region_;
   std::vector<MEHead> headContigs_;
   std::vector<polyTail> tailContigs_;
   std::vector<BamTools::BamAlignment> unknownContigs_;
 
+  void setRegion();
   void printGroupedContigHits();
   bool checkContigForTail(const BamTools::BamAlignment &);
   void classifyContig(const std::pair<BamTools::BamAlignment, MEHit> &);
+  void checkForNullTail();
+
 
 
 };

@@ -59,6 +59,16 @@ void clipCoords::printCoords(){
 	    << clipDir_ << ", clippedSeq_ : " << clippedSeq_ << std::endl; 
 }
 
+clipCoords::clipCoords(){
+  refID_ = -1;
+  leftPos_ = -1;
+  rightPos_ = -1;
+  globalOffset_ = -1;
+  clipDir_ = ltr;
+  clippedSeq_ = "Null";
+  clipIndex_ = -1;
+}
+
 clipCoords::clipCoords(const BamTools::BamAlignment & al) : al_(al){
   clipCoords::setCoords();
   //clipCoords::printCoords();

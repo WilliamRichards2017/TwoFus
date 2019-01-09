@@ -32,35 +32,15 @@ bool MEHead::mapReadToMEHead(const BamTools::BamAlignment & al){
 
 void MEHead::findSupportingReads(){
 
-  BamTools::BamReader reader;
+  BamTools::BamReader reader = util::openBamFile(i_.probandBamPath_);
   BamTools::BamAlignment al;
 
-  if(!reader.Open(i_.probandBamPath_)){
-    std::cout << "could not open probandBamPath_ in MEHead::findSupportingReads() for " << i_.probandBamPath_ << std::endl;
-    std::cout << "Exiting run with non-zero status..." << std::endl;
-    reader.Close();
-    exit (EXIT_FAILURE);
-  }
-
-  reader.LocateIndex();
-
-  if(!reader.HasIndex()){
-    std::cout << "Index for " << i_.probandBamPath_ << " could not be opened in MEHead::findSupportingReads()" << std::endl;
-    std::cout << "Exiting run with non-zero status.." << std::endl;
-    reader.Close();
-    exit (EXIT_FAILURE);
-  }
-
-  BamTools::BamRegion region = BamTools::BamRegion(clipCoords_.refID_, clipCoords_.leftPos_+clipCoords_.globalOffset_ -100, clipCoords_.refID_, clipCoords_.rightPos_+clipCoords_.globalOffset_+100);
+  BamTools::BamRegion region = BamTools::BamRegion(clipCoords_.refID_, clipCoords_.leftPos_+clipCoords_.globalOffset_ -100,
+						   clipCoords_.refID_, clipCoords_.rightPos_+clipCoords_.globalOffset_+100);
   
-
-  //  std::cout << "clipCoords for contig_: " << contig_.Name << " is: " << clipCoords_.refID_ << ':' << clipCoords_.leftPos_+clipCoords_.globalOffset_ 
-  //	    << '-' << clipCoords_.rightPos_+clipCoords_.globalOffset_ << std::endl;
-
-  // std::cout << "clippedSeq for contig_: " << contig_.Name << " is: " << clipCoords_.clippedSeq_ << std::endl;
-
   if(!reader.SetRegion(region)){
-    std::cout << "could not set region for coords: " <<clipCoords_.refID_ << ": " << clipCoords_.leftPos_+clipCoords_.globalOffset_ << '-' << clipCoords_.rightPos_+clipCoords_.globalOffset_ << std::endl;
+    std::cout << "could not set region for coords: " << clipCoords_.refID_ << ": " << clipCoords_.leftPos_+clipCoords_.globalOffset_ 
+	      << '-' << clipCoords_.rightPos_+clipCoords_.globalOffset_ << std::endl;
   }
 
   while(reader.GetNextAlignment(al)){
@@ -75,16 +55,11 @@ void MEHead::findSupportingReads(){
 
     }
   }
-
   reader.Close();
 }
 
 MEHead::MEHead(const std::pair<BamTools::BamAlignment, MEHit> & contigHit, const input & i) : contig_(contigHit.first), clipCoords_({contig_}), MEHit_(contigHit.second), i_(i){
   MEHead::findSupportingReads();
-
-  //std::cout  << "DS_.forwardStrand is: " << DS_.forwardStrand << std::endl;
-  //std::cout << "DS_.reverseStrand is: " << DS_.reverseStrand << std::endl;
-  std::cout << "supportingMEHeadReads_.size() is: " << supportingReads_.size() << std::endl;
 }
 
 MEHead::~MEHead(){
