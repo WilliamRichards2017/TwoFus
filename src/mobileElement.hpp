@@ -20,6 +20,9 @@ class mobileElement{
 public:
   mobileElement(const std::vector<std::pair<BamTools::BamAlignment, MEHit> > &, const input & i);
   ~mobileElement();
+
+  std::vector<MEHead> & getHeadContigs();
+  std::vector<polyTail> & getTailContigs();
   
 private:
   int32_t tailSize_ = 10;

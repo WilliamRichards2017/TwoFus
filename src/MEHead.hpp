@@ -20,6 +20,9 @@ public:
   MEHead(const std::pair<BamTools::BamAlignment, MEHit> &, const input & i);
   ~MEHead();
 
+  MEHit & getMEHit();
+  BamTools::BamAlignment & getContig();
+
 private:
 
   input i_;

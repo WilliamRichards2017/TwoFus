@@ -18,6 +18,7 @@ add_library(twofus_core STATIC
 	polyTail.cpp
 	mobileElement.cpp
 	contigs.cpp
+	vcfWriter.cpp
 )
 
 SET(CORE_LIB twofus_core CACHE STRING "")

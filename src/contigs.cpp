@@ -14,6 +14,7 @@
 #include "input.hpp"
 #include "mobileElement.hpp"
 #include "util.hpp"
+#include "vcfWriter.hpp"
 
 
 KSEQ_INIT(gzFile, gzread)
@@ -142,25 +143,21 @@ bool contigs::vecHasAlignment(const std::vector<std::pair<BamTools::BamAlignment
 void contigs::findMobileElementContigs(){
   contigs::alignContigsToMEList();
   
-  int count = 0;
-
-  
   for(const auto & g : groupedContigsVec_){
     std::vector<std::pair<BamTools::BamAlignment, MEHit> > alignedContigs;
     for(const auto & c: g){
       alignedContigs.push_back(contigs::getMEAlignment(c));
     }
     if(contigs::vecHasAlignment(alignedContigs)){
-      std::cout << "Found contig alignment in alignedContigVec containing contigs: ";
+      //std::cout << "Found contig alignment in alignedContigVec containing contigs: ";
       for(const auto & c : alignedContigs){
 	std::cout << c.first.Name << ", ";
       }
       std::cout << std::endl;
       mobileElement ME = {alignedContigs, i_};
-      ++count;
+      vcfWriter writer = {ME, i_};
     }
   }
-  // std::cout << "found :" << count << "contigs aligning to ME list with split reads" << std::endl;
 }
 
 void contigs::findTranslocationContigs(){
@@ -205,7 +202,7 @@ void contigs::groupNearbyContigs(){
 
       previousContig = nextContig;
       ++i; // Dont double count contig thats in a single and double grouping
-      std::cout << "Double contig grouping for contig " << currentContig.Name << std::endl;
+      //std::cout << "Double contig grouping for contig " << currentContig.Name << std::endl;
     }
     //case 3
     else if(contigs::isNearby(previousContig, currentContig) and contigs::isNearby(currentContig, nextContig)){
@@ -220,7 +217,7 @@ void contigs::groupNearbyContigs(){
       
       previousContig = nextContig;
       ++i; //avoid double counting contigs
-      std::cout << "Triple contig grouping for contig " << currentContig.Name << std::endl;
+      //std::cout << "Triple contig grouping for contig " << currentContig.Name << std::endl;
     }
     else{
       std::cerr << "Warning: unhandled case in contigs::groupNearbyContigs()" << std::endl;

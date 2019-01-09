@@ -6,6 +6,14 @@
 #include "input.hpp"
 #include "util.hpp"
 
+MEHit & MEHead::getMEHit(){
+  return MEHit_;
+}
+
+BamTools::BamAlignment & MEHead::getContig(){
+  return contig_;
+}
+
 bool MEHead::mapReadToMEHead(const BamTools::BamAlignment & al){
 
   // std::cout << "getting read clips for al.Name: " << al.Name << " at position: " << al.RefID << ':' << al.Position << '-' << al.GetEndPosition() << std::endl;

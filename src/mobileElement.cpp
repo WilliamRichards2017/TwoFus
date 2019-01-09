@@ -4,6 +4,14 @@
 #include "util.hpp"
 
 
+std::vector<MEHead> & mobileElement::getHeadContigs(){
+  return headContigs_;
+}
+
+std::vector<polyTail> & mobileElement::getTailContigs(){
+  return tailContigs_;
+}
+
 bool mobileElement::checkContigForTail(const BamTools::BamAlignment & al){
   std::cout << "checking contig: " << al.Name << " for polyTail" << std::endl;
   std::string aStr = std::string(tailSize_, 'A');
