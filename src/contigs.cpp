@@ -151,20 +151,26 @@ void contigs::findMobileElementContigs(){
       alignedContigs.push_back(contigs::getMEAlignment(c));
     }
     if(contigs::vecHasAlignment(alignedContigs)){
+      std::cout << "Found contig alignment in alignedContigVec containing contigs: ";
+      for(const auto & c : alignedContigs){
+	std::cout << c.first.Name << ", ";
+      }
+      std::cout << std::endl;
       mobileElement ME = {alignedContigs, i_};
       ++count;
     }
   }
-  std::cout << "found :" << count << "contigs aligning to ME list with split reads" << std::endl;
+  // std::cout << "found :" << count << "contigs aligning to ME list with split reads" << std::endl;
 }
 
 void contigs::findTranslocationContigs(){
 }
 
 bool contigs::isNearby(const BamTools::BamAlignment & al1, const BamTools::BamAlignment & al2){
-  int32_t maxDist = 100;
+  int32_t maxDist = 1000;
 
   if(al1.RefID == al2.RefID and std::abs(al1.Position-al2.Position) < maxDist){
+    std::cout << "Found Nearby contigs at: " << al1.RefID << ':' << al1.Position << '-' << al1.GetEndPosition() << std::endl;
     return true;
   }
   return false;
@@ -189,6 +195,7 @@ void contigs::groupNearbyContigs(){
       groupedContigsVec_.push_back(g);
       
       previousContig = currentContig;
+      //std::cout << "No contig grouping for contig " << currentContig.Name << std::endl;
     }
     //Case 2 - Current and Next only group
     else if(!contigs::isNearby(previousContig, currentContig) and contigs::isNearby(currentContig, nextContig)){
@@ -198,6 +205,7 @@ void contigs::groupNearbyContigs(){
 
       previousContig = nextContig;
       ++i; // Dont double count contig thats in a single and double grouping
+      std::cout << "Double contig grouping for contig " << currentContig.Name << std::endl;
     }
     //case 3
     else if(contigs::isNearby(previousContig, currentContig) and contigs::isNearby(currentContig, nextContig)){
@@ -212,9 +220,13 @@ void contigs::groupNearbyContigs(){
       
       previousContig = nextContig;
       ++i; //avoid double counting contigs
+      std::cout << "Triple contig grouping for contig " << currentContig.Name << std::endl;
     }
     else{
       std::cerr << "Warning: unhandled case in contigs::groupNearbyContigs()" << std::endl;
+      std::cout << "PreviousContig coords: " << previousContig.RefID << ':' << previousContig.Position << '-' << previousContig.GetEndPosition() << std::endl;
+      std::cout << "CurrentContig coords: " << currentContig.RefID << ':' << currentContig.Position << '-' << currentContig.GetEndPosition() << std::endl;
+      std::cout << "NextContig coords: " << nextContig.RefID << ':' << nextContig.Position << '-' << nextContig.GetEndPosition() << std::endl;
     }
   }
 }

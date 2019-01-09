@@ -7,6 +7,7 @@ class util{
   
 public:
   static const bool fileExists(const std::string &); 
+  static const bool isReadLeftBound(const std::vector<BamTools::CigarOp> &);
   static const std::vector<std::string> getClipSeqs(const BamTools::BamAlignment &);
   static const std::vector<int32_t> getInsertionVec(const BamTools::BamAlignment &);
 

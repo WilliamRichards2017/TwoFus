@@ -14,8 +14,8 @@ bool MEHead::mapReadToMEHead(const BamTools::BamAlignment & al){
 
   for(const auto & c : readClips){
     if(c.substr(0, minHeadSize_).compare(clipCoords_.clippedSeq_.substr(0, minHeadSize_)) == 0){
-	std::cout << "comparing: " << c.substr(0, minHeadSize_) << " to clipped seq: " << clipCoords_.clippedSeq_.substr(0, minHeadSize_) << std::endl;
-	std::cout << "Found read mapping to MEHead" << std::endl;
+      //std::cout << "comparing: " << c.substr(0, minHeadSize_) << " to clipped seq: " << clipCoords_.clippedSeq_.substr(0, minHeadSize_) << std::endl;
+      //	std::cout << "Found read mapping to MEHead" << std::endl;
 	return true;
       }
   }
@@ -37,7 +37,7 @@ void MEHead::findSupportingReads(){
   reader.LocateIndex();
 
   if(!reader.HasIndex()){
-    std::cout << "Index for " << i_.probandBamPath_ << "could not be opened in contigAlignmnet::populateTails()" << std::endl;
+    std::cout << "Index for " << i_.probandBamPath_ << " could not be opened in MEHead::findSupportingReads()" << std::endl;
     std::cout << "Exiting run with non-zero status.." << std::endl;
     reader.Close();
     exit (EXIT_FAILURE);
@@ -74,9 +74,9 @@ void MEHead::findSupportingReads(){
 MEHead::MEHead(const std::pair<BamTools::BamAlignment, MEHit> & contigHit, const input & i) : contig_(contigHit.first), clipCoords_({contig_}), MEHit_(contigHit.second), i_(i){
   MEHead::findSupportingReads();
 
-  std::cout  << "DS_.forwardStrand is: " << DS_.forwardStrand << std::endl;
-  std::cout << "DS_.reverseStrand is: " << DS_.reverseStrand << std::endl;
-  std::cout << "supportingReads_.size() is: " << supportingReads_.size() << std::endl;
+  //std::cout  << "DS_.forwardStrand is: " << DS_.forwardStrand << std::endl;
+  //std::cout << "DS_.reverseStrand is: " << DS_.reverseStrand << std::endl;
+  std::cout << "supportingMEHeadReads_.size() is: " << supportingReads_.size() << std::endl;
 }
 
 MEHead::~MEHead(){

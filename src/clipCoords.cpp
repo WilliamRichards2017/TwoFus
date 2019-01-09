@@ -40,7 +40,7 @@ void clipCoords::setCoords(){
   globalOffset_ = genomePositions[clipIndex_]-readPositions[clipIndex_];
   refID_ = al_.RefID;
 
-  
+  /*
   std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
   std::cout << "clipCoords al_.Name is: " << al_.Name << std::endl;
   std::cout << "clipIndex_ is: " << clipIndex_ << std::endl;
@@ -48,6 +48,7 @@ void clipCoords::setCoords(){
   std::cout << "insertionVec[clipIndex_] is: " << insertionVec[clipIndex_] << std::endl;
   std::cout << "clipSizes[clipIndex_] is: " << clipSizes[clipIndex_] << std::endl;
   std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+  */
 
   clippedSeq_ = al_.QueryBases.substr(readPositions[clipIndex_]+insertionVec[clipIndex_], clipSizes[clipIndex_]);  
 }
