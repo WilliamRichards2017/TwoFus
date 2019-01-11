@@ -102,11 +102,11 @@ bool polyTail::mapReadToTail(const BamTools::BamAlignment & al){
 }
 
 
-polyTail::polyTail(const BamTools::BamRegion & region, const input & i) : region_(region), i_(i) {
+polyTail::polyTail(const BamTools::BamRegion & region, const input & i) : region_(region), i_(i), contigCount_(0) {
   polyTail::findSupportingReadsForRegion();
 }
 
-polyTail::polyTail(const BamTools::BamAlignment & contig, const input & i) : contig_(contig), i_(i), clipCoords_({contig_}){
+polyTail::polyTail(const BamTools::BamAlignment & contig, const input & i) : contig_(contig), i_(i), clipCoords_({contig_}), contigCount_(1){
     polyTail::findSupportingReadsForContig();
 }
 

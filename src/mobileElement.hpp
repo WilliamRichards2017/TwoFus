@@ -23,9 +23,11 @@ public:
 
   std::vector<MEHead> & getHeadContigs();
   std::vector<polyTail> & getTailContigs();
+  int32_t getTailContigCount();
   
 private:
   int32_t tailSize_ = 10;
+  int32_t tailContigCount_ = 0;
   input i_;
   std::vector<std::pair<BamTools::BamAlignment, MEHit> > groupedContigHits_;
 
@@ -39,6 +41,7 @@ private:
   bool checkContigForTail(const BamTools::BamAlignment &);
   void classifyContig(const std::pair<BamTools::BamAlignment, MEHit> &);
   void checkForNullTail();
+  void sumTailContigCount();
 
 
 

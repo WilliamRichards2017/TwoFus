@@ -12,6 +12,17 @@ std::vector<polyTail> & mobileElement::getTailContigs(){
   return tailContigs_;
 }
 
+int32_t mobileElement::getTailContigCount(){
+  return tailContigCount_;
+}
+
+void mobileElement::sumTailContigCount(){
+  for(const auto & tc : tailContigs_){
+    tailContigCount_ += tc.contigCount_;
+  }
+}
+
+
 void mobileElement::setRegion(){
   BamTools::BamAlignment firstContig = groupedContigHits_.front().first;
   region_ = {firstContig.RefID, firstContig.Position-100, firstContig.RefID, firstContig.GetEndPosition()+100};
@@ -70,6 +81,7 @@ mobileElement::mobileElement(const std::vector<std::pair<BamTools::BamAlignment,
   }
 
   mobileElement::checkForNullTail();
+  mobileElement::sumTailContigCount();
 
 }
 

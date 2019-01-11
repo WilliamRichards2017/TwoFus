@@ -14,6 +14,7 @@ public:
   polyTail(const BamTools::BamAlignment &, const input &);
   ~polyTail();
 
+  int32_t contigCount_;
 private:
   
   void findSupportingReadsForContig();

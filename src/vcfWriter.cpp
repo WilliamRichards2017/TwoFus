@@ -10,8 +10,13 @@
 void vcfWriter::printVCFLine(){
   std::cout << "~~~~~~~~~~~~~~PRINTING VCF LINE~~~~~~~~~~~~~~~~~~" << std::endl;
   std::cout << vcfLine_.CHROM << '\t' << vcfLine_.POS << '\t'  << vcfLine_.ID << '\t' << vcfLine_.REF << '\t' << vcfLine_.ALT
-	    << '\t' << vcfLine_.QUAL << '\t';
+	    << '\t' << vcfLine_.QUAL << '\t' << "NHC=" << vcfLine_.INFO.NHC << ";NTC=" << vcfLine_.INFO.NTC;
   std::cout << std::endl << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+}
+
+void vcfWriter::populateMEInfoField(){
+  vcfLine_.INFO.NHC = ME_.getHeadContigs().size();
+  vcfLine_.INFO.NTC = ME_.getTailContigCount();
 }
 
 void vcfWriter::populateMELine(){
@@ -21,6 +26,8 @@ void vcfWriter::populateMELine(){
   vcfLine_.REF = "N";
   vcfLine_.ALT = "ME:"+ME_.getHeadContigs().front().getMEHit().first;
   vcfLine_.QUAL = ME_.getHeadContigs().front().getMEHit().second;
+  
+  vcfWriter::populateMEInfoField();
 }
 
 
