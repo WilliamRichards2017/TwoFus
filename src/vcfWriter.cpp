@@ -10,13 +10,17 @@
 void vcfWriter::printVCFLine(){
   std::cout << "~~~~~~~~~~~~~~PRINTING VCF LINE~~~~~~~~~~~~~~~~~~" << std::endl;
   std::cout << vcfLine_.CHROM << '\t' << vcfLine_.POS << '\t'  << vcfLine_.ID << '\t' << vcfLine_.REF << '\t' << vcfLine_.ALT
-	    << '\t' << vcfLine_.QUAL << '\t' << "NHC=" << vcfLine_.INFO.NHC << ";NTC=" << vcfLine_.INFO.NTC;
+	    << '\t' << vcfLine_.QUAL << '\t' << "NHC=" << vcfLine_.INFO.NHC << ";NTC=" << vcfLine_.INFO.NTC << ";NHR=" << vcfLine_.INFO.NHR << ";NTR" << vcfLine_.INFO.NTR;
   std::cout << std::endl << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
 }
 
+
+//TODO: write function to find head contig and tail contig with max Support
 void vcfWriter::populateMEInfoField(){
   vcfLine_.INFO.NHC = ME_.getHeadContigs().size();
   vcfLine_.INFO.NTC = ME_.getTailContigCount();
+  vcfLine_.INFO.NHR = ME_.getHeadContigs().front().getSupportingReads().size();
+  vcfLine_.INFO.NTR = ME_.getTailContigs().front().getSupportingReads().size();
 }
 
 void vcfWriter::populateMELine(){

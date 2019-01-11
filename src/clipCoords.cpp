@@ -51,8 +51,13 @@ void clipCoords::setCoords(){
   std::cout << "clipSizes[clipIndex_] is: " << clipSizes[clipIndex_] << std::endl;
   std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
   */
-
-  clippedSeq_ = al_.QueryBases.substr(readPositions[clipIndex_]+insertionVec[clipIndex_], clipSizes[clipIndex_]);  
+  
+  if(util::isReadLeftBound(al_.CigarData)){
+    clippedSeq_ = al_.QueryBases.substr(0, clipSizes[clipIndex_]);
+  }
+  else{
+    clippedSeq_ = al_.QueryBases.substr(readPositions[clipIndex_]+insertionVec[clipIndex_], clipSizes[clipIndex_]);
+  }
 }
 
 void clipCoords::printCoords(){

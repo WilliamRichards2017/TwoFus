@@ -22,6 +22,7 @@ public:
 
   MEHit & getMEHit();
   BamTools::BamAlignment & getContig();
+  const std::vector<BamTools::BamAlignment> & getSupportingReads();
 
 private:
 

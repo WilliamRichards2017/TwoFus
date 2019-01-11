@@ -5,6 +5,9 @@
 #include "clipCoords.hpp"
 #include "util.hpp"
 
+const std::vector<BamTools::BamAlignment> & polyTail::getSupportingReads(){
+  return supportingReads_;
+}
 
 bool polyTail::readHasTail(const BamTools::BamAlignment & al){
   std::string aStr = std::string(minTailSize_, 'A');
@@ -56,7 +59,7 @@ void polyTail::findSupportingReadsForRegion(){
     std::cout << "Could not set region to " << region_.LeftRefID << ':' << region_.LeftPosition << '-' << region_.RightPosition << std::endl;
   }
 
-  std::cout << "Region in polyTail::findSupportingReads is: " << region_.LeftRefID << ':' << region_.LeftPosition << '-' << region_.RightPosition << std::endl;
+  //std::cout << "Region in polyTail::findSupportingReads is: " << region_.LeftRefID << ':' << region_.LeftPosition << '-' << region_.RightPosition << std::endl;
 
   while(reader.GetNextAlignment(al)){
     if(polyTail::readHasTail(al)){
@@ -80,20 +83,26 @@ void polyTail::findSupportingReadsForContig(){
     std::cout << "could not set region for coords: " <<clipCoords_.refID_ << ": " << clipCoords_.leftPos_+clipCoords_.globalOffset_ 
 	      << '-' << clipCoords_.rightPos_+clipCoords_.globalOffset_ << std::endl;
   }
+
+
+  std::cout << "Region in polyTail::findSupportingReadsForContig() is: " << region.LeftRefID << ':' << region.LeftPosition << '-' << region.RightPosition << std::endl;
   
   while(reader.GetNextAlignment(al)){
     if(polyTail::mapReadToTail(al)){
       supportingReads_.push_back(al);
     }
   }
+  std::cout << "allTails_.size() is " << allTails_.size() << std::endl;
 }
 
 bool polyTail::mapReadToTail(const BamTools::BamAlignment & al){
   const std::vector<std::string> readClips = util::getClipSeqs(al);
 
   for(const auto & c : readClips){
+    std::cout << "polyTail contig clipped seq is: " << clipCoords_.clippedSeq_ << std::endl;
+    std::cout << "comparing: " << c.substr(0, minTailSize_) << "to clipped seq: " << clipCoords_.clippedSeq_.substr(0, minTailSize_) << std::endl;
     if(c.substr(0, minTailSize_).compare(clipCoords_.clippedSeq_.substr(0, minTailSize_)) == 0){
-      std::cout << "comparing: " << c.substr(0, minTailSize_) << "to clipped seq: " << clipCoords_.clippedSeq_.substr(0, minTailSize_) << std::endl;
+
       std::cout << "Found read mapping to polyTail" << std::endl;
       return true;
     }

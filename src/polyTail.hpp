@@ -14,6 +14,7 @@ public:
   polyTail(const BamTools::BamAlignment &, const input &);
   ~polyTail();
 
+  const std::vector<BamTools::BamAlignment> & getSupportingReads();
   int32_t contigCount_;
 private:
   

@@ -14,6 +14,10 @@ BamTools::BamAlignment & MEHead::getContig(){
   return contig_;
 }
 
+const std::vector<BamTools::BamAlignment> & MEHead::getSupportingReads(){
+  return supportingReads_;
+}
+
 bool MEHead::mapReadToMEHead(const BamTools::BamAlignment & al){
 
   // std::cout << "getting read clips for al.Name: " << al.Name << " at position: " << al.RefID << ':' << al.Position << '-' << al.GetEndPosition() << std::endl;
