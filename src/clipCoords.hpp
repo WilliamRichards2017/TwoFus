@@ -19,6 +19,7 @@ public:
   int32_t refID_;
   int32_t leftPos_;
   int32_t rightPos_;
+  int32_t breakPoint_;
   int32_t globalOffset_;
   direction clipDir_;
 

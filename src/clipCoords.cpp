@@ -30,12 +30,14 @@ void clipCoords::setCoords(){
     clipDir_ = rtl;
     leftPos_ = 0;
     rightPos_ = readPositions[clipIndex_] + insertionVec[clipIndex_];
+    breakPoint_ = rightPos_;
 
   }
   else{
     clipDir_ = ltr;
     leftPos_ = readPositions[clipIndex_] + insertionVec[clipIndex_];
     rightPos_ = leftPos_ + clipSizes[clipIndex_];
+    breakPoint_ = leftPos_;
   }
   globalOffset_ = genomePositions[clipIndex_]-readPositions[clipIndex_];
   refID_ = al_.RefID;
