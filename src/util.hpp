@@ -6,6 +6,7 @@
 class util{
   
 public:
+  static std::vector<BamTools::RefData> populateRefData(const std::string &);
   static const std::vector<std::string> split(const std::string &, const char delim);
   static const float calculateStrandBiasFromContigName(const std::string &);
   static const bool fileExists(const std::string &); 

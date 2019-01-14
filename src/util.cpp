@@ -6,6 +6,12 @@
 
 #include "util.hpp"
 
+
+std::vector<BamTools::RefData> util::populateRefData(const std::string & bamPath){
+  BamTools::BamReader reader = util::openBamFile(bamPath);
+  return reader.GetReferenceData();
+}
+
 const std::vector<std::string> util::split(const std::string & line, const char delim)
 {
   std::vector<std::string> tokens;
