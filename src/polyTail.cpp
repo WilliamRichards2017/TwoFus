@@ -42,7 +42,7 @@ void polyTail::findConsensusTails(){
 
   std::cout << "breakPointMode is: " << breakPointMode << std::endl;
 
-  for(const auto & t : allTails_){
+  for(auto & t : allTails_){
     clipCoords cc = {t};
     if(cc.breakPoint_+cc.globalOffset_ == breakPointMode){
       supportingReads_.push_back(t);
@@ -110,6 +110,19 @@ bool polyTail::mapReadToTail(const BamTools::BamAlignment & al){
   return false;
 }
 
+polyTail::polyTail(){
+}
+
+polyTail::polyTail(const polyTail & tail){
+  contigCount_ = tail.contigCount_;
+  i_ = tail.i_;
+  minTailSize_ = tail.minTailSize_;
+  contig_ = tail.contig_;
+  region_ = tail.region_;
+  allTails_ = tail.allTails_;
+  supportingReads_ = tail.supportingReads_;
+  clipCoords_ = tail.clipCoords_;
+}
 
 polyTail::polyTail(const BamTools::BamRegion & region, const input & i) : region_(region), i_(i), contigCount_(0) {
   polyTail::findSupportingReadsForRegion();

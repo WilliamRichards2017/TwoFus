@@ -10,6 +10,8 @@
 class polyTail{
 
 public:
+  polyTail();
+  polyTail(const polyTail &);
   polyTail(const BamTools::BamRegion &, const input &);
   polyTail(const BamTools::BamAlignment &, const input &);
   ~polyTail();

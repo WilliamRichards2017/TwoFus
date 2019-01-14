@@ -16,6 +16,39 @@ int32_t mobileElement::getTailContigCount(){
   return tailContigCount_;
 }
 
+int32_t mobileElement::getLongestTail(){
+  return longestTail_;
+}
+
+
+//TODO: implement
+void mobileElement::findLongestTail(){
+}
+
+void mobileElement::findHeadWithMostSupport(){
+  int32_t max = 0;
+  for(auto & h : headContigs_){
+    if(h.getSupportingReads().size() > max){
+      max = h.getSupportingReads().size();
+      mostSupportedHead_ =  h;
+    }
+  }
+  std::cout << "mostSupportedHead has number of supporting reads: " << max << std::endl;
+}
+
+void mobileElement::findTailWithMostSupport(){
+  polyTail mostSupportedTail;
+  int32_t max = 0;
+
+  for(const auto & t : tailContigs_){
+    if(t.getSupportingReads().size() > max){
+      max = t.getSupportingReads().size();
+      mostSupportedTail_ = t;
+    }
+  }
+  std::cout << "mostSupportedTail has number of supporting reads: " << max << std::endl;
+}
+
 void mobileElement::sumTailContigCount(){
   for(const auto & tc : tailContigs_){
     tailContigCount_ += tc.contigCount_;
@@ -73,6 +106,9 @@ void mobileElement::printGroupedContigHits(){
   std::cout << std::endl;
 }
 
+mobileElement::mobileElement(){
+}
+
 mobileElement::mobileElement(const std::vector<std::pair<BamTools::BamAlignment, MEHit> > & groupedContigHits, const input & i) : groupedContigHits_(groupedContigHits), i_(i){
 
   mobileElement::setRegion();
@@ -82,6 +118,10 @@ mobileElement::mobileElement(const std::vector<std::pair<BamTools::BamAlignment,
 
   mobileElement::checkForNullTail();
   mobileElement::sumTailContigCount();
+  
+  mobileElement::findHeadWithMostSupport();
+  mobileElement::findTailWithMostSupport();
+  
 
 }
 

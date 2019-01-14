@@ -17,6 +17,8 @@ struct DS{
 class MEHead{
 
 public:
+  MEHead();
+  MEHead(const MEHead &);
   MEHead(const std::pair<BamTools::BamAlignment, MEHit> &, const input & i);
   ~MEHead();
 

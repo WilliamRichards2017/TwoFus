@@ -62,6 +62,19 @@ void MEHead::findSupportingReads(){
   reader.Close();
 }
 
+MEHead::MEHead(){
+}
+
+MEHead::MEHead(const MEHead & ME){
+  i_ = ME.i_;
+  minHeadSize_ = ME.minHeadSize_;
+  supportingReads_ = ME.supportingReads_;
+  contig_ = ME.contig_;
+  clipCoords_ = ME.clipCoords_;
+  MEHit_ = ME.MEHit_;
+  DS_ = ME.DS_;
+}
+
 MEHead::MEHead(const std::pair<BamTools::BamAlignment, MEHit> & contigHit, const input & i) : contig_(contigHit.first), clipCoords_({contig_}), MEHit_(contigHit.second), i_(i){
   MEHead::findSupportingReads();
 }

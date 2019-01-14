@@ -7,7 +7,9 @@
 class input{
 
  public:
-  input(const int, char **);
+  input();
+  input(const input &);
+  input(int, char **);
   ~input();
 
   std::string probandBamPath_;
@@ -25,7 +27,7 @@ class input{
 
  private:
   
-  const int argc_;
+  int argc_;
   char ** argv_;
 
   void parseArgs();

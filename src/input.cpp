@@ -5,7 +5,22 @@
 
 #include "input.hpp"
 
-input::input(const int argc, char ** argv) : argc_(argc), argv_(argv){
+input::input(){
+}
+
+input::input(const input & i){
+  probandBamPath_ = i.probandBamPath_;
+  contigFastqPath_ = i.contigFastqPath_;
+  contigBamPath_ = i.contigBamPath_;
+  mobileElementFastaPath_ = i.mobileElementFastaPath_;
+  mobileElementIndexPath_ = i.mobileElementIndexPath_;
+  referencePath_ = i.referencePath_;
+  referenceIndexPath_ = i.referenceIndexPath_;
+  vcfOutPath_ = i.vcfOutPath_;
+  parentBamPaths_ = i.parentBamPaths_;
+}
+
+input::input(int argc, char ** argv) : argc_(argc), argv_(argv){
   if(argc_ < 4){
     std::cout << "Failed to provide the minimum number of arguments (3)" << std::endl;
     std::cout << "Exiting run with non-zero exit status, please provide the proper number of arguments" << std::endl;
