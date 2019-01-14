@@ -26,9 +26,11 @@ public:
   std::vector<polyTail> & getTailContigs();
   int32_t getTailContigCount();
   int32_t getLongestTail();
+  float getStrandBias();
   
 private:
   int32_t tailSize_ = 10;
+  float strandBias_ = 0.0;
   int32_t tailContigCount_ = 0;
   int32_t longestTail_ = 0;
   input i_;
@@ -51,6 +53,7 @@ private:
   void classifyContig(const std::pair<BamTools::BamAlignment, MEHit> &);
   void checkForNullTail();
   void sumTailContigCount();
+  void calculateStrandBias();
   //TODO: implement
   void findLongestTail();
 

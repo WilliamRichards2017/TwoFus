@@ -6,6 +6,8 @@
 class util{
   
 public:
+  static const std::vector<std::string> split(const std::string &, const char delim);
+  static const float calculateStrandBiasFromContigName(const std::string &);
   static const bool fileExists(const std::string &); 
   static const bool isReadLeftBound(const std::vector<BamTools::CigarOp> &);
   static const std::vector<std::string> getClipSeqs(const BamTools::BamAlignment &);

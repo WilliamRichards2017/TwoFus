@@ -20,19 +20,27 @@ int32_t mobileElement::getLongestTail(){
   return longestTail_;
 }
 
+float mobileElement::getStrandBias(){
+  return strandBias_;
+}
 
 //TODO: implement
 void mobileElement::findLongestTail(){
 }
 
+void mobileElement::calculateStrandBias(){
+  strandBias_ =  util::calculateStrandBiasFromContigName(mostSupportedHead_.getContig().Name);
+}
+
 void mobileElement::findHeadWithMostSupport(){
   int32_t max = 0;
   for(auto & h : headContigs_){
-    if(h.getSupportingReads().size() > max){
+    if(h.getSupportingReads().size() >= max){
       max = h.getSupportingReads().size();
       mostSupportedHead_ =  h;
     }
   }
+  
   std::cout << "mostSupportedHead has number of supporting reads: " << max << std::endl;
 }
 
@@ -40,7 +48,7 @@ void mobileElement::findTailWithMostSupport(){
   polyTail mostSupportedTail;
   int32_t max = 0;
 
-  for(const auto & t : tailContigs_){
+  for(auto & t : tailContigs_){
     if(t.getSupportingReads().size() > max){
       max = t.getSupportingReads().size();
       mostSupportedTail_ = t;
@@ -121,8 +129,8 @@ mobileElement::mobileElement(const std::vector<std::pair<BamTools::BamAlignment,
   
   mobileElement::findHeadWithMostSupport();
   mobileElement::findTailWithMostSupport();
+  mobileElement::calculateStrandBias();
   
-
 }
 
 mobileElement::~mobileElement(){

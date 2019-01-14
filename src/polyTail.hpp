@@ -25,9 +25,11 @@ private:
   bool mapReadToTail(const BamTools::BamAlignment &);
   bool readHasTail(const BamTools::BamAlignment &);
   void findConsensusTails();
+  void findLongestTail();
 
   input i_;
   int32_t minTailSize_ = 10;
+  int32_t longestTail = 0;
   BamTools::BamAlignment contig_;
   BamTools::BamRegion region_;
   std::vector<BamTools::BamAlignment> allTails_;

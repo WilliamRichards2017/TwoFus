@@ -6,9 +6,37 @@
 
 #include "util.hpp"
 
+const std::vector<std::string> util::split(const std::string & line, const char delim)
+{
+  std::vector<std::string> tokens;
+  std::stringstream lineStream(line);
+  std::string token;
+  while(getline(lineStream, token, delim)){
+    tokens.push_back(token);
+  }
+  return tokens;
+}
+
+const float util::calculateStrandBiasFromContigName(const std::string & contigName){
+
+  std::cout << "Calculating strand bias from contigName: " << contigName << std::endl;
+  std::vector<std::string> tokenizedName = util::split(contigName, ':');
+
+  std::pair<std::pair<int32_t, int32_t>, float> f;
+
+  if(tokenizedName.size() > 2){
+    f.first = std::make_pair(std::atoi(tokenizedName[1].c_str()), std::atoi(tokenizedName[2].c_str()));
+    f.second = float(f.first.first)/(float(f.first.first) + float(f.first.second));
+
+    std::cout << "Calculating strand bias to be : " << f.second << std::endl;
+  }
+
+  return f.second;
+}
+
 BamTools::BamReader util::openBamFile(const std::string & bamPath){
 
-  BamTools::BamReader reader;
+  BamTools::BamReader reader;  
 
   if(!reader.Open(bamPath)){
     std::cout << "could not open bamPath " << bamPath << std::endl;
