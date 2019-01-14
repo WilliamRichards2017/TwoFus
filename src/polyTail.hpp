@@ -17,6 +17,7 @@ public:
   ~polyTail();
 
   const std::vector<BamTools::BamAlignment> & getSupportingReads();
+  const int32_t getLongestTail();
   int32_t contigCount_;
 private:
   
@@ -26,10 +27,11 @@ private:
   bool readHasTail(const BamTools::BamAlignment &);
   void findConsensusTails();
   void findLongestTail();
+  int32_t calculateTailLength(const BamTools::BamAlignment &);
 
   input i_;
   int32_t minTailSize_ = 10;
-  int32_t longestTail = 0;
+  int32_t longestTail_ = 0;
   BamTools::BamAlignment contig_;
   BamTools::BamRegion region_;
   std::vector<BamTools::BamAlignment> allTails_;

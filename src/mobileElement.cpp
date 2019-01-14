@@ -12,20 +12,16 @@ std::vector<polyTail> & mobileElement::getTailContigs(){
   return tailContigs_;
 }
 
-int32_t mobileElement::getTailContigCount(){
+int32_t & mobileElement::getTailContigCount(){
   return tailContigCount_;
 }
 
-int32_t mobileElement::getLongestTail(){
-  return longestTail_;
-}
-
-float mobileElement::getStrandBias(){
+float & mobileElement::getStrandBias(){
   return strandBias_;
 }
 
-//TODO: implement
-void mobileElement::findLongestTail(){
+polyTail & mobileElement::getMostSupportedTail(){
+  return mostSupportedTail_;
 }
 
 void mobileElement::calculateStrandBias(){

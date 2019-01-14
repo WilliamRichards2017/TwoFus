@@ -10,7 +10,7 @@
 void vcfWriter::printVCFLine(){
   std::cout << "~~~~~~~~~~~~~~PRINTING VCF LINE~~~~~~~~~~~~~~~~~~" << std::endl;
   std::cout << vcfLine_.CHROM << '\t' << vcfLine_.POS << '\t'  << vcfLine_.ID << '\t' << vcfLine_.REF << '\t' << vcfLine_.ALT
-	    << '\t' << vcfLine_.QUAL << '\t' << "NHC=" << vcfLine_.INFO.NHC << ";NTC=" << vcfLine_.INFO.NTC << ";NHR=" << vcfLine_.INFO.NHR << ";NTR" << vcfLine_.INFO.NTR << ";SB=" << vcfLine_.INFO.SB << std::endl;
+	    << '\t' << vcfLine_.QUAL << '\t' << "NHC=" << vcfLine_.INFO.NHC << ";NTC=" << vcfLine_.INFO.NTC << ";NHR=" << vcfLine_.INFO.NHR << ";NTR" << vcfLine_.INFO.NTR << ";LT=" << vcfLine_.INFO.LT << ";SB=" << vcfLine_.INFO.SB << std::endl;
   std::cout << std::endl << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
 }
 
@@ -22,6 +22,7 @@ void vcfWriter::populateMEInfoField(){
   vcfLine_.INFO.NHR = ME_.getHeadContigs().front().getSupportingReads().size();
   vcfLine_.INFO.NTR = ME_.getTailContigs().front().getSupportingReads().size();
   vcfLine_.INFO.SB = ME_.getStrandBias();
+  vcfLine_.INFO.LT = ME_.getMostSupportedTail().getLongestTail();
 }
 
 void vcfWriter::populateMELine(){

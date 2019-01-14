@@ -24,16 +24,17 @@ public:
 
   std::vector<MEHead> & getHeadContigs();
   std::vector<polyTail> & getTailContigs();
-  int32_t getTailContigCount();
-  int32_t getLongestTail();
-  float getStrandBias();
+  int32_t & getTailContigCount();
+  int32_t & getLongestTail();
+  float & getStrandBias();
+  polyTail & getMostSupportedTail();
+  MEHead & getMostSupportedHead();
   
 private:
   int32_t tailSize_ = 10;
   float strandBias_ = 0.0;
   int32_t tailContigCount_ = 0;
-  int32_t longestTail_ = 0;
-  input i_;
+   input i_;
   std::vector<std::pair<BamTools::BamAlignment, MEHit> > groupedContigHits_;
 
   BamTools::BamRegion region_;
@@ -55,7 +56,6 @@ private:
   void sumTailContigCount();
   void calculateStrandBias();
   //TODO: implement
-  void findLongestTail();
 
 
 
