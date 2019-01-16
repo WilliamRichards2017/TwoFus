@@ -25,16 +25,20 @@ private:
   std::vector<BamTools::BamAlignment> contigVec_;
   std::vector<groupedContigs> groupedContigsVec_;
 
-  std::vector<groupedContigs> groupedMobileElementContigVec_;
-  std::vector<groupedContigs> groupedInsertionContigVec_;
-  std::vector<groupedContigs> groupedTranslocationContigVec_;
+  std::vector<groupedContigs> groupedMobileElementContigs_;
+  std::vector<groupedContigs> groupedInsertionContigs_;
+  std::vector<groupedContigs> groupedTranslocationContigs_;
+  std::vector<groupedContigs> groupedSplitAlignedContigs_;
 
+
+  std::map<std::string, std::pair<BamTools::BamAlignment, int32_t> > contigCountMap_;
 
   void findAllContigs();
   void groupNearbyContigs();
-  void findInsertionContigs();
+  void findSplitAlignedContigs();
   void findMobileElementContigs();
-  void findTranslocationContigs();
+  void populateContigCountMap();
+  void filterForInsertionAndTransContigs();
 
   void alignContigsToMEList();
 

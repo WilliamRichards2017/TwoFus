@@ -32,9 +32,74 @@ void contigs::findAllContigs(){
   reader.Close();
 }
 
+void contigs::populateContigCountMap(){
+  for(const auto & g : groupedSplitAlignedContigs_){
+    for(const auto & c : g){
 
-void contigs::findInsertionContigs(){
+      auto it = contigCountMap_.find(c.Name);
+
+      if(it == contigCountMap_.end()){
+	contigCountMap_.insert({c.Name, std::make_pair(c,1)});
+      }
+      else{
+	it->second.second++;
+      }
+    }
+  }
 }
+
+
+void contigs::filterForInsertionAndTransContigs(){
+  for(const auto & g : groupedSplitAlignedContigs_){
+    bool allUnique = true;
+    
+    for(const auto & c : g){
+      
+      auto it = contigCountMap_.find(c.Name);
+      
+      if(it == contigCountMap_.end()){
+	std::cerr << "Error, contig not found in contigs::filterForInsertionAndTransContigs()" << std::endl;
+	std::cerr << "Dev must fix their logic" << std::endl;
+	exit (EXIT_FAILURE);
+      }
+
+      else{
+	if(it->second.second > 1){
+	  allUnique = false;
+	}
+      }
+      
+    }
+    if(allUnique){
+      groupedInsertionContigs_.push_back(g);
+    }
+    else{
+      groupedTranslocationContigs_.push_back(g);
+    }
+  }
+  std::cout << "found " << groupedInsertionContigs_.size() << " insertion groups" << std::endl;
+  std::cout << "found " << groupedTranslocationContigs_.size() << " translocation groups" << std::endl;
+  
+}
+
+/*
+void contigs::filterForInsertionAndTransContigs(){
+  for(const auto & c : contigCountMap_){
+    if(c.second.second == 1){
+      insertionContigs_.push_back(c.second.first);
+    }
+    else if(c.second.second > 1){
+      translocationContigs_.push_back(c.second.first);
+    }
+    else{
+      std::cerr << "Unhandled case in contigs::filterForInsertionAndTransContigs()" << std::endl;
+      std::cerr << "Dev must fix logic!" << std::endl;
+    }
+  }
+  std::cout << "Filtered for " << insertionContigs_.size() << " large insertion contigs" << std::endl;
+  std::cout << "Filtered for " << translocationContigs_.size() << " translocation contigs" << std::endl;
+}
+*/
 
 void contigs::alignContigsToMEList(){
   mm_idxopt_t iopt;
@@ -122,7 +187,27 @@ bool contigs::vecHasAlignment(const std::vector<std::pair<BamTools::BamAlignment
 }
   
 					
-					
+void contigs::findSplitAlignedContigs(){
+
+  std::vector<int> clipSizes;
+  std::vector<int> readPositions;
+  std::vector<int> genomePositions;
+
+  for(const auto & g : groupedContigsVec_){
+    bool groupIsSplitAligned = true;
+    for(const auto & c : g){
+      c.GetSoftClips(clipSizes, readPositions, genomePositions);
+
+      if(clipSizes.size() < 1 or c.Position == -1){
+	groupIsSplitAligned = false;
+      }
+    }
+    if(groupIsSplitAligned){
+      groupedSplitAlignedContigs_.push_back(g);
+    }
+  }
+  std::cout << "Found " << groupedSplitAlignedContigs_.size() << " split aligned contig groups" << std::endl;
+}					
 
 void contigs::findMobileElementContigs(){
   contigs::alignContigsToMEList();
@@ -139,8 +224,6 @@ void contigs::findMobileElementContigs(){
   }
 }
 
-void contigs::findTranslocationContigs(){
-}
 
 bool contigs::isNearby(const BamTools::BamAlignment & al1, const BamTools::BamAlignment & al2){
   int32_t maxDist = 1000;
@@ -211,7 +294,10 @@ void contigs::groupNearbyContigs(){
 contigs::contigs(const input & i) : i_(i){
   contigs::findAllContigs();
   contigs::groupNearbyContigs();
-  contigs::findMobileElementContigs();
+  //contigs::findMobileElementContigs();
+  contigs::findSplitAlignedContigs();
+  contigs::populateContigCountMap();
+  contigs::filterForInsertionAndTransContigs();
   
 }
 

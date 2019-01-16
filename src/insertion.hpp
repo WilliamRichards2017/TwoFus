@@ -18,18 +18,26 @@ class insertion{
 public:
   insertion();
   insertion(const insertion &);
-  insertion(const std::vector<Bamtools::BamAlignment> &, const input &);
+  insertion(const std::vector<BamTools::BamAlignment> &, const input &);
   ~insertion();
 private:
-
+ 
   std::vector<BamTools::BamAlignment> groupedContigs_;
   std::vector<BamTools::RefData> refData_;
+
+  BamTools::BamAlignment leftContig_;
+  BamTools::BamAlignment rightContig_;
 
   input i_;
   variant variant_;
 
+  bool clipsConverge_;
+
   std::string refSequence_;
   std::string altSequence_;
+
+  void populateLeftAndRightContigs();
+  void populateClipsConverge();
 
 
   
