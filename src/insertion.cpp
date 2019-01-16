@@ -5,6 +5,8 @@
 
 #include "util.hpp"
 
+
+//TODO: refactor removing index method
 void insertion::populateLeftAndRightContigs(){
   if(groupedContigs_.size() < 2){
     std::cerr << "Inside large insertion without atleast two contigs..." << std::endl;
@@ -19,25 +21,39 @@ void insertion::populateLeftAndRightContigs(){
   }
 
 
-  int32_t leftMostPos = std::numeric_limits<int32_t>::infinity();
+  int32_t leftMostPos = std::numeric_limits<int32_t>::max();
   int32_t rightMostPos = -1;
-  int32_t leftIndex;
-  int32_t rightIndex;
+  int32_t leftIndex = -1;
+  int32_t rightIndex = -1;
   for(unsigned i = 0; i < groupedContigs_.size(); ++i){
+
+    std::cout << "populating left and right contigs for contig: " << groupedContigs_[i].Name << " at position " << groupedContigs_[i].Position <<  std::endl;
+
+    std::cout << "comparing if " << groupedContigs_[i].Position << " < " << leftMostPos << std::endl;
+    std::cout << "comparing if " << groupedContigs_[i].Position << " > " << rightMostPos << std::endl;
+
     if(groupedContigs_[i].Position < leftMostPos){
       leftMostPos = groupedContigs_[i].Position;
       leftIndex = i;
     }
-    else if(groupedContigs_[i].Position > rightMostPos){
+    if(groupedContigs_[i].Position > rightMostPos){
       rightMostPos = groupedContigs_[i].Position;
       rightIndex = i;
     }
   }
-  leftContig_ = groupedContigs_[leftIndex];
-  rightContig_ = groupedContigs_[rightIndex];
+
+  if(leftIndex != -1){
+    leftContig_ = groupedContigs_[leftIndex];
+    std::cout << "leftContig_.Name is: " << leftContig_.Name << std::endl;
+  }
+  if(rightIndex != -1){
+    rightContig_ = groupedContigs_[rightIndex];
+    std::cout << "rightContig_.Name is: " << rightContig_.Name << std::endl;
+  }
   
-  std::cout << "leftContig_.Name is: " << leftContig_.Name << std::endl;
-  std::cout << "rightContig_.Name is: " << rightContig_.Name << std::endl;
+  
+  
+  
 
 }
 
@@ -83,4 +99,7 @@ insertion::insertion(const std::vector<BamTools::BamAlignment> & groupedContigs,
 
   insertion::populateLeftAndRightContigs();
   insertion::populateClipsConverge();
+}
+
+insertion::~insertion(){
 }

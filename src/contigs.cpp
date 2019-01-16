@@ -12,6 +12,7 @@
 
 #include "contigs.hpp"
 #include "input.hpp"
+#include "insertion.hpp"
 #include "mobileElement.hpp"
 #include "util.hpp"
 #include "vcfWriter.hpp"
@@ -71,10 +72,15 @@ void contigs::filterForInsertionAndTransContigs(){
       
     }
     if(allUnique){
-      groupedInsertionContigs_.push_back(g);
+      if(g.size() > 1){
+	groupedInsertionContigs_.push_back(g);
+	insertion i = {g, i_};
+      }
     }
     else{
-      groupedTranslocationContigs_.push_back(g);
+      if(g.size() > 1){
+	groupedTranslocationContigs_.push_back(g);
+      }
     }
   }
   std::cout << "found " << groupedInsertionContigs_.size() << " insertion groups" << std::endl;
