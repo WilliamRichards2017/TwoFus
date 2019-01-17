@@ -21,6 +21,22 @@
 KSEQ_INIT(gzFile, gzread)
 
 
+void printSplitAlignedClipSizes(const std::vector<groupedContigs> & groupedContigs){
+
+
+  for(const auto & g : groupedContigs){
+    for(const auto & c : g){
+      std::vector<int> clipSizes;
+      std::vector<int> readPositions;
+      std::vector<int> genomePositions;
+      
+      c.GetSoftClips(clipSizes, readPositions, genomePositions);
+      std::cout << "clipSizes.size() is: " << clipSizes.size() << std::endl;
+    }
+  }
+
+}
+
 void contigs::findAllContigs(){
   BamTools::BamReader reader = util::openBamFile(i_.contigBamPath_);
   BamTools::BamAlignment al;
@@ -87,25 +103,6 @@ void contigs::filterForInsertionAndTransContigs(){
   std::cout << "found " << groupedTranslocationContigs_.size() << " translocation groups" << std::endl;
   
 }
-
-/*
-void contigs::filterForInsertionAndTransContigs(){
-  for(const auto & c : contigCountMap_){
-    if(c.second.second == 1){
-      insertionContigs_.push_back(c.second.first);
-    }
-    else if(c.second.second > 1){
-      translocationContigs_.push_back(c.second.first);
-    }
-    else{
-      std::cerr << "Unhandled case in contigs::filterForInsertionAndTransContigs()" << std::endl;
-      std::cerr << "Dev must fix logic!" << std::endl;
-    }
-  }
-  std::cout << "Filtered for " << insertionContigs_.size() << " large insertion contigs" << std::endl;
-  std::cout << "Filtered for " << translocationContigs_.size() << " translocation contigs" << std::endl;
-}
-*/
 
 void contigs::alignContigsToMEList(){
   mm_idxopt_t iopt;
@@ -195,16 +192,18 @@ bool contigs::vecHasAlignment(const std::vector<std::pair<BamTools::BamAlignment
 					
 void contigs::findSplitAlignedContigs(){
 
-  std::vector<int> clipSizes;
-  std::vector<int> readPositions;
-  std::vector<int> genomePositions;
 
   for(const auto & g : groupedContigsVec_){
     bool groupIsSplitAligned = true;
     for(const auto & c : g){
+
+      std::vector<int> clipSizes;
+      std::vector<int> readPositions;
+      std::vector<int> genomePositions;
+      
       c.GetSoftClips(clipSizes, readPositions, genomePositions);
 
-      if(clipSizes.size() < 1 or c.Position == -1){
+      if(clipSizes.size() == 0){
 	groupIsSplitAligned = false;
       }
     }
@@ -302,6 +301,7 @@ contigs::contigs(const input & i) : i_(i){
   contigs::groupNearbyContigs();
   //contigs::findMobileElementContigs();
   contigs::findSplitAlignedContigs();
+  
   contigs::populateContigCountMap();
   contigs::filterForInsertionAndTransContigs();
   

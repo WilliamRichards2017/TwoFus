@@ -15,16 +15,23 @@ int8_t clipCoords::getLargestClipIndex(const std::vector<int> & clipSizes){
 }
 
 void clipCoords::setCoords(){
+  
   std::vector<int> clipSizes;
   std::vector<int> readPositions;
   std::vector<int> genomePositions;
 
+  std::cout << "clipCoords al_.Name is: " << al_.Name << std::endl;
+
   al_.GetSoftClips(clipSizes, readPositions, genomePositions);
+
+  std::cout << "clipSizes.size(): " << clipSizes.size() << std::endl;
 
   auto insertionVec = util::getInsertionVec(al_);
 
 
   clipIndex_ = clipCoords::getLargestClipIndex(clipSizes);
+
+  std::cout << "clipCoords clipIndex_ is: " << clipIndex_ << std::endl;
 
   if(readPositions[clipIndex_]-clipSizes[clipIndex_]==0){
     clipDir_ = rtl;
@@ -44,7 +51,6 @@ void clipCoords::setCoords(){
 
   /*
   std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
-  std::cout << "clipCoords al_.Name is: " << al_.Name << std::endl;
   std::cout << "clipIndex_ is: " << clipIndex_ << std::endl;
   std::cout << "readPositions[clipIndex_] is: " << readPositions[clipIndex_] << std::endl;
   std::cout << "insertionVec[clipIndex_] is: " << insertionVec[clipIndex_] << std::endl;

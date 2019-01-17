@@ -10,8 +10,13 @@
 #include "input.hpp"
 
 struct variant{
-  std::pair<std::string, std::string> ref;
-  std::pair<std::string, std::string> alt;
+  std::string ref;
+  std::string alt;
+};
+
+struct breakpoint{
+  int32_t refID;
+  int32_t position;
 };
 
 class insertion{
@@ -28,16 +33,28 @@ private:
   BamTools::BamAlignment leftContig_;
   BamTools::BamAlignment rightContig_;
 
+  breakpoint leftBreakpoint_;
+  breakpoint rightBreakpoint_;
+
   input i_;
-  variant variant_;
+
+  variant leftVariant_;
+  variant rightVariant_;
+  variant insertionVariant_;
 
   bool clipsConverge_;
 
   std::string refSequence_;
   std::string altSequence_;
 
+  std::vector<std::string> refKmers_;
+  std::vector<std::string> altKmers_;
+
   void populateLeftAndRightContigs();
   void populateClipsConverge();
+  void populateBreakpoints();
+  void populateVariant();
+  void populateRefKmers();
 
 
   

@@ -3,8 +3,38 @@
 #include <limits>
 #include <stdexcept>
 
+#include "clipCoords.hpp"
 #include "util.hpp"
 
+
+void insertion::populateRefKmers(){
+
+}
+
+// TODO: make sure this works for revComp
+void insertion::populateVariant(){
+
+  clipCoords lcc = {leftContig_};
+  clipCoords rcc = {rightContig_};
+
+  leftVariant_.ref = std::string(1, leftContig_.AlignedBases.back());
+  leftVariant_.alt = lcc.clippedSeq_;
+
+  rightVariant_.ref = std::string(1, rightContig_.AlignedBases.back());
+  rightVariant_.alt = rcc.clippedSeq_;
+
+  insertionVariant_.ref = leftVariant_.ref;
+  insertionVariant_.alt = leftVariant_.alt + std::string("NNNNN") + rightVariant_.alt;
+
+  //std::cout << "Insertion is " << insertionVariant_.ref << " -> " << insertionVariant_.alt << std::endl;
+}
+
+void insertion::populateBreakpoints(){
+  leftBreakpoint_.refID = leftContig_.RefID;
+  leftBreakpoint_.position = leftContig_.Position;
+  rightBreakpoint_.refID = rightContig_.RefID;
+  rightBreakpoint_.position = rightContig_.Position;
+}
 
 //TODO: refactor removing index method
 void insertion::populateLeftAndRightContigs(){
@@ -27,10 +57,9 @@ void insertion::populateLeftAndRightContigs(){
   int32_t rightIndex = -1;
   for(unsigned i = 0; i < groupedContigs_.size(); ++i){
 
-    std::cout << "populating left and right contigs for contig: " << groupedContigs_[i].Name << " at position " << groupedContigs_[i].Position <<  std::endl;
-
-    std::cout << "comparing if " << groupedContigs_[i].Position << " < " << leftMostPos << std::endl;
-    std::cout << "comparing if " << groupedContigs_[i].Position << " > " << rightMostPos << std::endl;
+    //std::cout << "populating left and right contigs for contig: " << groupedContigs_[i].Name << " at position " << groupedContigs_[i].Position <<  std::endl;
+    //std::cout << "comparing if " << groupedContigs_[i].Position << " < " << leftMostPos << std::endl;
+    //std::cout << "comparing if " << groupedContigs_[i].Position << " > " << rightMostPos << std::endl;
 
     if(groupedContigs_[i].Position < leftMostPos){
       leftMostPos = groupedContigs_[i].Position;
@@ -44,20 +73,15 @@ void insertion::populateLeftAndRightContigs(){
 
   if(leftIndex != -1){
     leftContig_ = groupedContigs_[leftIndex];
-    std::cout << "leftContig_.Name is: " << leftContig_.Name << std::endl;
+    //std::cout << "leftContig_.Name is: " << leftContig_.Name << std::endl;
   }
   if(rightIndex != -1){
     rightContig_ = groupedContigs_[rightIndex];
-    std::cout << "rightContig_.Name is: " << rightContig_.Name << std::endl;
+    //std::cout << "rightContig_.Name is: " << rightContig_.Name << std::endl;
   }
-  
-  
-  
-  
-
 }
 
-//TODO: Check positions to assert c[0] is left of c[1]
+
 void insertion::populateClipsConverge(){
   bool rightBound1 = false;
   bool rightBound2 = false;
@@ -99,6 +123,9 @@ insertion::insertion(const std::vector<BamTools::BamAlignment> & groupedContigs,
 
   insertion::populateLeftAndRightContigs();
   insertion::populateClipsConverge();
+  insertion::populateBreakpoints();
+  insertion::populateVariant();
+  insertion::populateRefKmers();
 }
 
 insertion::~insertion(){
