@@ -1,11 +1,45 @@
+#include "util.hpp"
+
 #include <unistd.h>
 #include <string>
 
 #include "api/BamMultiReader.h"
 #include "api/BamWriter.h"
 
-#include "util.hpp"
 
+const std::vector<std::string> util::kmerize(const std::string & sequence, const int32_t & kmerSize){
+  int32_t kmercount = 0;
+  std::vector<std::string> kmers;
+
+  while(kmercount + kmerSize <= sequence.length()){
+    std::string kmer = sequence.substr(kmercount, kmerSize);
+    kmers.push_back(kmer);
+    ++kmercount;
+  }
+  return kmers;
+}
+
+const std::string util::getChromosomeFromRefID(const int32_t & id, const std::vector<BamTools::RefData> & refData){
+  std::string ret = "";
+  if(id == -1) {
+    ret = "unmapped";
+    return ret;
+  }
+  ret = refData[id].RefName;
+  return ret;
+}
+
+const std::string util::pullRefSequenceFromRegion(const breakpoint & leftBP, const int32_t & rightPos,
+						  const std::string & refPath, const std::vector<BamTools::RefData> & refData){
+
+  std::string fastahackPath = "../bin/externals/fastahack/src/fastahack_project-build/tools/fastahack";
+
+  std::string cmd = fastahackPath + " -r " + util::getChromosomeFromRefID(leftBP.refID, refData) + ':' + std::to_string(leftBP.position) + ".." + std::to_string(rightPos) + ' ' + refPath;
+
+  std::cout << "Executing command: " << cmd << std::endl;
+  
+  return util::exec(cmd.c_str());
+}
 
 std::vector<BamTools::RefData> util::populateRefData(const std::string & bamPath){
   BamTools::BamReader reader = util::openBamFile(bamPath);
@@ -109,4 +143,22 @@ const std::vector<std::string> util::getClipSeqs(const BamTools::BamAlignment & 
     }
   }
   return clipSeqs;
+}
+
+std::string util::exec(char const* cmd) {
+  char buffer[128];
+  std::string result = "";
+  FILE* pipe = popen(cmd, "r");
+  if (!pipe) throw std::runtime_error("popen() failed!");
+  try {
+    while (!feof(pipe)) {
+      if (fgets(buffer, 128, pipe) != NULL)
+	result += buffer;
+    }
+  } catch (...) {
+    pclose(pipe);
+    throw;
+  }
+  pclose(pipe);
+  return result;
 }

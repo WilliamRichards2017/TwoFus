@@ -29,6 +29,9 @@ public:
   float & getStrandBias();
   polyTail & getMostSupportedTail();
   MEHead & getMostSupportedHead();
+
+  const std::vector<BamTools::RefData> & getRefData();
+
   
 private:
   int32_t tailSize_ = 10;
@@ -42,6 +45,8 @@ private:
   std::vector<polyTail> tailContigs_;
   std::vector<BamTools::BamAlignment> unknownContigs_;
 
+  std::vector<BamTools::RefData> refData_;
+  
   MEHead mostSupportedHead_;
   polyTail mostSupportedTail_;
 

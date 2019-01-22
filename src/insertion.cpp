@@ -7,8 +7,47 @@
 #include "util.hpp"
 
 
+const BamTools::BamAlignment & insertion::getLeftContig(){
+  return leftContig_;
+}
+
+const BamTools::BamAlignment & insertion::getRightContig(){
+  return rightContig_;
+}
+
+const std::vector<BamTools::RefData> & insertion::getRefData(){
+  return refData_;
+}
+
+void insertion::populateCigarStrings(){
+
+  for(const auto & l : leftContig_.CigarData){
+    cigarStrings_.first += std::to_string(l.Length);
+    cigarStrings_.first += std::string(1, l.Type);
+  }
+
+  for(const auto & r : rightContig_.CigarData){
+    cigarStrings_.second += std::to_string(r.Length);
+    cigarStrings_.second += std::string(1, r.Type);
+  }
+
+  std::cout << "leftCigar String: " << cigarStrings_.first << std::endl;
+  std::cout << "rightCigar string: " << cigarStrings_.second << std::endl;
+
+}
+
 void insertion::populateRefKmers(){
 
+  refSequence_ = util::pullRefSequenceFromRegion(leftBreakpoint_, rightContig_.GetEndPosition(), i_.referencePath_, refData_);
+  std::cout << "pulled refSequence_: " << refSequence_ << std::endl;
+  refKmers_ = util::kmerize(refSequence_, 25);
+}
+
+
+void insertion::populateAltKmers(){
+  altKmers_ = util::kmerize(leftVariant_.alt, 25);
+  std::vector<std::string> rightAltKmers = util::kmerize(rightVariant_.alt, 25);
+  altKmers_.insert(std::end(altKmers_), std::begin(rightAltKmers), std::end(rightAltKmers));
 }
 
 // TODO: make sure this works for revComp
@@ -126,6 +165,8 @@ insertion::insertion(const std::vector<BamTools::BamAlignment> & groupedContigs,
   insertion::populateBreakpoints();
   insertion::populateVariant();
   insertion::populateRefKmers();
+  insertion::populateAltKmers();
+  insertion::populateCigarStrings();
 }
 
 insertion::~insertion(){

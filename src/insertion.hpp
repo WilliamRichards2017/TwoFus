@@ -25,6 +25,11 @@ public:
   insertion(const insertion &);
   insertion(const std::vector<BamTools::BamAlignment> &, const input &);
   ~insertion();
+
+  const BamTools::BamAlignment & getLeftContig();
+  const BamTools::BamAlignment & getRightContig();
+  const std::vector<BamTools::RefData> & getRefData();
+  
 private:
  
   std::vector<BamTools::BamAlignment> groupedContigs_;
@@ -47,6 +52,8 @@ private:
   std::string refSequence_;
   std::string altSequence_;
 
+  std::pair<std::string, std::string> cigarStrings_;
+
   std::vector<std::string> refKmers_;
   std::vector<std::string> altKmers_;
 
@@ -55,9 +62,8 @@ private:
   void populateBreakpoints();
   void populateVariant();
   void populateRefKmers();
-
-
-  
+  void populateAltKmers();
+  void populateCigarStrings();
   
 };
 

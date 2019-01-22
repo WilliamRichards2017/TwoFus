@@ -3,6 +3,9 @@
 #include "MEHead.hpp"
 #include "util.hpp"
 
+const std::vector<BamTools::RefData> & mobileElement::getRefData(){
+  return refData_;
+}
 
 std::vector<MEHead> & mobileElement::getHeadContigs(){
   return headContigs_;
@@ -114,6 +117,9 @@ mobileElement::mobileElement(){
 }
 
 mobileElement::mobileElement(const std::vector<std::pair<BamTools::BamAlignment, MEHit> > & groupedContigHits, const input & i) : groupedContigHits_(groupedContigHits), i_(i){
+
+  refData_ = util::populateRefData(i_.contigBamPath_);
+
 
   mobileElement::setRegion();
   for(const auto c : groupedContigHits){

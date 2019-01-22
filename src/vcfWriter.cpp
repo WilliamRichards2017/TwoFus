@@ -5,6 +5,7 @@
 
 #include "input.hpp"
 #include "mobileElement.hpp"
+#include "util.hpp"
 
 
 void vcfWriter::printVCFLine(){
@@ -13,6 +14,7 @@ void vcfWriter::printVCFLine(){
 	    << '\t' << vcfLine_.QUAL << '\t' << "NHC=" << vcfLine_.INFO.NHC << ";NTC=" << vcfLine_.INFO.NTC << ";NHR=" << vcfLine_.INFO.NHR << ";NTR" << vcfLine_.INFO.NTR << ";LT=" << vcfLine_.INFO.LT << ";SB=" << vcfLine_.INFO.SB << std::endl;
   std::cout << std::endl << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
 }
+
 
 
 //TODO: write function to find head contig and tail contig with max Support
@@ -25,8 +27,17 @@ void vcfWriter::populateMEInfoField(){
   vcfLine_.INFO.LT = ME_.getMostSupportedTail().getLongestTail();
 }
 
+void vcfWriter::populateINSLine(){
+  vcfLine_.CHROM = util::getChromosomeFromRefID(vcfContig_.RefID, INS_.getRefData());
+  vcfLine_.POS = vcfContig_.Position;
+  vcfLine_.ID = "INS";
+  vcfLine_.REF = "N";
+  vcfLine_.ALT = "INS:Large";
+  vcfLine_.QUAL = std::max(INS_.getLeftContig().MapQuality, INS_.getRightContig().MapQuality);
+}
+
 void vcfWriter::populateMELine(){
-  vcfLine_.CHROM = std::to_string(vcfContig_.RefID);
+  vcfLine_.CHROM = util::getChromosomeFromRefID(vcfContig_.RefID, ME_.getRefData());
   vcfLine_.POS = vcfContig_.Position;
   vcfLine_.ID = "ME";
   vcfLine_.REF = "N";
@@ -37,11 +48,16 @@ void vcfWriter::populateMELine(){
 }
 
 
+
+vcfWriter::vcfWriter(insertion & INS, input & i) : INS_(INS), i_(i), variantType_(ins), vcfContig_(INS_.getLeftContig()){
+  vcfWriter::populateINSLine();
+  vcfWriter::printVCFLine();
+
+}
+
 vcfWriter::vcfWriter(mobileElement & ME, input & i): ME_(ME), i_(i), variantType_(mobEl){
   vcfContig_ = ME_.getHeadContigs().front().getContig();
   vcfWriter::populateMELine();
-  vcfWriter::printVCFLine();
-
-	       
+  vcfWriter::printVCFLine();	       
 }
 

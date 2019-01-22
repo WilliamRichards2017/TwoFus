@@ -2,6 +2,7 @@
 #define __SRC_VCFWRITER_HPP__
 
 #include "input.hpp"
+#include "insertion.hpp"
 #include "mobileElement.hpp"
 
 enum variantType { mobEl, ins, trans};
@@ -43,11 +44,13 @@ struct vcfLine {
 class vcfWriter{
 
 public:
+  vcfWriter(insertion &, input &);
   vcfWriter(mobileElement &, input &);
 
 private:
   variantType variantType_;
   mobileElement ME_;
+  insertion INS_;
   input i_;
 
   BamTools::BamAlignment vcfContig_;
@@ -55,6 +58,8 @@ private:
   vcfLine vcfLine_;
 
   void populateMELine();
+  void populateINSLine();
+
   void populateMEInfoField();
   void printVCFLine();
 };

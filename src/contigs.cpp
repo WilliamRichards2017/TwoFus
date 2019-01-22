@@ -20,23 +20,6 @@
 
 KSEQ_INIT(gzFile, gzread)
 
-
-void printSplitAlignedClipSizes(const std::vector<groupedContigs> & groupedContigs){
-
-
-  for(const auto & g : groupedContigs){
-    for(const auto & c : g){
-      std::vector<int> clipSizes;
-      std::vector<int> readPositions;
-      std::vector<int> genomePositions;
-      
-      c.GetSoftClips(clipSizes, readPositions, genomePositions);
-      std::cout << "clipSizes.size() is: " << clipSizes.size() << std::endl;
-    }
-  }
-
-}
-
 void contigs::findAllContigs(){
   BamTools::BamReader reader = util::openBamFile(i_.contigBamPath_);
   BamTools::BamAlignment al;
@@ -90,7 +73,8 @@ void contigs::filterForInsertionAndTransContigs(){
     if(allUnique){
       if(g.size() > 1){
 	groupedInsertionContigs_.push_back(g);
-	insertion i = {g, i_};
+	insertion INS = {g, i_};
+	vcfWriter v = {INS, i_};
       }
     }
     else{
@@ -299,7 +283,7 @@ void contigs::groupNearbyContigs(){
 contigs::contigs(const input & i) : i_(i){
   contigs::findAllContigs();
   contigs::groupNearbyContigs();
-  //contigs::findMobileElementContigs();
+  contigs::findMobileElementContigs();
   contigs::findSplitAlignedContigs();
   
   contigs::populateContigCountMap();
@@ -309,3 +293,24 @@ contigs::contigs(const input & i) : i_(i){
 
 contigs::~contigs(){
 }
+
+
+
+/*
+void printSplitAlignedClipSizes(const std::vector<groupedContigs> & groupedContigs){
+
+
+  for(const auto & g : groupedContigs){
+    for(const auto & c : g){
+      std::vector<int> clipSizes;
+      std::vector<int> readPositions;
+      std::vector<int> genomePositions;
+      
+      c.GetSoftClips(clipSizes, readPositions, genomePositions);
+      std::cout << "clipSizes.size() is: " << clipSizes.size() << std::endl;
+    }
+  }
+
+}
+*/
+
