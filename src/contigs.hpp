@@ -22,6 +22,8 @@ private:
 
   input i_;
 
+  std::fstream vcfStream_;
+
   std::vector<BamTools::BamAlignment> contigVec_;
   std::vector<groupedContigs> groupedContigsVec_;
 
@@ -47,8 +49,7 @@ private:
   bool vecHasAlignment(const std::vector<std::pair<BamTools::BamAlignment, MEHit> > &);
   bool isNearby(const BamTools::BamAlignment &, const BamTools::BamAlignment &);
   std::pair<BamTools::BamAlignment, MEHit> getMEAlignment(const BamTools::BamAlignment &);
-  
-  
+
   
 };
 

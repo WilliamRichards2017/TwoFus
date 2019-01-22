@@ -7,14 +7,29 @@
 #include "mobileElement.hpp"
 #include "util.hpp"
 
-
 void vcfWriter::printVCFLine(){
   std::cout << "~~~~~~~~~~~~~~PRINTING VCF LINE~~~~~~~~~~~~~~~~~~" << std::endl;
   std::cout << vcfLine_.CHROM << '\t' << vcfLine_.POS << '\t'  << vcfLine_.ID << '\t' << vcfLine_.REF << '\t' << vcfLine_.ALT
-	    << '\t' << vcfLine_.QUAL << '\t' << "NHC=" << vcfLine_.INFO.NHC << ";NTC=" << vcfLine_.INFO.NTC << ";NHR=" << vcfLine_.INFO.NHR << ";NTR" << vcfLine_.INFO.NTR << ";LT=" << vcfLine_.INFO.LT << ";SB=" << vcfLine_.INFO.SB << std::endl;
+	    << '\t' << vcfLine_.QUAL << '\t' << std::endl;
   std::cout << std::endl << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
 }
 
+void vcfWriter::writeShared(){
+  vcfStream_ << vcfLine_.CHROM << '\t' << vcfLine_.POS << '\t' << vcfLine_.ID << '\t' << vcfLine_.REF << '\t' << vcfLine_.ALT << '\t' << vcfLine_.QUAL << '\t';
+}
+
+void vcfWriter::writeMEInfo(){
+  vcfStream_ << "NHC=" << vcfLine_.INFO.NHC << ";NTC=" << vcfLine_.INFO.NTC << ";NHR=" << vcfLine_.INFO.NHR << ";NTR" << vcfLine_.INFO.NTR << ";LT=" << vcfLine_.INFO.LT << ";SB=" << vcfLine_.INFO.SB << '\t';
+}
+
+void vcfWriter::writeMELine(){
+  vcfWriter::writeShared();
+  vcfWriter::writeMEInfo();
+}
+
+void vcfWriter::writeInsertionLine(){
+  vcfWriter::writeShared();
+}
 
 
 //TODO: write function to find head contig and tail contig with max Support
@@ -49,13 +64,14 @@ void vcfWriter::populateMELine(){
 
 
 
-vcfWriter::vcfWriter(insertion & INS, input & i) : INS_(INS), i_(i), variantType_(ins), vcfContig_(INS_.getLeftContig()){
+vcfWriter::vcfWriter(std::fstream & vcfStream, insertion & INS, input & i) : INS_(INS), i_(i), variantType_(ins), vcfStream_(vcfStream){
+  vcfContig_ = INS_.getLeftContig();
   vcfWriter::populateINSLine();
   vcfWriter::printVCFLine();
 
 }
 
-vcfWriter::vcfWriter(mobileElement & ME, input & i): ME_(ME), i_(i), variantType_(mobEl){
+vcfWriter::vcfWriter(std::fstream & vcfStream, mobileElement & ME, input & i): ME_(ME), i_(i), variantType_(mobEl), vcfStream_(vcfStream){
   vcfContig_ = ME_.getHeadContigs().front().getContig();
   vcfWriter::populateMELine();
   vcfWriter::printVCFLine();	       

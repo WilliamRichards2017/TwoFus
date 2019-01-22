@@ -1,6 +1,8 @@
 #ifndef __SRC_VCFWRITER_HPP__
 #define __SRC_VCFWRITER_HPP__
 
+#include <fstream>
+
 #include "input.hpp"
 #include "insertion.hpp"
 #include "mobileElement.hpp"
@@ -44,14 +46,16 @@ struct vcfLine {
 class vcfWriter{
 
 public:
-  vcfWriter(insertion &, input &);
-  vcfWriter(mobileElement &, input &);
+  vcfWriter(std::fstream & vcfStream, insertion &, input &);
+  vcfWriter(std::fstream & vcfStream, mobileElement &, input &);
 
 private:
   variantType variantType_;
   mobileElement ME_;
   insertion INS_;
   input i_;
+
+  std::fstream & vcfStream_;
 
   BamTools::BamAlignment vcfContig_;
 

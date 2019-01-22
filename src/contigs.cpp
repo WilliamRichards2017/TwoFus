@@ -50,6 +50,7 @@ void contigs::populateContigCountMap(){
 
 
 void contigs::filterForInsertionAndTransContigs(){
+
   for(const auto & g : groupedSplitAlignedContigs_){
     bool allUnique = true;
     
@@ -74,7 +75,7 @@ void contigs::filterForInsertionAndTransContigs(){
       if(g.size() > 1){
 	groupedInsertionContigs_.push_back(g);
 	insertion INS = {g, i_};
-	vcfWriter v = {INS, i_};
+	vcfWriter v = {vcfStream_, INS, i_};
       }
     }
     else{
@@ -86,6 +87,7 @@ void contigs::filterForInsertionAndTransContigs(){
   std::cout << "found " << groupedInsertionContigs_.size() << " insertion groups" << std::endl;
   std::cout << "found " << groupedTranslocationContigs_.size() << " translocation groups" << std::endl;
   
+  vcfStream_.close();
 }
 
 void contigs::alignContigsToMEList(){
@@ -199,6 +201,7 @@ void contigs::findSplitAlignedContigs(){
 }					
 
 void contigs::findMobileElementContigs(){
+
   contigs::alignContigsToMEList();
   
   for(const auto & g : groupedContigsVec_){
@@ -208,9 +211,10 @@ void contigs::findMobileElementContigs(){
     }
     if(contigs::vecHasAlignment(alignedContigs)){
       mobileElement ME = {alignedContigs, i_};
-      vcfWriter writer = {ME, i_};
+      vcfWriter writer = {vcfStream_, ME, i_};
     }
   }
+
 }
 
 
@@ -281,6 +285,10 @@ void contigs::groupNearbyContigs(){
 
 
 contigs::contigs(const input & i) : i_(i){
+
+  std::string vcfFile = "~/TwoFus/bin/testy.vcf";
+  vcfStream_.open(vcfFile.c_str(), std::fstream::in | std::fstream::out | std::fstream::app);
+
   contigs::findAllContigs();
   contigs::groupNearbyContigs();
   contigs::findMobileElementContigs();
@@ -288,6 +296,8 @@ contigs::contigs(const input & i) : i_(i){
   
   contigs::populateContigCountMap();
   contigs::filterForInsertionAndTransContigs();
+
+  vcfStream_.close();
   
 }
 

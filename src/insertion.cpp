@@ -96,7 +96,7 @@ void insertion::populateLeftAndRightContigs(){
   int32_t rightIndex = -1;
   for(unsigned i = 0; i < groupedContigs_.size(); ++i){
 
-    //std::cout << "populating left and right contigs for contig: " << groupedContigs_[i].Name << " at position " << groupedContigs_[i].Position <<  std::endl;
+    std::cout << "populating left and right contigs for contig: " << groupedContigs_[i].Name << " at position " << groupedContigs_[i].Position <<  std::endl;
     //std::cout << "comparing if " << groupedContigs_[i].Position << " < " << leftMostPos << std::endl;
     //std::cout << "comparing if " << groupedContigs_[i].Position << " > " << rightMostPos << std::endl;
 
@@ -154,6 +154,21 @@ insertion::insertion(){
 insertion::insertion(const insertion & ins){
   i_ = ins.i_;
   groupedContigs_ = ins.groupedContigs_;
+  refData_ = ins.refData_;
+  leftContig_ = ins.leftContig_;
+  rightContig_ = ins.rightContig_;
+  leftBreakpoint_ = ins.leftBreakpoint_;
+  rightBreakpoint_ = ins.rightBreakpoint_;
+  leftVariant_ = ins.leftVariant_;
+  rightVariant_ = ins.rightVariant_;
+  insertionVariant_ = ins.insertionVariant_;
+  clipsConverge_ = ins.clipsConverge_;
+  refSequence_ = ins.refSequence_;
+  altSequence_ = ins.altSequence_;
+  cigarStrings_ = ins.cigarStrings_;
+  refKmers_ = ins.refKmers_;
+  altKmers_ = ins.altKmers_;
+
 }
 
 //primary constructor
