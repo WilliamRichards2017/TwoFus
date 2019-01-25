@@ -22,7 +22,8 @@ struct infoField {
   std::string RN; // INFO=<ID=RN,Number=1,Type=String,Description="Name of contig that produced the call">
   int16_t MQ = -1; // INFO=<ID=MQ,Number=1,Type=Integer,Description="Mapping quality of the contig that created the call">
   std::string cigar = ""; 
-  std::string CVT = "ME"; //Compressed variant type
+  std::string VT = ""; //variant type
+  std::string CVT = ""; //Compressed variant type
   double SB; // Strand Bias
 
   std::vector<int32_t> HD = {-1,-1}; // hashcount for kmers overlapping variant
@@ -62,9 +63,19 @@ private:
   vcfLine vcfLine_;
 
   void populateMELine();
-  void populateINSLine();
-
   void populateMEInfoField();
+  void populateINSLine();
+  void populateINSInfoField();
+
+  void writeShared();
+  void writeHD();
+  void writeMELine();			
+  void writeMEInfo();
+
+  void writeINSLine();
+  void writeINSInfo();
+
+
   void printVCFLine();
 };
 

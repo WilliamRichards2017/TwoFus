@@ -286,8 +286,15 @@ void contigs::groupNearbyContigs(){
 
 contigs::contigs(const input & i) : i_(i){
 
-  std::string vcfFile = "~/TwoFus/bin/testy.vcf";
+  std::string vcfFile = "/uufs/chpc.utah.edu/common/home/u0401321/TwoFus/bin/testy.vcf";
+  std::cout << "Appending to vcf test file: " << vcfFile << std::endl;
   vcfStream_.open(vcfFile.c_str(), std::fstream::in | std::fstream::out | std::fstream::app);
+
+  if(! vcfStream_.is_open()){
+    std::cout << "Could not open " << vcfFile << std::endl;
+    std::cout << "Exiting run with non-zero exit status" << std::endl;
+    exit(EXIT_FAILURE);
+  }
 
   contigs::findAllContigs();
   contigs::groupNearbyContigs();

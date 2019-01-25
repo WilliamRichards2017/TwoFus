@@ -75,6 +75,17 @@ clipCoords::clipCoords(){
   clipIndex_ = -1;
 }
 
+
+clipCoords::clipCoords(const clipCoords & cc){
+  refID_ = cc.refID_;
+  leftPos_ = cc.leftPos_;
+  rightPos_ = cc.rightPos_;
+  breakPoint_ = cc.breakPoint_;
+  globalOffset_ = cc.globalOffset_;
+  clipDir_ = cc.clipDir_;
+  clippedSeq_ = cc.clippedSeq_;
+}
+
 clipCoords::clipCoords(const BamTools::BamAlignment & al) : al_(al){
   clipCoords::setCoords();
   //clipCoords::printCoords();

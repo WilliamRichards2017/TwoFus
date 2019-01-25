@@ -19,6 +19,26 @@ const std::vector<BamTools::RefData> & insertion::getRefData(){
   return refData_;
 }
 
+const variant & insertion::getInsertionVariant(){
+  return insertionVariant_;
+}
+
+const std::pair<clipCoords, clipCoords> & insertion::getClipCoords(){
+  return clipCoords_;
+}
+
+const std::pair<std::string, std::string> & insertion::getCigarStrings(){
+  return cigarStrings_;
+}
+
+void insertion::populateKmerDepths(){
+  auto kmerCounts = util::countKmersFromJhash(i_.kmerPath_, altKmers_);
+  std::cout << "Printing out kmer depths" << std::endl;
+  for(const auto kmer : kmerCounts){
+    std::cout << kmer.first << ':' << kmer.second << std::endl;
+  }
+}
+
 void insertion::populateCigarStrings(){
 
   for(const auto & l : leftContig_.CigarData){
@@ -53,14 +73,17 @@ void insertion::populateAltKmers(){
 // TODO: make sure this works for revComp
 void insertion::populateVariant(){
 
-  clipCoords lcc = {leftContig_};
-  clipCoords rcc = {rightContig_};
+  clipCoords_.first = {leftContig_};
+  clipCoords_.second = {rightContig_};
+
+  std::cout << "clipCoords_.second.rightPos_ " << clipCoords_.second.rightPos_ << std::endl;
+  std::cout << "clipCoords_.second.globalOffset_ " << clipCoords_.second.globalOffset_ << std::endl;
 
   leftVariant_.ref = std::string(1, leftContig_.AlignedBases.back());
-  leftVariant_.alt = lcc.clippedSeq_;
+  leftVariant_.alt = clipCoords_.first.clippedSeq_;
 
   rightVariant_.ref = std::string(1, rightContig_.AlignedBases.back());
-  rightVariant_.alt = rcc.clippedSeq_;
+  rightVariant_.alt = clipCoords_.second.clippedSeq_;
 
   insertionVariant_.ref = leftVariant_.ref;
   insertionVariant_.alt = leftVariant_.alt + std::string("NNNNN") + rightVariant_.alt;
@@ -168,6 +191,7 @@ insertion::insertion(const insertion & ins){
   cigarStrings_ = ins.cigarStrings_;
   refKmers_ = ins.refKmers_;
   altKmers_ = ins.altKmers_;
+  clipCoords_ = ins.clipCoords_;
 
 }
 
@@ -182,6 +206,7 @@ insertion::insertion(const std::vector<BamTools::BamAlignment> & groupedContigs,
   insertion::populateRefKmers();
   insertion::populateAltKmers();
   insertion::populateCigarStrings();
+  insertion::populateKmerDepths();
 }
 
 insertion::~insertion(){

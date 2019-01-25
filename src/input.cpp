@@ -18,6 +18,7 @@ input::input(const input & i){
   referenceIndexPath_ = i.referenceIndexPath_;
   vcfOutPath_ = i.vcfOutPath_;
   parentBamPaths_ = i.parentBamPaths_;
+  kmerPath_ = i.kmerPath_;
 }
 
 input::input(int argc, char ** argv) : argc_(argc), argv_(argv){
@@ -43,6 +44,7 @@ void input::printArgs(){
   std::cout << "referencePath_ is: " << referencePath_ << std::endl;
   std::cout << "referenceIndexPath_ is: " << referenceIndexPath_ << std::endl;
   std::cout << "vcfOutPath_ is: " << vcfOutPath_ << std::endl;
+  std::cout << "kmerPath_ is: " << kmerPath_ << std::endl;
 }
 
 void input::parseArgs(){
@@ -55,6 +57,7 @@ void input::parseArgs(){
   referencePath_ = std::string(argv_[3]);
   referenceIndexPath_ = referencePath_ + ".fai";
   vcfOutPath_ = probandBamPath_ + ".generator.V2.overlap.hashcount.fastq.bam.vcf";
+  kmerPath_ = probandBamPath_ + ".generator.Jhash";
 
   for(unsigned u = 4; u < argc_; ++u){
     parentBamPaths_.push_back(std::string(argv_[u]));

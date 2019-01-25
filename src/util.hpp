@@ -9,6 +9,7 @@ class util{
   
 public:
 
+  static const std::map<std::string, int32_t> countKmersFromJhash(const std::string &, const std::vector<std::string> &);
   static const std::vector<std::string> kmerize(const std::string &, const int32_t &);
   static const std::string getChromosomeFromRefID(const int32_t &, const std::vector<BamTools::RefData> &);
   static const std::string pullRefSequenceFromRegion(const breakpoint &, const int32_t &, const std::string &, const std::vector<BamTools::RefData> &);

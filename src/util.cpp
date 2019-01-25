@@ -1,11 +1,36 @@
 #include "util.hpp"
 
+
+#include <iomanip>
+#include <iostream>
+#include <iterator>
 #include <unistd.h>
 #include <string>
 
 #include "api/BamMultiReader.h"
 #include "api/BamWriter.h"
 
+
+const std::map<std::string, int32_t> util::countKmersFromJhash(const std::string & jhashPath, const std::vector<std::string> & kmers){
+  std::string jellyfishPath = "/uufs/chpc.utah.edu/common/home/u0401321/RUFUS/src/externals/jellyfish-2.2.5/bin/jellyfish";
+  
+  std::map<std::string, int32_t> ret;
+  for (const auto & kmer : kmers){
+
+    std::string cmd = jellyfishPath + " query " + jhashPath + " " + kmer;
+    //std::cout << "executing command: " << cmd << std::endl;
+    
+    std::string queryOutput = util::exec(cmd.c_str());
+    //std::cout << "command output is: " << queryOutput << std::endl;
+    std::istringstream iss(queryOutput);
+    std::vector<std::string> kmerCount((std::istream_iterator<std::string>(iss)), std::istream_iterator<std::string>());
+
+    if(kmerCount.size() == 2){
+      ret.insert({kmerCount[0], atoi(kmerCount[1].c_str())});
+    }
+  }
+  return ret;
+}
 
 const std::vector<std::string> util::kmerize(const std::string & sequence, const int32_t & kmerSize){
   int32_t kmercount = 0;

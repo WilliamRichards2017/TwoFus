@@ -13,6 +13,7 @@ class clipCoords{
 
 public:
   clipCoords();
+  clipCoords(const clipCoords &);
   clipCoords(const BamTools::BamAlignment &);
   ~clipCoords();
 

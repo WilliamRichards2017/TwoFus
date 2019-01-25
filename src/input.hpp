@@ -20,6 +20,8 @@ class input{
   std::string referencePath_;
   std::string referenceIndexPath_;
   std::string vcfOutPath_;
+  std::string kmerPath_;
+
 
   std::vector<std::string> parentBamPaths_;
 

@@ -7,6 +7,7 @@
 #include "api/BamMultiReader.h"
 #include "api/BamWriter.h"
 
+#include "clipCoords.hpp"
 #include "input.hpp"
 
 struct variant{
@@ -29,6 +30,9 @@ public:
   const BamTools::BamAlignment & getLeftContig();
   const BamTools::BamAlignment & getRightContig();
   const std::vector<BamTools::RefData> & getRefData();
+  const variant & getInsertionVariant();
+  const std::pair<clipCoords, clipCoords> & getClipCoords();
+  const std::pair<std::string, std::string> & getCigarStrings();
   
 private:
  
@@ -57,6 +61,10 @@ private:
   std::vector<std::string> refKmers_;
   std::vector<std::string> altKmers_;
 
+  std::pair<clipCoords, clipCoords> clipCoords_;
+
+  std::vector<int32_t> kmerDepths_;
+
   void populateLeftAndRightContigs();
   void populateClipsConverge();
   void populateBreakpoints();
@@ -64,6 +72,7 @@ private:
   void populateRefKmers();
   void populateAltKmers();
   void populateCigarStrings();
+  void populateKmerDepths();
   
 };
 
