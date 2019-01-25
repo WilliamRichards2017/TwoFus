@@ -18,6 +18,7 @@ add_library(twofus_core STATIC
 	polyTail.cpp
 	mobileElement.cpp
 	insertion.cpp
+	translocation.cpp
 	contigs.cpp
 	vcfWriter.cpp
 )

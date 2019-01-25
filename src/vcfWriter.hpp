@@ -9,6 +9,15 @@
 
 enum variantType { mobEl, ins, trans};
 
+struct formatField {
+  int32_t DP = -1; // FORMAT=<ID=DP,Number=1,Type=Integer,Description=\"Total Kmer depth across the variant\">
+  int32_t RO = -1; // FORMAT=<ID=RO,Number=1,Type=Integer,Description=\"Mode of reference kmer counts\"
+  int32_t AO = -1; // FORMAT=<ID=AO,Number=1,Type=Integer,Description=\"Mode of alt kmer counts\">
+  int32_t LP = -1; // FORMAT=<ID=LP,Number=1,Type=Integer,Description=\"Number of lowcoverage parent bases\"
+  int32_t PC = -1; // FORMAT=<ID=PC,Number=1,Type=Integer,Description=\"Mode of parents coverage\">
+  float SB = -1.0; // FORMAT=<ID=SB,Number=1,Type=Float,Description=\"StrandBias\">
+};
+
 struct infoField {
   int32_t NR  =  -1; // INFO=<ID=NR,Number=1,Type=Integer,Description="Number of total reads in target region">
   int32_t NTC = -1;
@@ -40,7 +49,7 @@ struct vcfLine {
   int32_t QUAL = -1;
   //filterField FILTER = {};
   infoField INFO = {};
-  //formatField FORMAT = {};
+  formatField FORMAT = {};
 };
 
 
@@ -64,8 +73,11 @@ private:
 
   void populateMELine();
   void populateMEInfoField();
+  void populateMEFormatField();
+
   void populateINSLine();
   void populateINSInfoField();
+  void populateINSFormatField();
 
   void writeShared();
   void writeHD();

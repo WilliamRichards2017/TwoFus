@@ -31,7 +31,7 @@ void vcfWriter::writeMEInfo(){
 }
 
 void vcfWriter::writeINSInfo(){
-  vcfStream_ << "SVTYPE=" << vcfLine_.INFO.SVTYPE << ";SVLEN= > " << vcfLine_.INFO.SVLEN << ";END=" << vcfLine_.INFO.END << ";RN=" << vcfLine_.INFO.RN << ";MQ=" << vcfLine_.INFO.MQ << ";cigar=" << vcfLine_.INFO.cigar << ";VT=" << vcfLine_.INFO.VT << ";CVT=" << vcfLine_.INFO.CVT << ";SB=" << vcfLine_.INFO.SB;
+  vcfStream_ << "SVTYPE=" << vcfLine_.INFO.SVTYPE << ";SVLEN= >" << vcfLine_.INFO.SVLEN << ";END=" << vcfLine_.INFO.END << ";RN=" << vcfLine_.INFO.RN << ";MQ=" << vcfLine_.INFO.MQ << ";cigar=" << vcfLine_.INFO.cigar << ";VT=" << vcfLine_.INFO.VT << ";CVT=" << vcfLine_.INFO.CVT << ";SB=" << vcfLine_.INFO.SB;
 }
 
 void vcfWriter::writeMELine(){
@@ -46,13 +46,18 @@ void vcfWriter::writeINSLine(){
   vcfWriter::writeHD();
 }
 
+void vcfWriter::populateMEFormatField(){
+}
+
+void vcfWriter::populateINSFormatField(){
+}
 
 
 void vcfWriter::populateINSInfoField(){
   vcfLine_.INFO.SVTYPE = "largeINS";
   vcfLine_.INFO.SVLEN = INS_.getInsertionVariant().alt.length();
   vcfLine_.INFO.END = INS_.getClipCoords().second.rightPos_ + INS_.getClipCoords().second.globalOffset_;
-  vcfLine_.INFO.RN = INS_.getLeftContig().Name + "3<-->" + INS_.getRightContig().Name;
+  vcfLine_.INFO.RN = INS_.getLeftContig().Name + "<-->" + INS_.getRightContig().Name;
   vcfLine_.INFO.MQ = std::max(INS_.getLeftContig().MapQuality, INS_.getRightContig().MapQuality);
   vcfLine_.INFO.cigar = INS_.getCigarStrings().first + "<-->" + INS_.getCigarStrings().second;
   //TODO: combine SBs, write util function to calculate SB from two contigs
