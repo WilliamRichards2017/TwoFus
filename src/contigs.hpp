@@ -33,15 +33,15 @@ private:
   std::vector<groupedContigs> groupedSplitAlignedContigs_;
 
 
-  std::map<std::string, std::pair<BamTools::BamAlignment, int32_t> > contigCountMap_;
+  std::map<std::string, std::vector<BamTools::BamAlignment> > SAMap_;
+
 
   void findAllContigs();
   void groupNearbyContigs();
   void findSplitAlignedContigs();
   void findMobileElementContigs();
-  void populateContigCountMap();
   void filterForInsertionAndTransContigs();
-
+  void populateSAMap();
   void alignContigsToMEList();
 
   std::vector<std::pair<BamTools::BamAlignment, MEHit> > contigsAlignedToMEList_;

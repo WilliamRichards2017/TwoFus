@@ -21,6 +21,26 @@
 
 KSEQ_INIT(gzFile, gzread)
 
+
+void contigs::populateSAMap(){
+  for(const auto & g : groupedSplitAlignedContigs_){
+    for(const auto & c : g){
+      auto it = SAMap_.find(c.Name);
+
+
+      if(it==SAMap_.end()){
+	std::vector<BamTools::BamAlignment> vec;
+	vec.push_back(c);
+	SAMap_.insert({c.Name, vec});
+      }
+      else{
+	it->second.push_back(c);
+      }
+
+    }
+  }
+}
+
 void contigs::findAllContigs(){
   BamTools::BamReader reader = util::openBamFile(i_.contigBamPath_);
   BamTools::BamAlignment al;
@@ -33,23 +53,6 @@ void contigs::findAllContigs(){
   reader.Close();
 }
 
-void contigs::populateContigCountMap(){
-  for(const auto & g : groupedSplitAlignedContigs_){
-    for(const auto & c : g){
-
-      auto it = contigCountMap_.find(c.Name);
-
-      if(it == contigCountMap_.end()){
-	contigCountMap_.insert({c.Name, std::make_pair(c,1)});
-      }
-      else{
-	it->second.second++;
-      }
-    }
-  }
-}
-
-
 void contigs::filterForInsertionAndTransContigs(){
 
   for(const auto & g : groupedSplitAlignedContigs_){
@@ -57,21 +60,11 @@ void contigs::filterForInsertionAndTransContigs(){
     
     for(const auto & c : g){
       
-      auto it = contigCountMap_.find(c.Name);
-      
-      if(it == contigCountMap_.end()){
-	std::cerr << "Error, contig not found in contigs::filterForInsertionAndTransContigs()" << std::endl;
-	std::cerr << "Dev must fix their logic" << std::endl;
-	exit (EXIT_FAILURE);
-      }
-
-      else{
-	if(it->second.second > 1){
+      if(c.HasTag("SA")){
 	  allUnique = false;
-	}
       }
-      
     }
+    
     if(allUnique){
       if(g.size() > 1){
 	groupedInsertionContigs_.push_back(g);
@@ -82,7 +75,7 @@ void contigs::filterForInsertionAndTransContigs(){
     else{
       if(g.size() > 1){
 	groupedTranslocationContigs_.push_back(g);
-	translocation TRANS = {g, i_};
+	translocation TRANS = {g, SAMap_, i_};
       }
     }
   }
@@ -258,7 +251,7 @@ void contigs::groupNearbyContigs(){
       groupedContigsVec_.push_back(g);
 
       previousContig = nextContig;
-      //++i; // Dont double count contig thats in a single and double grouping
+      ++i; // Dont double count contig thats in a single and double grouping
       //std::cout << "Double contig grouping for contig " << currentContig.Name << std::endl;
     }
     //case 3
@@ -308,8 +301,7 @@ contigs::contigs(const input & i) : i_(i){
   contigs::groupNearbyContigs();
   //contigs::findMobileElementContigs();
   contigs::findSplitAlignedContigs();
-  
-  contigs::populateContigCountMap();
+  contigs::populateSAMap();
   contigs::filterForInsertionAndTransContigs();
 
   vcfStream_.close();
