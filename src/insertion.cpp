@@ -33,9 +33,9 @@ const std::pair<std::string, std::string> & insertion::getCigarStrings(){
 
 void insertion::populateKmerDepths(){
   auto kmerCounts = util::countKmersFromJhash(i_.kmerPath_, altKmers_);
-  std::cout << "Printing out kmer depths" << std::endl;
-  for(const auto kmer : kmerCounts){
-    std::cout << kmer.first << ':' << kmer.second << std::endl;
+
+  for(const auto & k : kmerCounts){
+    kmerDepths_.push_back(k.second);
   }
 }
 

@@ -14,6 +14,7 @@
 #include "input.hpp"
 #include "insertion.hpp"
 #include "mobileElement.hpp"
+#include "translocation.hpp"
 #include "util.hpp"
 #include "vcfWriter.hpp"
 
@@ -81,6 +82,7 @@ void contigs::filterForInsertionAndTransContigs(){
     else{
       if(g.size() > 1){
 	groupedTranslocationContigs_.push_back(g);
+	translocation TRANS = {g, i_};
       }
     }
   }
@@ -256,7 +258,7 @@ void contigs::groupNearbyContigs(){
       groupedContigsVec_.push_back(g);
 
       previousContig = nextContig;
-      ++i; // Dont double count contig thats in a single and double grouping
+      //++i; // Dont double count contig thats in a single and double grouping
       //std::cout << "Double contig grouping for contig " << currentContig.Name << std::endl;
     }
     //case 3
@@ -274,8 +276,14 @@ void contigs::groupNearbyContigs(){
       ++i; //avoid double counting contigs
       //std::cout << "Triple contig grouping for contig " << currentContig.Name << std::endl;
     }
+    else if(contigs::isNearby(previousContig, currentContig)){
+      g.push_back(previousContig);
+      g.push_back(currentContig);
+      groupedContigsVec_.push_back(g);
+    }
     else{
       std::cerr << "Warning: unhandled case in contigs::groupNearbyContigs()" << std::endl;
+      
       std::cerr << "PreviousContig coords: " << previousContig.RefID << ':' << previousContig.Position << '-' << previousContig.GetEndPosition() << std::endl;
       std::cerr << "CurrentContig coords: " << currentContig.RefID << ':' << currentContig.Position << '-' << currentContig.GetEndPosition() << std::endl;
       std::cerr << "NextContig coords: " << nextContig.RefID << ':' << nextContig.Position << '-' << nextContig.GetEndPosition() << std::endl;
@@ -298,7 +306,7 @@ contigs::contigs(const input & i) : i_(i){
 
   contigs::findAllContigs();
   contigs::groupNearbyContigs();
-  contigs::findMobileElementContigs();
+  //contigs::findMobileElementContigs();
   contigs::findSplitAlignedContigs();
   
   contigs::populateContigCountMap();
