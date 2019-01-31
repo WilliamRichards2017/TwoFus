@@ -291,7 +291,7 @@ contigs::contigs(const input & i) : i_(i){
   vcfStream_.open(i_.vcfOutPath_.c_str(), std::fstream::in | std::fstream::out | std::fstream::app);
 
   if(! vcfStream_.is_open()){
-    std::cout << "Could not open " << vcfFile << std::endl;
+    std::cout << "Could not open " << i_.vcfOutPath_ << std::endl;
     std::cout << "Exiting run with non-zero exit status" << std::endl;
     exit(EXIT_FAILURE);
   }
