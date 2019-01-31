@@ -82,7 +82,6 @@ void contigs::filterForInsertionAndTransContigs(){
   std::cout << "found " << groupedInsertionContigs_.size() << " insertion groups" << std::endl;
   std::cout << "found " << groupedTranslocationContigs_.size() << " translocation groups" << std::endl;
   
-  vcfStream_.close();
 }
 
 void contigs::alignContigsToMEList(){
@@ -287,9 +286,9 @@ void contigs::groupNearbyContigs(){
 
 contigs::contigs(const input & i) : i_(i){
 
-  std::string vcfFile = "/uufs/chpc.utah.edu/common/home/u0401321/TwoFus/bin/testy.vcf";
-  std::cout << "Appending to vcf test file: " << vcfFile << std::endl;
-  vcfStream_.open(vcfFile.c_str(), std::fstream::in | std::fstream::out | std::fstream::app);
+  //std::string vcfFile = "/uufs/chpc.utah.edu/common/home/u0401321/TwoFus/bin/testy.vcf";
+  //std::cout << "Appending to vcf test file: " << vcfFile << std::endl;
+  vcfStream_.open(i_.vcfOutPath_.c_str(), std::fstream::in | std::fstream::out | std::fstream::app);
 
   if(! vcfStream_.is_open()){
     std::cout << "Could not open " << vcfFile << std::endl;
@@ -299,7 +298,7 @@ contigs::contigs(const input & i) : i_(i){
 
   contigs::findAllContigs();
   contigs::groupNearbyContigs();
-  //contigs::findMobileElementContigs();
+  contigs::findMobileElementContigs();
   contigs::findSplitAlignedContigs();
   contigs::populateSAMap();
   contigs::filterForInsertionAndTransContigs();
