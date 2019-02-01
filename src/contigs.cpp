@@ -76,6 +76,7 @@ void contigs::filterForInsertionAndTransContigs(){
       if(g.size() > 1){
 	groupedTranslocationContigs_.push_back(g);
 	translocation TRANS = {g, SAMap_, i_};
+	vcfWriter v = {vcfStream_, TRANS, i_};
       }
     }
   }
@@ -212,15 +213,6 @@ void contigs::findMobileElementContigs(){
 }
 
 
-bool contigs::isNearby(const BamTools::BamAlignment & al1, const BamTools::BamAlignment & al2){
-  int32_t maxDist = 1000;
-
-  if(al1.RefID == al2.RefID and std::abs(al1.Position-al2.Position) < maxDist){
-    //std::cout << "Found Nearby contigs at: " << al1.RefID << ':' << al1.Position << '-' << al1.GetEndPosition() << std::endl;
-    return true;
-  }
-  return false;
-}
 
 void contigs::groupNearbyContigs(){
 
@@ -236,7 +228,7 @@ void contigs::groupNearbyContigs(){
     
     
     //Case 1 - No grouping
-    if(!contigs::isNearby(previousContig, currentContig) and !contigs::isNearby(currentContig, nextContig)){
+    if(!util::isNearby(previousContig, currentContig) and !util::isNearby(currentContig, nextContig)){
       g.push_back(currentContig);
       groupedContigsVec_.push_back(g);
       
@@ -244,7 +236,7 @@ void contigs::groupNearbyContigs(){
       //std::cout << "No contig grouping for contig " << currentContig.Name << std::endl;
     }
     //Case 2 - Current and Next only group
-    else if(!contigs::isNearby(previousContig, currentContig) and contigs::isNearby(currentContig, nextContig)){
+    else if(!util::isNearby(previousContig, currentContig) and util::isNearby(currentContig, nextContig)){
       g.push_back(currentContig);
       g.push_back(nextContig);
       groupedContigsVec_.push_back(g);
@@ -254,7 +246,7 @@ void contigs::groupNearbyContigs(){
       //std::cout << "Double contig grouping for contig " << currentContig.Name << std::endl;
     }
     //case 3
-    else if(contigs::isNearby(previousContig, currentContig) and contigs::isNearby(currentContig, nextContig)){
+    else if(util::isNearby(previousContig, currentContig) and util::isNearby(currentContig, nextContig)){
       groupedContigs g2;
       g.push_back(previousContig);
       g.push_back(currentContig);
@@ -268,7 +260,7 @@ void contigs::groupNearbyContigs(){
       ++i; //avoid double counting contigs
       //std::cout << "Triple contig grouping for contig " << currentContig.Name << std::endl;
     }
-    else if(contigs::isNearby(previousContig, currentContig)){
+    else if(util::isNearby(previousContig, currentContig)){
       g.push_back(previousContig);
       g.push_back(currentContig);
       groupedContigsVec_.push_back(g);
@@ -286,12 +278,12 @@ void contigs::groupNearbyContigs(){
 
 contigs::contigs(const input & i) : i_(i){
 
-  //std::string vcfFile = "/uufs/chpc.utah.edu/common/home/u0401321/TwoFus/bin/testy.vcf";
-  //std::cout << "Appending to vcf test file: " << vcfFile << std::endl;
-  vcfStream_.open(i_.vcfOutPath_.c_str(), std::fstream::in | std::fstream::out | std::fstream::app);
+  std::string vcfFile = "/uufs/chpc.utah.edu/common/home/u0401321/TwoFus/bin/testy.vcf";
+  //vcfStream_.open(i_.vcfOutPath_.c_str(), std::fstream::in | std::fstream::out | std::fstream::app);
+  vcfStream_.open(vcfFile.c_str(), std::fstream::in | std::fstream::out | std::fstream::app);
 
   if(! vcfStream_.is_open()){
-    std::cout << "Could not open " << i_.vcfOutPath_ << std::endl;
+    //std::cout << "Could not open " << i_.vcfOutPath_ << std::endl;
     std::cout << "Exiting run with non-zero exit status" << std::endl;
     exit(EXIT_FAILURE);
   }

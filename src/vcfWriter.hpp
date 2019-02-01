@@ -6,6 +6,7 @@
 #include "input.hpp"
 #include "insertion.hpp"
 #include "mobileElement.hpp"
+#include "translocation.hpp"
 
 enum variantType { mobEl, ins, trans};
 
@@ -56,13 +57,15 @@ struct vcfLine {
 class vcfWriter{
 
 public:
-  vcfWriter(std::fstream & vcfStream, insertion &, input &);
-  vcfWriter(std::fstream & vcfStream, mobileElement &, input &);
+  vcfWriter(std::fstream &, insertion &, input &);
+  vcfWriter(std::fstream &, mobileElement &, input &);
+  vcfWriter(std::fstream &, translocation &, input &);
 
 private:
   variantType variantType_;
   mobileElement ME_;
   insertion INS_;
+  translocation TRANS_;
   input i_;
 
   std::fstream & vcfStream_;
@@ -79,13 +82,21 @@ private:
   void populateINSInfoField();
   void populateINSFormatField();
 
+  void populateTRANSLine();
+  void populateTRANSInfoField();
+  void populateTRANSFormatField();
+
   void writeShared();
   void writeHD();
+
   void writeMELine();			
   void writeMEInfo();
 
   void writeINSLine();
   void writeINSInfo();
+
+  void writeTRANSLine();
+  void writeTRANSInfo();
 
 
   void printVCFLine();

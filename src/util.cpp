@@ -10,6 +10,62 @@
 #include "api/BamMultiReader.h"
 #include "api/BamWriter.h"
 
+
+const bool util::isNearby(const BamTools::BamAlignment & al1, const BamTools::BamAlignment & al2){
+  int32_t maxDist = 200;
+  if(al1.RefID == al2.RefID and std::abs(al1.Position-al2.Position) < maxDist){
+    return true;
+  }
+  return false;
+}
+
+const std::pair<BamTools::BamAlignment, BamTools::BamAlignment> util::findLeftAndRightContigs(const std::vector<BamTools::BamAlignment> & groupedContigs){
+  BamTools::BamAlignment leftContig;
+  BamTools::BamAlignment rightContig;
+  
+  if(groupedContigs.size() < 2){
+    std::cerr << "Inside util::populateLeftAndRightContigs() without atleast two contigs..." << std::endl;
+    std::cerr << "Exiting run with non-zero status..." << std::endl;
+    exit (EXIT_FAILURE);
+  }
+
+  else if(groupedContigs.size() > 2){
+    std::cerr << "Warning: group has more than two contigs in util::populateLeftAndRightContigs()" << std::endl;
+    std::cerr << "Proceding using left most and right most contig" << std::endl;
+  }
+
+  int32_t leftMostPos = std::numeric_limits<int32_t>::max();
+  int32_t rightMostPos = -1;
+  int32_t leftIndex = -1;
+  int32_t rightIndex = -1;
+  for(unsigned i = 0; i < groupedContigs.size(); ++i){
+
+    std::cout << "populating left and right contigs for contig: " << groupedContigs[i].Name << " at position " << groupedContigs[i].Position <<  std::endl;
+    //std::cout << "comparing if " << groupedContigs[i].Position << " < " << leftMostPos << std::endl;
+    //std::cout << "comparing if " << groupedContigs[i].Position << " > " << rightMostPos << std::endl;
+                                                                            
+    if(groupedContigs[i].Position < leftMostPos){
+      leftMostPos = groupedContigs[i].Position;
+      leftIndex = i;
+    }
+    if(groupedContigs[i].Position > rightMostPos){
+      rightMostPos = groupedContigs[i].Position;
+      rightIndex = i;
+    }
+  }
+
+  if(leftIndex != -1){
+    leftContig = groupedContigs[leftIndex];
+    //std::cout << "leftContig_.Name is: " << leftContig_.Name << std::endl;
+  }
+  if(rightIndex != -1){
+    rightContig = groupedContigs[rightIndex];
+    //std::cout << "rightContig_.Name is: " << rightContig_.Name << std::endl;
+  }
+  return std::make_pair(leftContig, rightContig);
+}
+
+
 const int32_t util::countMinKmerDepth(const std::vector<std::pair<std::string, int32_t> > & kmers){
   std::vector<int32_t> kmerCounts;
 
@@ -32,7 +88,6 @@ const std::map<std::string, int32_t> util::countKmersFromJhash(const std::string
   
   std::map<std::string, int32_t> ret;
   for (const auto & kmer : kmers){
-
     std::string cmd = jellyfishPath + " query " + jhashPath + " " + kmer;
     //std::cout << "executing command: " << cmd << std::endl;
     
@@ -100,8 +155,7 @@ const std::vector<std::string> util::split(const std::string & line, const char 
 
 const float util::calculateStrandBiasFromContigName(const std::string & contigName){
 
-  std::cout << "Calculating strand bias from contigName: " << contigName << std::endl;
-  std::vector<std::string> tokenizedName = util::split(contigName, ':');
+    std::vector<std::string> tokenizedName = util::split(contigName, ':');
 
   std::pair<std::pair<int32_t, int32_t>, float> f;
 
@@ -109,10 +163,24 @@ const float util::calculateStrandBiasFromContigName(const std::string & contigNa
     f.first = std::make_pair(std::atoi(tokenizedName[1].c_str()), std::atoi(tokenizedName[2].c_str()));
     f.second = float(f.first.first)/(float(f.first.first) + float(f.first.second));
 
-    std::cout << "Calculating strand bias to be : " << f.second << std::endl;
+  }
+  return f.second;
+}
+
+const float util::calculateStrandBiasFromContigNames(const std::vector<std::string> & contigNames){
+  float forwardCount = 0;
+  float reverseCount = 0;
+  for(const auto & cn : contigNames){
+    std::vector<std::string> tokenizedName = util::split(cn, ':');
+    forwardCount += std::atoi(tokenizedName[1].c_str());
+    reverseCount += std::atoi(tokenizedName[2].c_str());
+    
+    std::cout << "forwardCount: " << forwardCount << std::endl;
+    std::cout << "reverseCount: " << reverseCount << std::endl;
   }
 
-  return f.second;
+  std::cout << "SB from contigNames is: " << forwardCount/(forwardCount+reverseCount) << std::endl;
+  return forwardCount/(forwardCount+reverseCount);
 }
 
 BamTools::BamReader util::openBamFile(const std::string & bamPath){

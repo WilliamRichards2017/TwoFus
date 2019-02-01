@@ -4,7 +4,9 @@
 #include <vector>
 
 #include "input.hpp"
+#include "insertion.hpp"
 #include "mobileElement.hpp"
+#include "translocation.hpp"
 #include "util.hpp"
 
 void vcfWriter::printVCFLine(){
@@ -27,7 +29,11 @@ void vcfWriter::writeHD(){
 }
 
 void vcfWriter::writeMEInfo(){
-  vcfStream_ << "NHC=" << vcfLine_.INFO.NHC << ";NTC=" << vcfLine_.INFO.NTC << ";NHR=" << vcfLine_.INFO.NHR << ";NTR" << vcfLine_.INFO.NTR << ";LT=" << vcfLine_.INFO.LT << ";SB=" << vcfLine_.INFO.SB << '\t';
+  vcfStream_ << "NHC=" << vcfLine_.INFO.NHC << ";NTC=" << vcfLine_.INFO.NTC << ";NHR=" << vcfLine_.INFO.NHR << ";NTR=" << vcfLine_.INFO.NTR << ";LT=" << vcfLine_.INFO.LT << ";SB=" << vcfLine_.INFO.SB;
+}
+
+void vcfWriter:: writeTRANSInfo(){
+  vcfStream_ << "SVTYPE=" << vcfLine_.INFO.SVTYPE;
 }
 
 void vcfWriter::writeINSInfo(){
@@ -38,12 +44,19 @@ void vcfWriter::writeMELine(){
   vcfWriter::writeShared();
   vcfWriter::writeMEInfo();
   vcfWriter::writeHD();
+  vcfStream_ << std::endl;
 }
 
 void vcfWriter::writeINSLine(){
   vcfWriter::writeShared();
   vcfWriter::writeINSInfo();
   vcfWriter::writeHD();
+  vcfStream_ << std::endl;
+}
+
+void vcfWriter::writeTRANSLine(){
+  vcfWriter::writeShared();
+  vcfWriter::writeTRANSInfo();
 }
 
 void vcfWriter::populateMEFormatField(){
@@ -61,7 +74,13 @@ void vcfWriter::populateINSInfoField(){
   vcfLine_.INFO.MQ = std::max(INS_.getLeftContig().MapQuality, INS_.getRightContig().MapQuality);
   vcfLine_.INFO.cigar = INS_.getCigarStrings().first + "<-->" + INS_.getCigarStrings().second;
   //TODO: combine SBs, write util function to calculate SB from two contigs
-  vcfLine_.INFO.SB = (util::calculateStrandBiasFromContigName(INS_.getLeftContig().Name) + util::calculateStrandBiasFromContigName(INS_.getRightContig().Name))/float(2);
+
+
+  std::vector<std::string> contigNames;
+  contigNames.push_back(INS_.getLeftContig().Name);
+  contigNames.push_back(INS_.getRightContig().Name);
+
+  vcfLine_.INFO.SB = util::calculateStrandBiasFromContigNames(contigNames);
 }
 
 void vcfWriter::populateMEInfoField(){
@@ -71,6 +90,9 @@ void vcfWriter::populateMEInfoField(){
   vcfLine_.INFO.NTR = ME_.getTailContigs().front().getSupportingReads().size();
   vcfLine_.INFO.SB = ME_.getStrandBias();
   vcfLine_.INFO.LT = ME_.getMostSupportedTail().getLongestTail();
+}
+
+void vcfWriter::populateTRANSInfoField(){
 
 }
 
@@ -96,6 +118,19 @@ void vcfWriter::populateMELine(){
 }
 
 
+//TODO refactor RefID to Chrom, store RefData in TRANS class
+void vcfWriter::populateTRANSLine(){
+  vcfLine_.CHROM = vcfContig_.RefID;
+  vcfLine_.POS = vcfContig_.Position;
+  vcfLine_.ID = "TRANS";
+  vcfLine_.REF = "N";
+  vcfLine_.ALT = "TRANS";
+  vcfLine_.QUAL = std::max(TRANS_.getLeftContig().MapQuality, TRANS_.getRightContig().MapQuality);
+
+  vcfWriter::populateTRANSInfoField();
+}
+
+
 
 vcfWriter::vcfWriter(std::fstream & vcfStream, insertion & INS, input & i) : INS_(INS), i_(i), variantType_(ins), vcfStream_(vcfStream){
   vcfContig_ = INS_.getLeftContig();
@@ -105,10 +140,16 @@ vcfWriter::vcfWriter(std::fstream & vcfStream, insertion & INS, input & i) : INS
 
 }
 
-vcfWriter::vcfWriter(std::fstream & vcfStream, mobileElement & ME, input & i): ME_(ME), i_(i), variantType_(mobEl), vcfStream_(vcfStream){
+vcfWriter::vcfWriter(std::fstream & vcfStream, mobileElement & ME, input & i) : ME_(ME), i_(i), variantType_(mobEl), vcfStream_(vcfStream){
   vcfContig_ = ME_.getHeadContigs().front().getContig();
   vcfWriter::populateMELine();
   vcfWriter::writeMELine();
   vcfWriter::printVCFLine();	       
 }
 
+vcfWriter::vcfWriter(std::fstream & vcfStream, translocation & TRANS, input & i) : TRANS_(TRANS), i_(i), variantType_(trans), vcfStream_(vcfStream){
+  vcfContig_ = TRANS_.getSAMap().begin()->second.front();
+  vcfWriter::populateTRANSLine();
+  vcfWriter::writeTRANSLine();
+  vcfWriter::printVCFLine();
+}
