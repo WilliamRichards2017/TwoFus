@@ -4,6 +4,7 @@
 #include "api/BamMultiReader.h"
 #include "api/BamWriter.h"
 
+#include "clipCoords.hpp"
 #include "input.hpp"
 
 class translocation{
@@ -16,8 +17,12 @@ public:
 
   const std::map<std::string, std::vector<BamTools::BamAlignment> > & getSAMap();
 
-  const BamTools::BamAlignment & getLeftContig();
-  const BamTools::BamAlignment & getRightContig();
+  const bool isTrans();
+
+  const std::pair<BamTools::BamAlignment, BamTools::BamAlignment> & getPrimaryContigs();
+  const std::pair<BamTools::BamAlignment, BamTools::BamAlignment> & getSecondaryContigs();
+  
+
 
 private:
 
@@ -25,12 +30,15 @@ private:
   std::vector<BamTools::BamAlignment> groupedContigs_;
   std::map<std::string, std::vector<BamTools::BamAlignment> > SAMap_;
 
-  BamTools::BamAlignment leftContig_;
-  BamTools::BamAlignment rightContig_;
+  std::pair<clipCoords, clipCoords> primaryClipCoords_;
+  std::pair<clipCoords, clipCoords> secondaryClipCoords_;
+
+  std::pair<BamTools::BamAlignment, BamTools::BamAlignment> primaryContigs_;
+  std::pair<BamTools::BamAlignment, BamTools::BamAlignment> secondaryContigs_;
 
 
+  void populatePrimaryAndSecondaryContigs();
   void populateLeftAndRightContigs();
-  const bool isTrans();
   std::vector<BamTools::BamAlignment> pullAllReadsWithName(const std::string &);
 
 };

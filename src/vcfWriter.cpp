@@ -33,7 +33,7 @@ void vcfWriter::writeMEInfo(){
 }
 
 void vcfWriter:: writeTRANSInfo(){
-  vcfStream_ << "SVTYPE=" << vcfLine_.INFO.SVTYPE;
+  writeINSInfo();
 }
 
 void vcfWriter::writeINSInfo(){
@@ -55,8 +55,11 @@ void vcfWriter::writeINSLine(){
 }
 
 void vcfWriter::writeTRANSLine(){
-  vcfWriter::writeShared();
-  vcfWriter::writeTRANSInfo();
+  if(TRANS_.isTrans()){
+    vcfWriter::writeShared();
+    vcfWriter::writeTRANSInfo();
+    vcfStream_ << std::endl;
+  }
 }
 
 void vcfWriter::populateMEFormatField(){
@@ -94,6 +97,16 @@ void vcfWriter::populateMEInfoField(){
 
 void vcfWriter::populateTRANSInfoField(){
 
+  vcfLine_.INFO.SVTYPE = "Translocation";
+  vcfLine_.INFO.SVLEN = -1;
+  vcfLine_.INFO.END = -1;
+  vcfLine_.INFO.RN = TRANS_.getPrimaryContigs().first.Name + "<-->" + TRANS_.getSecondaryContigs().second.Name;
+  vcfLine_.INFO.MQ = -1;
+  vcfLine_.INFO.cigar = "";
+  vcfLine_.INFO.CVT = "T";
+  vcfLine_.INFO.HD = {-1, -1};
+  vcfLine_.INFO.VT = "TRANS";
+ 
 }
 
 void vcfWriter::populateINSLine(){
@@ -120,12 +133,12 @@ void vcfWriter::populateMELine(){
 
 //TODO refactor RefID to Chrom, store RefData in TRANS class
 void vcfWriter::populateTRANSLine(){
-  vcfLine_.CHROM = vcfContig_.RefID;
+  vcfLine_.CHROM = std::to_string(vcfContig_.RefID);
   vcfLine_.POS = vcfContig_.Position;
   vcfLine_.ID = "TRANS";
   vcfLine_.REF = "N";
   vcfLine_.ALT = "TRANS";
-  vcfLine_.QUAL = std::max(TRANS_.getLeftContig().MapQuality, TRANS_.getRightContig().MapQuality);
+  vcfLine_.QUAL = std::max(TRANS_.getPrimaryContigs().first.MapQuality, TRANS_.getPrimaryContigs().second.MapQuality);
 
   vcfWriter::populateTRANSInfoField();
 }
@@ -148,7 +161,7 @@ vcfWriter::vcfWriter(std::fstream & vcfStream, mobileElement & ME, input & i) : 
 }
 
 vcfWriter::vcfWriter(std::fstream & vcfStream, translocation & TRANS, input & i) : TRANS_(TRANS), i_(i), variantType_(trans), vcfStream_(vcfStream){
-  vcfContig_ = TRANS_.getSAMap().begin()->second.front();
+  vcfContig_ = TRANS_.getPrimaryContigs().first;
   vcfWriter::populateTRANSLine();
   vcfWriter::writeTRANSLine();
   vcfWriter::printVCFLine();

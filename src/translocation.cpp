@@ -4,12 +4,12 @@
 
 #include "util.hpp"
 
-const BamTools::BamAlignment & translocation::getLeftContig(){
-  return leftContig_;
+const std::pair<BamTools::BamAlignment, BamTools::BamAlignment> & translocation::getPrimaryContigs(){
+  return primaryContigs_;
 }
 
-const BamTools::BamAlignment & translocation::getRightContig(){
-  return rightContig_;
+const std::pair<BamTools::BamAlignment, BamTools::BamAlignment> & translocation::getSecondaryContigs(){
+  return secondaryContigs_;
 }
 
 const std::map<std::string, std::vector<BamTools::BamAlignment> > & translocation::getSAMap(){
@@ -17,23 +17,45 @@ const std::map<std::string, std::vector<BamTools::BamAlignment> > & translocatio
 }
 
 
-bool contigAndGroupOverlap(const BamTools::BamAlignment & contig, const std::vector<BamTools::BamAlignment> & group){
+
+BamTools::BamAlignment contigAndGroupOverlap(const BamTools::BamAlignment & contig, const std::vector<BamTools::BamAlignment> & group){
+  BamTools::BamAlignment nullAl;
 
   for(const auto & c : group){
     if(util::isNearby(contig, c)){
-      return true;
+      return c;
     }
   }
-  return false;
+  return nullAl;
 }
 
 const bool translocation::isTrans(){
 
-  auto leftContigs = translocation::pullAllReadsWithName(leftContig_.Name);
-  auto rightContigs = translocation::pullAllReadsWithName(rightContig_.Name);
+  auto leftContigs = translocation::pullAllReadsWithName(primaryContigs_.first.Name);
+  auto rightContigs = translocation::pullAllReadsWithName(secondaryContigs_.first.Name);
+
+
+  std::cout << "Left Contig Positions" << std::endl;
+  for(const auto & l : leftContigs){
+    std::cout << l.RefID << ':' << l.Position << std::endl;
+  }
+
+  std::cout << "Right Contig Positions" << std::endl;
+  for(const auto & r : rightContigs){
+    std::cout << r.RefID << ':' << r.Position << std::endl;
+  }
 
   for(const auto & l : leftContigs){
-    if(contigAndGroupOverlap(l, rightContigs)){
+
+    auto al = contigAndGroupOverlap(l, rightContigs);
+    
+    if(al.Position != -1 and al.Position != l.Position and al.Name.compare(l.Name) != 0){
+
+      primaryContigs_.second = al;
+      secondaryContigs_.second = l;
+
+
+      std::cout << "Found secondary alignment for contigs " << l.Name << " and " << al.Name << std::endl;
       return true;
     }
   }
@@ -52,8 +74,8 @@ std::vector<BamTools::BamAlignment> translocation::pullAllReadsWithName(const st
 
 void translocation::populateLeftAndRightContigs(){
   auto contigs = util::findLeftAndRightContigs(groupedContigs_);
-  leftContig_ = contigs.first;
-  rightContig_ = contigs.second;
+  primaryContigs_.first = contigs.first;
+  secondaryContigs_.first = contigs.second;
 }
 
 
@@ -65,6 +87,11 @@ translocation::translocation(const std::vector<BamTools::BamAlignment> & grouped
 
   if(b){
     std::cout << "FOUND TRANS GROUPING" << std::endl;
+
+    std::cout << primaryContigs_.first.QueryBases.size() << "<-->" << primaryContigs_.second.QueryBases.size() << std::endl;
+    std::cout << primaryContigs_.first.Name << "<-->" << primaryContigs_.second.Name << std::endl;
+    std::cout << primaryContigs_.first.RefID << ':' << primaryContigs_.first.Position << "<-->" << primaryContigs_.second.RefID << ':' << primaryContigs_.second.Position << std::endl;
+    std::cout << secondaryContigs_.first.RefID << ':' << secondaryContigs_.first.Position << "<-->" << secondaryContigs_.second.RefID << ':' << secondaryContigs_.second.Position << std::endl;
   }
 } 
 
@@ -72,8 +99,11 @@ translocation::translocation(const translocation & t){
   i_ = t.i_;
   groupedContigs_ = t.groupedContigs_;
   SAMap_ = t.SAMap_;
-  leftContig_ = t.leftContig_;
-  rightContig_ = t.rightContig_;
+  primaryClipCoords_ = t.primaryClipCoords_;
+  secondaryClipCoords_ = t.secondaryClipCoords_;
+  primaryContigs_ = t.primaryContigs_;
+  secondaryContigs_ = t.secondaryContigs_;
+  
 }
 
 translocation::translocation(){

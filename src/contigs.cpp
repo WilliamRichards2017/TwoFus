@@ -236,7 +236,7 @@ void contigs::groupNearbyContigs(){
       //std::cout << "No contig grouping for contig " << currentContig.Name << std::endl;
     }
     //Case 2 - Current and Next only group
-    else if(!util::isNearby(previousContig, currentContig) and util::isNearby(currentContig, nextContig)){
+    else if(!util::isNearby(previousContig, currentContig) and util::isNearby(currentContig, nextContig) and currentContig.Name.compare(nextContig.Name) != 0){
       g.push_back(currentContig);
       g.push_back(nextContig);
       groupedContigsVec_.push_back(g);
@@ -250,21 +250,27 @@ void contigs::groupNearbyContigs(){
       groupedContigs g2;
       g.push_back(previousContig);
       g.push_back(currentContig);
-      groupedContigsVec_.push_back(g);
-      
+
+      if(g[0].Name.compare(g[1].Name) != 0){
+	groupedContigsVec_.push_back(g);
+      }
+	
       g2.push_back(currentContig);
       g2.push_back(nextContig);
-      groupedContigsVec_.push_back(g2);
-      
-      previousContig = nextContig;
-      ++i; //avoid double counting contigs
-      //std::cout << "Triple contig grouping for contig " << currentContig.Name << std::endl;
-    }
-    else if(util::isNearby(previousContig, currentContig)){
-      g.push_back(previousContig);
-      g.push_back(currentContig);
-      groupedContigsVec_.push_back(g);
-    }
+
+      if(g2[0].Name.compare(g2[1].Name) != 0){
+	groupedContigsVec_.push_back(g2);
+      }
+	
+	previousContig = nextContig;
+	++i; //avoid double counting contigs
+	//std::cout << "Triple contig grouping for contig " << currentContig.Name << std::endl;
+      }
+    else if(util::isNearby(previousContig, currentContig) and previousContig.Name.compare(currentContig.Name) != 0){
+	g.push_back(previousContig);
+	g.push_back(currentContig);
+	groupedContigsVec_.push_back(g);
+      }
     else{
       std::cerr << "Warning: unhandled case in contigs::groupNearbyContigs()" << std::endl;
       
