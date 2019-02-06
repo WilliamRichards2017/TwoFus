@@ -30,7 +30,7 @@ struct infoField {
   int32_t SVLEN = -1; // INFO=<ID=SVLEN,Number=1,Type=Integer,Description="Length of SV detected"> 
   int32_t END = -1; // INFO=<ID=END,Number=1,Type=Integer,Description="END of SV detected">
   std::string RN; // INFO=<ID=RN,Number=1,Type=String,Description="Name of contig that produced the call">
-  int16_t MQ = -1; // INFO=<ID=MQ,Number=1,Type=Integer,Description="Mapping quality of the contig that created the call">
+  std::vector<int16_t> MQ = {-1}; // INFO=<ID=MQ,Number=1,Type=Integer,Description="Mapping quality of the contig that created the call">
   std::string cigar = ""; 
   std::string VT = ""; //variant type
   std::string CVT = ""; //Compressed variant type
@@ -88,6 +88,7 @@ private:
 
   void writeShared();
   void writeHD();
+  void writeMQ();
 
   void writeMELine();			
   void writeMEInfo();

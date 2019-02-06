@@ -8,6 +8,14 @@ const std::pair<BamTools::BamAlignment, BamTools::BamAlignment> & translocation:
   return primaryContigs_;
 }
 
+const std::pair<clipCoords, clipCoords> & translocation::getPrimaryClipCoords(){
+  return primaryClipCoords_;
+}
+
+const std::pair<clipCoords, clipCoords> & translocation::getSecondaryClipCoords(){
+  return secondaryClipCoords_;
+}
+
 const std::pair<BamTools::BamAlignment, BamTools::BamAlignment> & translocation::getSecondaryContigs(){
   return secondaryContigs_;
 }
@@ -71,6 +79,15 @@ std::vector<BamTools::BamAlignment> translocation::pullAllReadsWithName(const st
   }
   return nullVec;
 }
+
+void translocation::populatePrimaryAndSecondaryClipCoords(){
+  primaryClipCoords_.first = clipCoords{primaryContigs_.first};
+  primaryClipCoords_.second = clipCoords{primaryContigs_.second};
+  
+  secondaryClipCoords_.first = clipCoords{secondaryContigs_.first};
+  secondaryClipCoords_.second = clipCoords{secondaryContigs_.second};
+}
+
 
 void translocation::populateLeftAndRightContigs(){
   auto contigs = util::findLeftAndRightContigs(groupedContigs_);

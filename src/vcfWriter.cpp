@@ -28,6 +28,13 @@ void vcfWriter::writeHD(){
   vcfStream_ << '\t';
 }
 
+void vcfWriter::writeMQ(){
+  vcfStream_ << ";MQ=";
+  for(const auto q : vcfLine_.INFO.MQ){
+    vcfStream_ << q << ',';
+  }
+}
+
 void vcfWriter::writeMEInfo(){
   vcfStream_ << "NHC=" << vcfLine_.INFO.NHC << ";NTC=" << vcfLine_.INFO.NTC << ";NHR=" << vcfLine_.INFO.NHR << ";NTR=" << vcfLine_.INFO.NTR << ";LT=" << vcfLine_.INFO.LT << ";SB=" << vcfLine_.INFO.SB;
 }
@@ -37,7 +44,9 @@ void vcfWriter:: writeTRANSInfo(){
 }
 
 void vcfWriter::writeINSInfo(){
-  vcfStream_ << "SVTYPE=" << vcfLine_.INFO.SVTYPE << ";SVLEN= >" << vcfLine_.INFO.SVLEN << ";END=" << vcfLine_.INFO.END << ";RN=" << vcfLine_.INFO.RN << ";MQ=" << vcfLine_.INFO.MQ << ";cigar=" << vcfLine_.INFO.cigar << ";VT=" << vcfLine_.INFO.VT << ";CVT=" << vcfLine_.INFO.CVT << ";SB=" << vcfLine_.INFO.SB;
+  vcfStream_ << "SVTYPE=" << vcfLine_.INFO.SVTYPE << ";SVLEN=" << vcfLine_.INFO.SVLEN << ";END=" << vcfLine_.INFO.END << ";RN=" << vcfLine_.INFO.RN;
+  vcfWriter::writeMQ();
+  vcfStream_ << ";cigar=" << vcfLine_.INFO.cigar << ";VT=" << vcfLine_.INFO.VT << ";CVT=" << vcfLine_.INFO.CVT << ";SB=" << vcfLine_.INFO.SB;
 }
 
 void vcfWriter::writeMELine(){
@@ -74,7 +83,7 @@ void vcfWriter::populateINSInfoField(){
   vcfLine_.INFO.SVLEN = INS_.getInsertionVariant().alt.length();
   vcfLine_.INFO.END = INS_.getClipCoords().second.rightPos_ + INS_.getClipCoords().second.globalOffset_;
   vcfLine_.INFO.RN = INS_.getLeftContig().Name + "<-->" + INS_.getRightContig().Name;
-  vcfLine_.INFO.MQ = std::max(INS_.getLeftContig().MapQuality, INS_.getRightContig().MapQuality);
+  vcfLine_.INFO.MQ = {INS_.getLeftContig().MapQuality, INS_.getRightContig().MapQuality};
   vcfLine_.INFO.cigar = INS_.getCigarStrings().first + "<-->" + INS_.getCigarStrings().second;
   //TODO: combine SBs, write util function to calculate SB from two contigs
 
@@ -96,16 +105,15 @@ void vcfWriter::populateMEInfoField(){
 }
 
 void vcfWriter::populateTRANSInfoField(){
-
   vcfLine_.INFO.SVTYPE = "Translocation";
-  vcfLine_.INFO.SVLEN = -1;
-  vcfLine_.INFO.END = -1;
+  vcfLine_.INFO.SVLEN = TRANS_.getPrimaryClipCoords().first.clippedSeq_.size() + TRANS_.getPrimaryClipCoords().second.clippedSeq_.size();
+  vcfLine_.INFO.END = TRANS_.getPrimaryClipCoords().second.rightPos_ + TRANS_.getPrimaryClipCoords().second.globalOffset_;
   vcfLine_.INFO.RN = TRANS_.getPrimaryContigs().first.Name + "<-->" + TRANS_.getSecondaryContigs().second.Name;
-  vcfLine_.INFO.MQ = -1;
+  vcfLine_.INFO.MQ = {TRANS_.getPrimaryContigs().first.MapQuality, TRANS_.getPrimaryContigs().second.MapQuality};
   vcfLine_.INFO.cigar = "";
-  vcfLine_.INFO.CVT = "T";
+  vcfLine_.INFO.CVT = "BND";
   vcfLine_.INFO.HD = {-1, -1};
-  vcfLine_.INFO.VT = "TRANS";
+  vcfLine_.INFO.VT = "Trans";
  
 }
 

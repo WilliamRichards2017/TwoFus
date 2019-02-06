@@ -268,22 +268,3 @@ contigs::~contigs(){
 }
 
 
-
-/*
-void printSplitAlignedClipSizes(const std::vector<groupedContigs> & groupedContigs){
-
-
-  for(const auto & g : groupedContigs){
-    for(const auto & c : g){
-      std::vector<int> clipSizes;
-      std::vector<int> readPositions;
-      std::vector<int> genomePositions;
-      
-      c.GetSoftClips(clipSizes, readPositions, genomePositions);
-      std::cout << "clipSizes.size() is: " << clipSizes.size() << std::endl;
-    }
-  }
-
-}
-*/
-
