@@ -177,13 +177,12 @@ void contigs::findSplitAlignedContigs(){
   for(const auto & g : groupedContigsVec_){
     bool groupIsSplitAligned = true;
     for(const auto & c : g){
-
+      
       std::vector<int> clipSizes;
       std::vector<int> readPositions;
       std::vector<int> genomePositions;
-      
       c.GetSoftClips(clipSizes, readPositions, genomePositions);
-
+      
       if(clipSizes.size() == 0){
 	groupIsSplitAligned = false;
       }
@@ -213,71 +212,31 @@ void contigs::findMobileElementContigs(){
 }
 
 
-
 void contigs::groupNearbyContigs(){
+  //std::vector<std::vector<BamTools::BamAlignment> > contigGroups;
+  std::vector<BamTools::BamAlignment> currentGroup;
+  currentGroup.push_back(contigVec_[0]);
+  contigVec_.erase(contigVec_.begin());
 
-  BamTools::BamAlignment previousContig;
-  BamTools::BamAlignment currentContig;
-  BamTools::BamAlignment nextContig;
-  
-  for(int i = 0; i < contigVec_.size()-1; ++i){
-    groupedContigs g;
-    
-    currentContig = contigVec_[i];
-    nextContig = contigVec_[i+1];
-    
-    
-    //Case 1 - No grouping
-    if(!util::isNearby(previousContig, currentContig) and !util::isNearby(currentContig, nextContig)){
-      g.push_back(currentContig);
-      groupedContigsVec_.push_back(g);
-      
-      previousContig = currentContig;
-      //std::cout << "No contig grouping for contig " << currentContig.Name << std::endl;
+  for(const auto & c : contigVec_){
+    if(util::isNearby(c, currentGroup.back())){
+      if(c.Name.compare(currentGroup.back().Name) != 0){
+	currentGroup.push_back(c);
+      }
     }
-    //Case 2 - Current and Next only group
-    else if(!util::isNearby(previousContig, currentContig) and util::isNearby(currentContig, nextContig) and currentContig.Name.compare(nextContig.Name) != 0){
-      g.push_back(currentContig);
-      g.push_back(nextContig);
-      groupedContigsVec_.push_back(g);
-
-      previousContig = nextContig;
-      ++i; // Dont double count contig thats in a single and double grouping
-      //std::cout << "Double contig grouping for contig " << currentContig.Name << std::endl;
-    }
-    //case 3
-    else if(util::isNearby(previousContig, currentContig) and util::isNearby(currentContig, nextContig)){
-      groupedContigs g2;
-      g.push_back(previousContig);
-      g.push_back(currentContig);
-
-      if(g[0].Name.compare(g[1].Name) != 0){
-	groupedContigsVec_.push_back(g);
-      }
-	
-      g2.push_back(currentContig);
-      g2.push_back(nextContig);
-
-      if(g2[0].Name.compare(g2[1].Name) != 0){
-	groupedContigsVec_.push_back(g2);
-      }
-	
-	previousContig = nextContig;
-	++i; //avoid double counting contigs
-	//std::cout << "Triple contig grouping for contig " << currentContig.Name << std::endl;
-      }
-    else if(util::isNearby(previousContig, currentContig) and previousContig.Name.compare(currentContig.Name) != 0){
-	g.push_back(previousContig);
-	g.push_back(currentContig);
-	groupedContigsVec_.push_back(g);
-      }
     else{
-      std::cerr << "Warning: unhandled case in contigs::groupNearbyContigs()" << std::endl;
-      
-      std::cerr << "PreviousContig coords: " << previousContig.RefID << ':' << previousContig.Position << '-' << previousContig.GetEndPosition() << std::endl;
-      std::cerr << "CurrentContig coords: " << currentContig.RefID << ':' << currentContig.Position << '-' << currentContig.GetEndPosition() << std::endl;
-      std::cerr << "NextContig coords: " << nextContig.RefID << ':' << nextContig.Position << '-' << nextContig.GetEndPosition() << std::endl;
+      groupedContigsVec_.push_back(currentGroup);
+      currentGroup = {c};
     }
+  }
+  for(const auto & g : groupedContigsVec_){
+    std::cout << "found contig grouping of size " << g.size() << std::endl;
+    if(g.size() > 1){
+      for(const auto & c : g){
+	std::cout << c.Name << std::endl;
+      }
+    }
+									    
   }
 }
 
