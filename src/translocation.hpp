@@ -17,7 +17,8 @@ public:
 
   const std::map<std::string, std::vector<BamTools::BamAlignment> > & getSAMap();
 
-  const bool isTrans();
+  bool isTrans_ = false;
+
   const std::pair<BamTools::BamAlignment, BamTools::BamAlignment> & getPrimaryContigs();
   const std::pair<BamTools::BamAlignment, BamTools::BamAlignment> & getSecondaryContigs();
   const std::pair<clipCoords, clipCoords> & getPrimaryClipCoords();
@@ -26,6 +27,8 @@ public:
 
 
 private:
+
+  int32_t SVLEN_;
 
   input i_;
   std::vector<BamTools::BamAlignment> groupedContigs_;
@@ -37,11 +40,20 @@ private:
   std::pair<BamTools::BamAlignment, BamTools::BamAlignment> primaryContigs_;
   std::pair<BamTools::BamAlignment, BamTools::BamAlignment> secondaryContigs_;
 
+  std::pair<BamTools::BamAlignment, BamTools::BamAlignment> t1_;
+  std::pair<BamTools::BamAlignment, BamTools::BamAlignment> t2_;
+
+  void populatePrimaryContigs();
+  void populateSecondaryContigs();
+  std::vector<BamTools::BamAlignment> filterOutPrimaryAlignment(const BamTools::BamAlignment &, const std::vector<BamTools::BamAlignment> &);
+  void populateTransContigs();
   void populatePrimaryAndSecondaryContigs();
   void populatePrimaryAndSecondaryClipCoords();
   void populateLeftAndRightContigs();
+  void calculateSVLEN();
   std::vector<BamTools::BamAlignment> pullAllReadsWithName(const std::string &);
 
+  void printTransContigs();
 };
 
 #endif //__SRC_TRANSLOCATION_HPP__

@@ -40,7 +40,7 @@ const std::pair<BamTools::BamAlignment, BamTools::BamAlignment> util::findLeftAn
   int32_t rightIndex = -1;
   for(unsigned i = 0; i < groupedContigs.size(); ++i){
 
-    std::cout << "populating left and right contigs for contig: " << groupedContigs[i].Name << " at position " << groupedContigs[i].Position <<  std::endl;
+    //std::cout << "populating left and right contigs for contig: " << groupedContigs[i].Name << " at position " << groupedContigs[i].Position <<  std::endl;
     //std::cout << "comparing if " << groupedContigs[i].Position << " < " << leftMostPos << std::endl;
     //std::cout << "comparing if " << groupedContigs[i].Position << " > " << rightMostPos << std::endl;
                                                                             

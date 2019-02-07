@@ -76,7 +76,9 @@ void contigs::filterForInsertionAndTransContigs(){
       if(g.size() > 1){
 	groupedTranslocationContigs_.push_back(g);
 	translocation TRANS = {g, SAMap_, i_};
-	vcfWriter v = {vcfStream_, TRANS, i_};
+	if(TRANS.isTrans_){
+	  vcfWriter v = {vcfStream_, TRANS, i_};
+	}
       }
     }
   }
@@ -230,13 +232,12 @@ void contigs::groupNearbyContigs(){
     }
   }
   for(const auto & g : groupedContigsVec_){
-    std::cout << "found contig grouping of size " << g.size() << std::endl;
-    if(g.size() > 1){
+    //std::cout << "found contig grouping of size " << g.size() << std::endl;
+    /*if(g.size() > 1){
       for(const auto & c : g){
 	std::cout << c.Name << std::endl;
       }
-    }
-									    
+    */   
   }
 }
 

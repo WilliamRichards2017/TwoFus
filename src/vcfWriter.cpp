@@ -40,7 +40,10 @@ void vcfWriter::writeMEInfo(){
 }
 
 void vcfWriter:: writeTRANSInfo(){
-  writeINSInfo();
+  vcfStream_ << "SVTYPE=" << vcfLine_.INFO.SVTYPE << ";SVLEN=" << vcfLine_.INFO.SVLEN << ";END=" << TRANS_.getSecondaryClipCoords().second.refID_ << ':' << vcfLine_.INFO.END << ";RN=" << vcfLine_.INFO.RN;
+  vcfWriter::writeMQ();
+  vcfStream_ << ";cigar=" << vcfLine_.INFO.cigar << ";VT=" << vcfLine_.INFO.VT << ";CVT=" << vcfLine_.INFO.CVT << ";SB=" << vcfLine_.INFO.SB;
+
 }
 
 void vcfWriter::writeINSInfo(){
@@ -64,7 +67,7 @@ void vcfWriter::writeINSLine(){
 }
 
 void vcfWriter::writeTRANSLine(){
-  if(TRANS_.isTrans()){
+  if(TRANS_.isTrans_){
     vcfWriter::writeShared();
     vcfWriter::writeTRANSInfo();
     vcfStream_ << std::endl;
@@ -107,8 +110,8 @@ void vcfWriter::populateMEInfoField(){
 void vcfWriter::populateTRANSInfoField(){
   vcfLine_.INFO.SVTYPE = "Translocation";
   vcfLine_.INFO.SVLEN = TRANS_.getPrimaryClipCoords().first.clippedSeq_.size() + TRANS_.getPrimaryClipCoords().second.clippedSeq_.size();
-  vcfLine_.INFO.END = TRANS_.getPrimaryClipCoords().second.rightPos_ + TRANS_.getPrimaryClipCoords().second.globalOffset_;
-  vcfLine_.INFO.RN = TRANS_.getPrimaryContigs().first.Name + "<-->" + TRANS_.getSecondaryContigs().second.Name;
+  vcfLine_.INFO.END = TRANS_.getSecondaryClipCoords().second.rightPos_ + TRANS_.getSecondaryClipCoords().second.globalOffset_;
+  vcfLine_.INFO.RN = TRANS_.getPrimaryContigs().first.Name + "<-->" + TRANS_.getSecondaryContigs().first.Name;
   vcfLine_.INFO.MQ = {TRANS_.getPrimaryContigs().first.MapQuality, TRANS_.getPrimaryContigs().second.MapQuality};
   vcfLine_.INFO.cigar = "";
   vcfLine_.INFO.CVT = "BND";
