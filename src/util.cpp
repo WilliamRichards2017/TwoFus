@@ -11,6 +11,51 @@
 #include "api/BamWriter.h"
 
 
+const bool util::checkClipsConverge(const BamTools::BamAlignment & al1, const BamTools::BamAlignment & al2){
+  bool rightBound1 = false;
+  bool rightBound2 = false;
+
+  BamTools::BamAlignment lAl;
+  BamTools::BamAlignment rAl;
+
+  clipCoords cc1 = clipCoords{al1};
+  clipCoords cc2 = clipCoords{al2};
+
+  if(cc1.leftPos_ + cc1.globalOffset_ < cc2.leftPos_ + cc2.globalOffset_){
+    rAl = al1;
+    lAl = al2;
+    std::cout << "rAl.Name " << rAl.Name << std::endl;
+    std::cout << "rAl.leftPos " << cc1.leftPos_ + cc1.globalOffset_ << std::endl;
+
+    std::cout << "lAl.Name " << lAl.Name << std::endl;
+    std::cout << "lAl.leftPos " << cc2.leftPos_ + cc2.globalOffset_ << std::endl;
+  }
+  else{
+    rAl = al2;
+    lAl = al1;
+
+    std::cout << "rAl.Name " << rAl.Name << std::endl;
+    std::cout << "rAl.leftPos " << cc2.leftPos_ + cc2.globalOffset_ << std::endl;
+    std::cout << "lAl.Name " << lAl.Name << std::endl;
+    std::cout << "lAl.leftPos " << cc1.leftPos_ + cc1.globalOffset_ << std::endl;
+  }
+  
+  std::vector<BamTools::CigarOp> cig1 = lAl.CigarData;
+  std::vector<BamTools::CigarOp> cig2 = rAl.CigarData;
+  
+  if(cig1[0].Type == 'S'){
+    rightBound1 = true;
+  }
+  if(cig2[0].Type == 'S'){
+    rightBound2 = true;
+  }
+
+
+  std::cout << "rightBound1 " << rightBound1 << std::endl;
+  std::cout << "rightBound2 " << rightBound2 << std::endl;
+    return !rightBound1 and rightBound2;
+}
+
 const bool util::isNearby(const BamTools::BamAlignment & al1, const BamTools::BamAlignment & al2){
   int32_t maxDist = 200;
   if(al1.RefID == al2.RefID and std::abs(al1.Position-al2.Position) < maxDist){

@@ -40,7 +40,7 @@ void mobileElement::findHeadWithMostSupport(){
     }
   }
   
-  std::cout << "mostSupportedHead has number of supporting reads: " << max << std::endl;
+  //std::cout << "mostSupportedHead has number of supporting reads: " << max << std::endl;
 }
 
 void mobileElement::findTailWithMostSupport(){
@@ -53,7 +53,7 @@ void mobileElement::findTailWithMostSupport(){
       mostSupportedTail_ = t;
     }
   }
-  std::cout << "mostSupportedTail has number of supporting reads: " << max << std::endl;
+  //std::cout << "mostSupportedTail has number of supporting reads: " << max << std::endl;
 }
 
 void mobileElement::sumTailContigCount(){

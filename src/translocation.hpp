@@ -19,6 +19,7 @@ public:
 
   bool isTrans_ = false;
 
+
   const std::pair<BamTools::BamAlignment, BamTools::BamAlignment> & getPrimaryContigs();
   const std::pair<BamTools::BamAlignment, BamTools::BamAlignment> & getSecondaryContigs();
   const std::pair<clipCoords, clipCoords> & getPrimaryClipCoords();
@@ -28,7 +29,15 @@ public:
 
 private:
 
+  bool primaryClipsConverge_ = false;
+  bool secondaryClipsConverge_ = false;
+
+  void populateClipsConverge();
+
+  bool hasSecondaryAl_;
   int32_t SVLEN_;
+
+  void checkIfTrans();
 
   input i_;
   std::vector<BamTools::BamAlignment> groupedContigs_;

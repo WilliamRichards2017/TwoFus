@@ -20,23 +20,23 @@ int32_t polyTail::calculateTailLength(const BamTools::BamAlignment & al){
   const std::vector<std::string> readClips = util::getClipSeqs(al);
 
   for(const auto & c : readClips){
-    std::cout << "clippedSeq_ for tail supporting reads: " << c << std::endl;
+    //std::cout << "clippedSeq_ for tail supporting reads: " << c << std::endl;
     std::string aStr = std::string(c.length(), 'A');
     std::string tStr = std::string(c.length(), 'T');
     
-    std::cout << "comparing: " << c << " and " << std::endl << aStr << std::endl;
+    //std::cout << "comparing: " << c << " and " << std::endl << aStr << std::endl;
 
     if(c.compare(aStr) == 0){
-      std::cout << "Compare is true" << std::endl;
-      std::cout << "c.length() is: " << c.length() << std::endl;
+      //std::cout << "Compare is true" << std::endl;
+      //std::cout << "c.length() is: " << c.length() << std::endl;
       if(c.length() > maxTail){
-	std::cout << "Found new max polyATail of size: " << c.length() << std::endl;
+	//std::cout << "Found new max polyATail of size: " << c.length() << std::endl;
 	maxTail = c.length();
       }
     }
     else if(c.compare(tStr) == 0){
       if(c.length() > maxTail){
-	std::cout << "Found new max polyTTail of size: " << c.length() << std::endl;
+	//std::cout << "Found new max polyTTail of size: " << c.length() << std::endl;
 	maxTail = c.length();
       }
     }
@@ -54,7 +54,7 @@ void polyTail::findLongestTail(){
     }
   }
   longestTail_ = maxTail;
-  std::cout << "longestTail_ is: " << longestTail_ << std::endl;
+  //std::cout << "longestTail_ is: " << longestTail_ << std::endl;
 }
 
 bool polyTail::readHasTail(const BamTools::BamAlignment & al){
@@ -64,7 +64,7 @@ bool polyTail::readHasTail(const BamTools::BamAlignment & al){
 
   for(const auto & c : readClips){
     if(c.substr(0, minTailSize_).compare(aStr) == 0 || c.substr(0, minTailSize_).compare(tStr) == 0 ){
-      std::cout << "Found read mapping to polyTail" << std::endl;
+      //std::cout << "Found read mapping to polyTail" << std::endl;
       return true;
     }
   }
@@ -88,7 +88,7 @@ void polyTail::findConsensusTails(){
     }
   }
 
-  std::cout << "breakPointMode is: " << breakPointMode << std::endl;
+  //std::cout << "breakPointMode is: " << breakPointMode << std::endl;
 
   for(auto & t : allTails_){
     clipCoords cc = {t};
@@ -96,7 +96,7 @@ void polyTail::findConsensusTails(){
       supportingReads_.push_back(t);
     }
   }
-  std::cout << "Size of consensus tails: " << supportingReads_.size() << std::endl;
+  //std::cout << "Size of consensus tails: " << supportingReads_.size() << std::endl;
 }
 
 void polyTail::findSupportingReadsForRegion(){
@@ -147,11 +147,11 @@ bool polyTail::mapReadToTail(const BamTools::BamAlignment & al){
   const std::vector<std::string> readClips = util::getClipSeqs(al);
 
   for(const auto & c : readClips){
-    std::cout << "polyTail contig clipped seq is: " << clipCoords_.clippedSeq_ << std::endl;
-    std::cout << "comparing: " << c.substr(0, minTailSize_) << "to clipped seq: " << clipCoords_.clippedSeq_.substr(0, minTailSize_) << std::endl;
+    //std::cout << "polyTail contig clipped seq is: " << clipCoords_.clippedSeq_ << std::endl;
+    //std::cout << "comparing: " << c.substr(0, minTailSize_) << "to clipped seq: " << clipCoords_.clippedSeq_.substr(0, minTailSize_) << std::endl;
     if(c.substr(0, minTailSize_).compare(clipCoords_.clippedSeq_.substr(0, minTailSize_)) == 0){
 
-      std::cout << "Found read mapping to polyTail" << std::endl;
+      //std::cout << "Found read mapping to polyTail" << std::endl;
       return true;
     }
   }

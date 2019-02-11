@@ -8,7 +8,7 @@
 class util{
   
 public:
- 
+  static const bool checkClipsConverge(const BamTools::BamAlignment &, const BamTools::BamAlignment &);
   static const bool isNearby(const BamTools::BamAlignment &, const BamTools::BamAlignment &);
   static const int32_t countMinKmerDepth(const std::vector<std::pair<std::string, int32_t> > &);
   static const std::map<std::string, int32_t> countKmersFromJhash(const std::string &, const std::vector<std::string> &);
