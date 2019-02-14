@@ -4,8 +4,24 @@
 
 #include "util.hpp"
 
+const std::pair<BamTools::BamAlignment, BamTools::BamAlignment> & translocation::getT1(){
+  return t1_;
+}
+
+const std::pair<BamTools::BamAlignment, BamTools::BamAlignment> & translocation::getT2(){
+  return t2_;
+}
+
 const std::pair<BamTools::BamAlignment, BamTools::BamAlignment> & translocation::getPrimaryContigs(){
   return primaryContigs_;
+}
+
+const std::pair<clipCoords, clipCoords> & translocation::getT1ClipCoords(){
+  return t1ClipCoords_;
+}
+
+const std::pair<clipCoords, clipCoords> & translocation::getT2ClipCoords(){
+  return t2ClipCoords_;
 }
 
 const std::pair<clipCoords, clipCoords> & translocation::getPrimaryClipCoords(){
@@ -24,12 +40,6 @@ const std::map<std::string, std::vector<BamTools::BamAlignment> > & translocatio
   return SAMap_;
 }
 
-
-void translocation::calculateSVLEN(){
-  SVLEN_ = primaryClipCoords_.first.clippedSeq_.size() + primaryClipCoords_.second.clippedSeq_.size();
-
-  std::cout << "Calculating SVLEN inside translocation to be " << SVLEN_ << std::endl;
-}
 
 BamTools::BamAlignment contigAndGroupOverlap(const BamTools::BamAlignment & contig, const std::vector<BamTools::BamAlignment> & group){
   BamTools::BamAlignment nullAl;
@@ -80,7 +90,7 @@ void translocation::populateSecondaryContigs(){
   auto rightSecondaryContigs = translocation::filterOutPrimaryAlignment(primaryContigs_.second, rightContigs);
 
 
-  /*
+  
   std::cout << "Printing out left secondary contigs" << std::endl;
   for(const auto & lsc : leftSecondaryContigs){
     std::cout << lsc.Name << '\t' << lsc.RefID << ':' << lsc.Position << std::endl;
@@ -90,13 +100,13 @@ void translocation::populateSecondaryContigs(){
   for(const auto & rsc : rightSecondaryContigs){
     std::cout << rsc.Name << '\t' << rsc.RefID << ':' << rsc.Position << std::endl;
   }
-  */
+  
 
   for(const auto & l : leftSecondaryContigs){
 
     auto al = contigAndGroupOverlap(l, rightSecondaryContigs);
 
-    if(al.Position != -1){
+    if(al.Position != -1 and al.Name != l.Name){
 
       secondaryContigs_.first = al;
       secondaryContigs_.second = l;

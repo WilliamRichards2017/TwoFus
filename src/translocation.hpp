@@ -22,8 +22,17 @@ public:
 
   const std::pair<BamTools::BamAlignment, BamTools::BamAlignment> & getPrimaryContigs();
   const std::pair<BamTools::BamAlignment, BamTools::BamAlignment> & getSecondaryContigs();
+
   const std::pair<clipCoords, clipCoords> & getPrimaryClipCoords();
   const std::pair<clipCoords, clipCoords> & getSecondaryClipCoords();
+
+  const std::pair<BamTools::BamAlignment, BamTools::BamAlignment> & getT1();
+  const std::pair<BamTools::BamAlignment, BamTools::BamAlignment> & getT2();
+
+  const std::pair<clipCoords, clipCoords> & getT1ClipCoords();
+  const std::pair<clipCoords, clipCoords> & getT2ClipCoords();
+
+  
   
 
 
@@ -45,6 +54,8 @@ private:
 
   std::pair<clipCoords, clipCoords> primaryClipCoords_;
   std::pair<clipCoords, clipCoords> secondaryClipCoords_;
+  std::pair<clipCoords, clipCoords> t1ClipCoords_;
+  std::pair<clipCoords, clipCoords> t2ClipCoords_;
 
   std::pair<BamTools::BamAlignment, BamTools::BamAlignment> primaryContigs_;
   std::pair<BamTools::BamAlignment, BamTools::BamAlignment> secondaryContigs_;
@@ -58,8 +69,9 @@ private:
   void populateTransContigs();
   void populatePrimaryAndSecondaryContigs();
   void populatePrimaryAndSecondaryClipCoords();
+  void populateT1andT2ClipCoords();
   void populateLeftAndRightContigs();
-  void calculateSVLEN();
+  
   std::vector<BamTools::BamAlignment> pullAllReadsWithName(const std::string &);
 
   void printTransContigs();

@@ -39,12 +39,6 @@ void vcfWriter::writeMEInfo(){
   vcfStream_ << "NHC=" << vcfLine_.INFO.NHC << ";NTC=" << vcfLine_.INFO.NTC << ";NHR=" << vcfLine_.INFO.NHR << ";NTR=" << vcfLine_.INFO.NTR << ";LT=" << vcfLine_.INFO.LT << ";SB=" << vcfLine_.INFO.SB;
 }
 
-void vcfWriter:: writeTRANSInfo(){
-  vcfStream_ << "SVTYPE=" << vcfLine_.INFO.SVTYPE << ";SVLEN=" << vcfLine_.INFO.SVLEN << ";END=" << TRANS_.getSecondaryClipCoords().second.refID_ << ':' << vcfLine_.INFO.END << ";RN=" << vcfLine_.INFO.RN;
-  vcfWriter::writeMQ();
-  vcfStream_ << ";cigar=" << vcfLine_.INFO.cigar << ";VT=" << vcfLine_.INFO.VT << ";CVT=" << vcfLine_.INFO.CVT << ";SB=" << vcfLine_.INFO.SB;
-
-}
 
 void vcfWriter::writeINSInfo(){
   vcfStream_ << "SVTYPE=" << vcfLine_.INFO.SVTYPE << ";SVLEN=" << vcfLine_.INFO.SVLEN << ";END=" << vcfLine_.INFO.END << ";RN=" << vcfLine_.INFO.RN;
@@ -66,10 +60,16 @@ void vcfWriter::writeINSLine(){
   vcfStream_ << std::endl;
 }
 
+void vcfWriter::writeT1(){
+}
+
+
+void vcfWriter::writeT2(){}
+
 void vcfWriter::writeTRANSLine(){
   if(TRANS_.isTrans_){
-    vcfWriter::writeShared();
-    vcfWriter::writeTRANSInfo();
+    vcfWriter::writeT1();
+    vcfWriter::writeT2();
     vcfStream_ << std::endl;
   }
 }
@@ -107,18 +107,28 @@ void vcfWriter::populateMEInfoField(){
   vcfLine_.INFO.LT = ME_.getMostSupportedTail().getLongestTail();
 }
 
-void vcfWriter::populateTRANSInfoField(){
-  vcfLine_.INFO.SVTYPE = "Translocation";
-  vcfLine_.INFO.SVLEN = TRANS_.getPrimaryClipCoords().first.clippedSeq_.size() + TRANS_.getPrimaryClipCoords().second.clippedSeq_.size();
-  vcfLine_.INFO.END = TRANS_.getSecondaryClipCoords().second.rightPos_ + TRANS_.getSecondaryClipCoords().second.globalOffset_;
-  vcfLine_.INFO.RN = TRANS_.getPrimaryContigs().first.Name + "<-->" + TRANS_.getSecondaryContigs().first.Name;
-  vcfLine_.INFO.MQ = {TRANS_.getPrimaryContigs().first.MapQuality, TRANS_.getPrimaryContigs().second.MapQuality};
-  vcfLine_.INFO.cigar = "";
-  vcfLine_.INFO.CVT = "BND";
-  vcfLine_.INFO.HD = {-1, -1};
-  vcfLine_.INFO.VT = "Trans";
- 
+void vcfWriter::populateT1(){
+  //TODO - refactor vcfWriter refData handling
+  // T1_.CHROM = util::getChromosomeFromRefID(TRANS_.T1.first.RefID, TRANS_.T1.first.getRefData());
+  T1_.CHROM = TRANS_.getT1().first.RefID;
+  T1_.POS = TRANS_.getT1().first.Position;
+  T1_.ID = "bnd_" + TRANS_.getT1().first.Name;
+  T1_.REF = "N";
+  T1_.ALT = "<TRANS>";
+  T1_.QUAL = std::max(INS_.getLeftContig().MapQuality, INS_.getRightContig().MapQuality);
+
+  T1_.INFO.SVTYPE = "BND";
+  T1_.INFO.SVLEN =  TRANS_.getT1ClipCoords().first.clippedSeq_.size() + TRANS_.getT2ClipCoords().first.clippedSeq_.size();
+  T1_.INFO.SVEND = std::to_string(TRANS_.getT1().first.RefID) + ":" + std::to_string(TRANS_.getT1ClipCoords().second.rightPos_ + TRANS_.getT1ClipCoords().second.globalOffset_);
+  T1_.INFO.RN = TRANS_.getT1().first.Name + "<-->" + TRANS_.getT1().second.Name;
+  T1_.INFO.cigar = "TODO";
+  T1_.INFO.SB = 0;
 }
+
+void vcfWriter::populateT2(){
+
+}
+
 
 void vcfWriter::populateINSLine(){
   vcfLine_.CHROM = util::getChromosomeFromRefID(vcfContig_.RefID, INS_.getRefData());
@@ -144,14 +154,9 @@ void vcfWriter::populateMELine(){
 
 //TODO refactor RefID to Chrom, store RefData in TRANS class
 void vcfWriter::populateTRANSLine(){
-  vcfLine_.CHROM = std::to_string(vcfContig_.RefID);
-  vcfLine_.POS = vcfContig_.Position;
-  vcfLine_.ID = "TRANS";
-  vcfLine_.REF = "N";
-  vcfLine_.ALT = "TRANS";
-  vcfLine_.QUAL = std::max(TRANS_.getPrimaryContigs().first.MapQuality, TRANS_.getPrimaryContigs().second.MapQuality);
-
-  vcfWriter::populateTRANSInfoField();
+  vcfLine_.CHROM = util::getChromosomeFromRefID(vcfContig_.RefID, INS_.getRefData());
+  vcfWriter::populateT1();
+  vcfWriter::populateT2();
 }
 
 
@@ -172,7 +177,6 @@ vcfWriter::vcfWriter(std::fstream & vcfStream, mobileElement & ME, input & i) : 
 }
 
 vcfWriter::vcfWriter(std::fstream & vcfStream, translocation & TRANS, input & i) : TRANS_(TRANS), i_(i), variantType_(trans), vcfStream_(vcfStream){
-  vcfContig_ = TRANS_.getPrimaryContigs().first;
   vcfWriter::populateTRANSLine();
   vcfWriter::writeTRANSLine();
   vcfWriter::printVCFLine();

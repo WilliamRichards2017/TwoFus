@@ -28,9 +28,10 @@ struct infoField {
   int32_t LT  =  -1; // INFO=<ID=LT,Number=1,Type=Integer,Description="Longest polyA tail in target region"> 
   std::string SVTYPE; // INFO=<ID=SVTYPE,Number=1,Type=String,Description="Type of SV detected">
   int32_t SVLEN = -1; // INFO=<ID=SVLEN,Number=1,Type=Integer,Description="Length of SV detected"> 
+  std::string SVEND;
   int32_t END = -1; // INFO=<ID=END,Number=1,Type=Integer,Description="END of SV detected">
   std::string RN; // INFO=<ID=RN,Number=1,Type=String,Description="Name of contig that produced the call">
-  std::vector<int16_t> MQ = {-1}; // INFO=<ID=MQ,Number=1,Type=Integer,Description="Mapping quality of the contig that created the call">
+  std::vector<int> MQ = {-1}; // INFO=<ID=MQ,Number=1,Type=Integer,Description="Mapping quality of the contig that created the call">
   std::string cigar = ""; 
   std::string VT = ""; //variant type
   std::string CVT = ""; //Compressed variant type
@@ -73,6 +74,8 @@ private:
   BamTools::BamAlignment vcfContig_;
 
   vcfLine vcfLine_;
+  vcfLine T1_;
+  vcfLine T2_;
 
   void populateMELine();
   void populateMEInfoField();
@@ -83,8 +86,9 @@ private:
   void populateINSFormatField();
 
   void populateTRANSLine();
-  void populateTRANSInfoField();
-  void populateTRANSFormatField();
+  void populateT1();
+  void populateT2();
+  void populateT1andT2ClipCoords();
 
   void writeShared();
   void writeHD();
@@ -97,7 +101,8 @@ private:
   void writeINSInfo();
 
   void writeTRANSLine();
-  void writeTRANSInfo();
+  void writeT1();
+  void writeT2();
 
 
   void printVCFLine();

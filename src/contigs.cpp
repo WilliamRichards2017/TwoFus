@@ -27,7 +27,6 @@ void contigs::populateSAMap(){
     for(const auto & c : g){
       auto it = SAMap_.find(c.Name);
 
-
       if(it==SAMap_.end()){
 	std::vector<BamTools::BamAlignment> vec;
 	vec.push_back(c);
