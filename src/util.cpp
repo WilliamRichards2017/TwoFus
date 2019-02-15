@@ -10,6 +10,83 @@
 #include "api/BamMultiReader.h"
 #include "api/BamWriter.h"
 
+const std::pair<BamTools::BamAlignment, std::vector<BamTools::BamAlignment> >  util::filterOutPrimaryAlignment(const BamTools::BamAlignment & pAl, const std::vector<BamTools::BamAlignment> & allAl){
+  std::vector<BamTools::BamAlignment> sa;
+  BamTools::BamAlignment pa;
+
+
+
+  for(const auto & al : allAl){
+    if(al.Position == pAl.Position){
+      pa = al;
+    }
+
+    else{
+      sa.push_back(al);
+    }
+  }
+  return std::make_pair(pa, sa);
+}
+
+const std::vector<BamTools::BamAlignment>  util::pullAllReadsWithName(const std::string & readName, 
+								      const std::map<std::string, std::vector<BamTools::BamAlignment> > & SAMap){
+  std::vector<BamTools::BamAlignment> nullVec;
+  auto it = SAMap.find(readName);
+
+  if(it != SAMap.end()){
+    return it->second;
+  }
+  return nullVec;
+}
+
+const std::vector<std::pair<BamTools::BamAlignment, BamTools::BamAlignment> > util::checkIfSecondariesAreNearby(const std::vector<std::pair<BamTools::BamAlignment, std::vector<BamTools::BamAlignment> > > & contigs){
+  
+  std::vector<std::pair<BamTools::BamAlignment, BamTools::BamAlignment> > primaryContigs;
+
+  for(unsigned i = 0; i < contigs.size()-1; ++i){
+    auto pc1 = contigs[i].first;
+    auto pc2 = contigs[i+1].second;
+
+    auto sa1 = contigs[i].second;
+    auto sa2 = contigs[i+1].second;
+
+    for(const auto s1 : sa1){
+      for(const auto s2 : sa2){
+	if(util::isNearby(s1, s2)){
+
+	  std::cout << "Found nearby supplemental alignments" << std::endl;	  
+
+	  auto p1 = std::make_pair(pc1, s1);
+	  auto p2 = std::make_pair(pc1, s2);
+	  primaryContigs.push_back(p1);
+	  primaryContigs.push_back(p2);
+	  return primaryContigs;
+	}
+      }
+    }
+  }
+  return primaryContigs;
+}
+
+const std::vector<std::pair<BamTools::BamAlignment, BamTools::BamAlignment> > util::findContigsWithSecondaryAlignments(const std::vector<BamTools::BamAlignment> & contigs, const std::map<std::string, std::vector<BamTools::BamAlignment> > & SAMap){
+  
+  std::vector<std::pair<BamTools::BamAlignment, std::vector<BamTools::BamAlignment> > > SAVec;
+  std::cout << "Searching if the following contigs have suplemenary alignments" << std::endl;
+
+  for(const auto & c : contigs){
+
+    std::cout << c.Name << '\t' << c.RefID << '\t' << c.Position << std::endl;
+
+    auto allContigs = util::pullAllReadsWithName(c.Name, SAMap);
+
+    auto secondaryContigs = util::filterOutPrimaryAlignment(c, allContigs);
+    SAVec.push_back(secondaryContigs);
+  }
+
+  auto primaryContigs = util::checkIfSecondariesAreNearby(SAVec);
+
+  return primaryContigs;
+}
 
 const bool util::checkClipsConverge(const BamTools::BamAlignment & al1, const BamTools::BamAlignment & al2){
   bool rightBound1 = false;
@@ -129,7 +206,7 @@ const int32_t util::countMinKmerDepth(const std::vector<std::pair<std::string, i
 
 const std::map<std::string, int32_t> util::countKmersFromJhash(const std::string & jhashPath, const std::vector<std::string> & kmers){
 
-  std::string jellyfishPath = "../bin/externals/jellyfish/src/jellyfish_project/jellyfish/jellyfish";
+  std::string jellyfishPath = "../bin/externals/jellyfish/src/jellyfish_project/bin/jellyfish";
   
   std::map<std::string, int32_t> ret;
   for (const auto & kmer : kmers){

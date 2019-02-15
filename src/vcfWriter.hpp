@@ -20,21 +20,62 @@ struct formatField {
 };
 
 struct infoField {
-  int32_t NR  =  -1; // INFO=<ID=NR,Number=1,Type=Integer,Description="Number of total reads in target region">
-  int32_t NTC = -1;
-  int32_t NTR  =  -1; // INFO=<ID=NT,Number=1,Type=Integer,Description="Number of polyA tails in target region">
-  int32_t NHR = -1; // INFO=<ID=NH,Number=1,Type=Integer,Description="Number of alu heads in target region"> 
-  int32_t NHC = -1;
-  int32_t LT  =  -1; // INFO=<ID=LT,Number=1,Type=Integer,Description="Longest polyA tail in target region"> 
+
+  infoField(){
+    NR = -1;
+    NTC = -1;
+    NTR = -1;
+    NHR = -1;
+    NHC = -1;
+    LT = -1;
+    SVTYPE = "null";
+    SVLEN = -1;
+    SVEND = "null";
+    END = -1;
+    RN = "null";
+    MQ = {-1};
+    cigar = "null";
+    VT = "null";
+    CVT = "null";
+    SB = -1;
+    HD = {-1,-1};
+  }
+
+  infoField(const infoField & i){
+    NR = i.NR;
+    NTC = i.NTC;
+    NTR = i.NTR;
+    NHR = i.NHR;
+    NHC = i.NHC;
+    LT = i.LT;
+    SVTYPE = i.SVTYPE;
+    SVLEN = i.SVLEN;
+    SVEND = i.SVEND;
+    END = i.END;
+    RN = i.RN;
+    MQ = i.MQ;
+    cigar = i.cigar;
+    VT = i.VT;
+    CVT = i.CVT;
+    SB = i.SB;
+    HD = i.HD;
+  }
+  
+  int32_t NR ; // INFO=<ID=NR,Number=1,Type=Integer,Description="Number of total reads in target region">
+  int32_t NTC;
+  int32_t NTR; // INFO=<ID=NT,Number=1,Type=Integer,Description="Number of polyA tails in target region">
+  int32_t NHR; // INFO=<ID=NH,Number=1,Type=Integer,Description="Number of alu heads in target region"> 
+  int32_t NHC;
+  int32_t LT; // INFO=<ID=LT,Number=1,Type=Integer,Description="Longest polyA tail in target region"> 
   std::string SVTYPE; // INFO=<ID=SVTYPE,Number=1,Type=String,Description="Type of SV detected">
-  int32_t SVLEN = -1; // INFO=<ID=SVLEN,Number=1,Type=Integer,Description="Length of SV detected"> 
+  int32_t SVLEN; // INFO=<ID=SVLEN,Number=1,Type=Integer,Description="Length of SV detected"> 
   std::string SVEND;
-  int32_t END = -1; // INFO=<ID=END,Number=1,Type=Integer,Description="END of SV detected">
+  int32_t END; // INFO=<ID=END,Number=1,Type=Integer,Description="END of SV detected">
   std::string RN; // INFO=<ID=RN,Number=1,Type=String,Description="Name of contig that produced the call">
-  std::vector<int> MQ = {-1}; // INFO=<ID=MQ,Number=1,Type=Integer,Description="Mapping quality of the contig that created the call">
-  std::string cigar = ""; 
-  std::string VT = ""; //variant type
-  std::string CVT = ""; //Compressed variant type
+  std::vector<int> MQ; // INFO=<ID=MQ,Number=1,Type=Integer,Description="Mapping quality of the contig that created the call">
+  std::string cigar; 
+  std::string VT; //variant type
+  std::string CVT; //Compressed variant type
   double SB; // Strand Bias
 
   std::vector<int32_t> HD = {-1,-1}; // hashcount for kmers overlapping variant
@@ -43,15 +84,36 @@ struct infoField {
 
 
 struct vcfLine {
-  std::string CHROM = ".";
-  int32_t POS = -1;
-  std::string ID = ".";
-  std::string REF = ".";
-  std::string ALT = ".";
-  int32_t QUAL = -1;
-  //filterField FILTER = {};
+
+  vcfLine(){
+    CHROM = ".";
+    POS = -1;
+    ID = ".";
+    REF = ".";
+    ALT = ".";
+    QUAL = -1;
+  }
+    
+  vcfLine(const vcfLine & l){
+    CHROM = l.CHROM;
+    POS = l.POS;
+    ID = l.ID;
+    REF = l.REF;
+    ALT = l.ALT;
+    QUAL = l.QUAL;
+  }
+
+  std::string CHROM;
+  int32_t POS;
+  std::string ID;
+  std::string REF;
+  std::string ALT;
+  int32_t QUAL;
+  //filterField FILTER;
   infoField INFO = {};
   formatField FORMAT = {};
+
+
 };
 
 
@@ -92,7 +154,7 @@ private:
 
   void writeShared();
   void writeHD();
-  void writeMQ();
+  void writeINSMQ();
 
   void writeMELine();			
   void writeMEInfo();
@@ -100,10 +162,9 @@ private:
   void writeINSLine();
   void writeINSInfo();
 
-  void writeTRANSLine();
-  void writeT1();
-  void writeT2();
-
+  void writeT1andT2();
+  void writeT(const vcfLine &);
+  void writeTInfoField(const vcfLine &);
 
   void printVCFLine();
 };

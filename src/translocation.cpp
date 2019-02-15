@@ -40,6 +40,11 @@ const std::map<std::string, std::vector<BamTools::BamAlignment> > & translocatio
   return SAMap_;
 }
 
+const std::vector<BamTools::RefData> & translocation::getRefData(){
+  return refData_;
+}
+
+
 
 BamTools::BamAlignment contigAndGroupOverlap(const BamTools::BamAlignment & contig, const std::vector<BamTools::BamAlignment> & group){
   BamTools::BamAlignment nullAl;
@@ -52,6 +57,9 @@ BamTools::BamAlignment contigAndGroupOverlap(const BamTools::BamAlignment & cont
   return nullAl;
 }
 
+void translocation::populateRefData(){
+  refData_ = util::populateRefData(i_.contigBamPath_);
+}
 
 void translocation::populateClipsConverge(){
   if(hasSecondaryAl_){
@@ -60,80 +68,12 @@ void translocation::populateClipsConverge(){
   }
 }
 
-std::vector<BamTools::BamAlignment> translocation::filterOutPrimaryAlignment(const BamTools::BamAlignment & pAl, const std::vector<BamTools::BamAlignment> & allAl){
-  std::vector<BamTools::BamAlignment> sa;
-  for(const auto & al : allAl){
-    if(al.Position != pAl.Position){
-      sa.push_back(al);
-    }
-  }
-  return sa;
-}
 
 void translocation::checkIfTrans(){
   std::cout << "primaryClipsConverge_ " << primaryClipsConverge_ << std::endl;
   std::cout << "secondaryClipsConverge_ " << secondaryClipsConverge_ << std::endl;
-  if(primaryClipsConverge_ and secondaryClipsConverge_){
-    isTrans_ = true;
-    return;
-  }
-  else{
-    isTrans_ = false;
-  }
+  isTrans_ = true;
 }
-
-void translocation::populateSecondaryContigs(){
-  auto leftContigs = translocation::pullAllReadsWithName(primaryContigs_.first.Name);
-  auto rightContigs = translocation::pullAllReadsWithName(primaryContigs_.second.Name);
-
-  auto leftSecondaryContigs = translocation::filterOutPrimaryAlignment(primaryContigs_.first, leftContigs);
-  auto rightSecondaryContigs = translocation::filterOutPrimaryAlignment(primaryContigs_.second, rightContigs);
-
-
-  
-  std::cout << "Printing out left secondary contigs" << std::endl;
-  for(const auto & lsc : leftSecondaryContigs){
-    std::cout << lsc.Name << '\t' << lsc.RefID << ':' << lsc.Position << std::endl;
-  }
-
-  std::cout << "Printing out right secondary contigs" << std::endl;
-  for(const auto & rsc : rightSecondaryContigs){
-    std::cout << rsc.Name << '\t' << rsc.RefID << ':' << rsc.Position << std::endl;
-  }
-  
-
-  for(const auto & l : leftSecondaryContigs){
-
-    auto al = contigAndGroupOverlap(l, rightSecondaryContigs);
-
-    if(al.Position != -1 and al.Name != l.Name){
-
-      secondaryContigs_.first = al;
-      secondaryContigs_.second = l;
-
-      std::cout << "Found secondary alignment for contigs " << l.Name << " and " << al.Name << std::endl;
-      std::cout << "at positions: " << l.RefID << ':' << l.Position << " and " << al.RefID << ':' << al.Position << std::endl;
-      hasSecondaryAl_ = true;
-
-      std::cout << "hasSecondaryAl_ is: " << hasSecondaryAl_ << std::endl;
-      return;
-    }
-  }
-  hasSecondaryAl_ = false;
-
-}
-
-
-std::vector<BamTools::BamAlignment> translocation::pullAllReadsWithName(const std::string & readName){
-  std::vector<BamTools::BamAlignment> nullVec;
-  auto it = SAMap_.find(readName);
-
-  if(it != SAMap_.end()){
-    return it->second;
-  }
-  return nullVec;
-}
-
 
 
 void translocation::populatePrimaryAndSecondaryClipCoords(){
@@ -144,11 +84,30 @@ void translocation::populatePrimaryAndSecondaryClipCoords(){
   secondaryClipCoords_.second = clipCoords{secondaryContigs_.second};
 }
 
+void translocation::populateT1andT2ClipCoords(){
+  t1ClipCoords_.first = clipCoords{t1_.first};
+  t1ClipCoords_.second = clipCoords{t1_.second};
 
-void translocation::populatePrimaryContigs(){
-  auto contigs = util::findLeftAndRightContigs(groupedContigs_);
-  primaryContigs_.first = contigs.first;
-  primaryContigs_.second = contigs.second;
+  t2ClipCoords_.first = clipCoords{t2_.first};
+  t2ClipCoords_.second = clipCoords{t2_.second};
+}
+
+
+void translocation::populatePrimaryAndSecondaryContigs(){
+  auto SAContigs = util::findContigsWithSecondaryAlignments(groupedContigs_, SAMap_);
+
+  if(SAContigs.size() != 2){
+    hasSecondaryAl_ = false;
+  }
+  else{
+    hasSecondaryAl_ = true;
+    primaryContigs_.first = SAContigs[0].first;
+    primaryContigs_.second = SAContigs[0].second;
+    secondaryContigs_.first = SAContigs[1].first;
+    secondaryContigs_.second = SAContigs[1].second;
+  }
+
+  std::cout << "hasSecondaryAl_ " << hasSecondaryAl_ << std::endl;
 }
 
 void translocation::populateTransContigs(){
@@ -181,21 +140,24 @@ void translocation::printTransContigs(){
 
 translocation::translocation(const std::vector<BamTools::BamAlignment> & groupedContigs, const std::map<std::string, std::vector<BamTools::BamAlignment> > & SAMap, const input & i) : groupedContigs_(groupedContigs), SAMap_(SAMap), i_(i){
 
-  translocation::populatePrimaryContigs();
-  translocation::populateSecondaryContigs();
+
+  translocation::populateRefData();
+  translocation::populatePrimaryAndSecondaryContigs();
   if(hasSecondaryAl_){
+    translocation::populatePrimaryAndSecondaryClipCoords();
     translocation::populateClipsConverge();
     translocation::checkIfTrans();
   }
+  
+  std::cout << "hasSecondaryAl_ " << hasSecondaryAl_ << std::endl;
   std::cout << "isTrans_ " << isTrans_ << std::endl;
   
-
+  
   if(isTrans_){
     
-    translocation::populatePrimaryAndSecondaryClipCoords();
     translocation::populateTransContigs();
+    translocation::populateT1andT2ClipCoords();
     translocation::printTransContigs();
-
   }
 } 
 
@@ -208,8 +170,12 @@ translocation::translocation(const translocation & t){
   primaryContigs_ = t.primaryContigs_;
   secondaryContigs_ = t.secondaryContigs_;
   isTrans_ = t.isTrans_;
+  hasSecondaryAl_ = t.hasSecondaryAl_;
   t1_ = t.t1_;
   t2_ = t.t2_;
+  t1ClipCoords_ = t.t1ClipCoords_;
+  t2ClipCoords_ = t.t2ClipCoords_;
+  refData_ = t.refData_;
   
 }
 

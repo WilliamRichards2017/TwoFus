@@ -32,6 +32,8 @@ public:
   const std::pair<clipCoords, clipCoords> & getT1ClipCoords();
   const std::pair<clipCoords, clipCoords> & getT2ClipCoords();
 
+  const std::vector<BamTools::RefData> & getRefData();
+
   
   
 
@@ -49,6 +51,9 @@ private:
   void checkIfTrans();
 
   input i_;
+
+  std::vector<BamTools::RefData> refData_;
+
   std::vector<BamTools::BamAlignment> groupedContigs_;
   std::map<std::string, std::vector<BamTools::BamAlignment> > SAMap_;
 
@@ -63,16 +68,16 @@ private:
   std::pair<BamTools::BamAlignment, BamTools::BamAlignment> t1_;
   std::pair<BamTools::BamAlignment, BamTools::BamAlignment> t2_;
 
+  void populateRefData();
   void populatePrimaryContigs();
   void populateSecondaryContigs();
-  std::vector<BamTools::BamAlignment> filterOutPrimaryAlignment(const BamTools::BamAlignment &, const std::vector<BamTools::BamAlignment> &);
+
   void populateTransContigs();
   void populatePrimaryAndSecondaryContigs();
   void populatePrimaryAndSecondaryClipCoords();
   void populateT1andT2ClipCoords();
   void populateLeftAndRightContigs();
   
-  std::vector<BamTools::BamAlignment> pullAllReadsWithName(const std::string &);
 
   void printTransContigs();
 };

@@ -67,12 +67,18 @@ void contigs::filterForInsertionAndTransContigs(){
     if(allUnique){
       if(g.size() > 1){
 	groupedInsertionContigs_.push_back(g);
-	insertion INS = {g, i_};
-	vcfWriter v = {vcfStream_, INS, i_};
+	//insertion INS = {g, i_};
+	//vcfWriter v = {vcfStream_, INS, i_};
       }
     }
     else{
       if(g.size() > 1){
+	std::cout << "ENTERING TRANS CONSTRUCTOR FOR " << std::endl;
+
+	for(const auto & c : g){
+	  std::cout << c.Name << '\t' << c.RefID << '\t' << c.Position << std::endl;
+	}
+
 	groupedTranslocationContigs_.push_back(g);
 	translocation TRANS = {g, SAMap_, i_};
 	if(TRANS.isTrans_){
@@ -255,7 +261,7 @@ contigs::contigs(const input & i) : i_(i){
 
   contigs::findAllContigs();
   contigs::groupNearbyContigs();
-  contigs::findMobileElementContigs();
+  //contigs::findMobileElementContigs();
   contigs::findSplitAlignedContigs();
   contigs::populateSAMap();
   contigs::filterForInsertionAndTransContigs();
