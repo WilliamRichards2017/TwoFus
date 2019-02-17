@@ -7,6 +7,9 @@
 #include "clipCoords.hpp"
 #include "input.hpp"
 
+
+
+
 class translocation{
 public:
   translocation();
@@ -18,7 +21,7 @@ public:
   const std::map<std::string, std::vector<BamTools::BamAlignment> > & getSAMap();
 
   bool isTrans_ = false;
-
+  bool hasSecondaryAl_;
 
   const std::pair<BamTools::BamAlignment, BamTools::BamAlignment> & getPrimaryContigs();
   const std::pair<BamTools::BamAlignment, BamTools::BamAlignment> & getSecondaryContigs();
@@ -45,7 +48,7 @@ private:
 
   void populateClipsConverge();
 
-  bool hasSecondaryAl_;
+
   int32_t SVLEN_;
 
   void checkIfTrans();
@@ -65,6 +68,9 @@ private:
   std::pair<BamTools::BamAlignment, BamTools::BamAlignment> primaryContigs_;
   std::pair<BamTools::BamAlignment, BamTools::BamAlignment> secondaryContigs_;
 
+  std::pair<std::vector<BamTools::BamAlignment>, std::vector<BamTools::BamAlignment> > secondaryAlignments_;
+  
+
   std::pair<BamTools::BamAlignment, BamTools::BamAlignment> t1_;
   std::pair<BamTools::BamAlignment, BamTools::BamAlignment> t2_;
 
@@ -77,7 +83,9 @@ private:
   void populatePrimaryAndSecondaryClipCoords();
   void populateT1andT2ClipCoords();
   void populateLeftAndRightContigs();
-  
+
+  std::vector<BamTools::BamAlignment> findSecondaryAlignments(const BamTools::BamAlignment &);
+  std::vector<std::vector<BamTools::BamAlignment> > findAllSecondaryGroupings(std::vector<BamTools::BamAlignment> & , std::vector<BamTools::BamAlignment> &);
 
   void printTransContigs();
 };

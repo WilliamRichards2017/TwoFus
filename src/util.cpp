@@ -10,6 +10,34 @@
 #include "api/BamMultiReader.h"
 #include "api/BamWriter.h"
 
+
+const bool util::breakpointHasSupport(const std::BamTools::BamAlignment &){
+
+  std::string variant;
+  std::vector<std::string> kmers;
+
+}
+
+bool util::addToGroup(BamTools::BamAlignment & al, std::vector<BamTools::BamAlignment> & group){
+  std::cout << "group.size() is " << group.size() << std::endl;
+  std::cout << "al.Pos is " << al.RefID << '\t' << al.Position << std::endl;
+
+  if(group.size() == 0){
+    std::cout << "returning true for group.size() == 0" << std::endl;
+    group.push_back(al);
+    return true;
+  }
+  else if(util::isNearby(al, group.back())){
+    group.push_back(al);
+    std::cout << "returning true for isNearby " << std::endl;
+    return true;
+  }
+  else{
+    std::cout << "returning false" << std::endl;
+    return false;
+  }
+}
+
 const std::pair<BamTools::BamAlignment, std::vector<BamTools::BamAlignment> >  util::filterOutPrimaryAlignment(const BamTools::BamAlignment & pAl, const std::vector<BamTools::BamAlignment> & allAl){
   std::vector<BamTools::BamAlignment> sa;
   BamTools::BamAlignment pa;
@@ -43,6 +71,7 @@ const std::vector<std::pair<BamTools::BamAlignment, BamTools::BamAlignment> > ut
   
   std::vector<std::pair<BamTools::BamAlignment, BamTools::BamAlignment> > primaryContigs;
 
+
   for(unsigned i = 0; i < contigs.size()-1; ++i){
     auto pc1 = contigs[i].first;
     auto pc2 = contigs[i+1].second;
@@ -50,17 +79,19 @@ const std::vector<std::pair<BamTools::BamAlignment, BamTools::BamAlignment> > ut
     auto sa1 = contigs[i].second;
     auto sa2 = contigs[i+1].second;
 
-    for(const auto s1 : sa1){
-      for(const auto s2 : sa2){
-	if(util::isNearby(s1, s2)){
 
-	  std::cout << "Found nearby supplemental alignments" << std::endl;	  
+    if(sa1.size() > 0 and sa2.size() < 4){
+      for(const auto s1 : sa1){
+	for(const auto s2 : sa2){
+	  if(util::isNearby(s1, s2)){
+	    std::cout << "Found nearby supplemental alignments" << std::endl;	  
 
-	  auto p1 = std::make_pair(pc1, s1);
-	  auto p2 = std::make_pair(pc1, s2);
-	  primaryContigs.push_back(p1);
-	  primaryContigs.push_back(p2);
-	  return primaryContigs;
+	    auto p1 = std::make_pair(pc1, s1);
+	    auto p2 = std::make_pair(pc1, s2);
+	    primaryContigs.push_back(p1);
+	    primaryContigs.push_back(p2);
+	    return primaryContigs;
+	  }
 	}
       }
     }
@@ -80,6 +111,7 @@ const std::vector<std::pair<BamTools::BamAlignment, BamTools::BamAlignment> > ut
     auto allContigs = util::pullAllReadsWithName(c.Name, SAMap);
 
     auto secondaryContigs = util::filterOutPrimaryAlignment(c, allContigs);
+
     SAVec.push_back(secondaryContigs);
   }
 
@@ -134,7 +166,7 @@ const bool util::checkClipsConverge(const BamTools::BamAlignment & al1, const Ba
 }
 
 const bool util::isNearby(const BamTools::BamAlignment & al1, const BamTools::BamAlignment & al2){
-  int32_t maxDist = 200;
+  int32_t maxDist = 150;
   if(al1.RefID == al2.RefID and std::abs(al1.Position-al2.Position) < maxDist){
     return true;
   }

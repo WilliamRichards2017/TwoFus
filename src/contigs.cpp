@@ -65,23 +65,23 @@ void contigs::filterForInsertionAndTransContigs(){
     }
     
     if(allUnique){
-      if(g.size() > 1){
+      if(g.size() > 1 and g.size() < 3){
 	groupedInsertionContigs_.push_back(g);
 	//insertion INS = {g, i_};
 	//vcfWriter v = {vcfStream_, INS, i_};
       }
     }
     else{
-      if(g.size() > 1){
+      if(g.size() == 2){
 	std::cout << "ENTERING TRANS CONSTRUCTOR FOR " << std::endl;
-
+	
 	for(const auto & c : g){
 	  std::cout << c.Name << '\t' << c.RefID << '\t' << c.Position << std::endl;
 	}
 
 	groupedTranslocationContigs_.push_back(g);
 	translocation TRANS = {g, SAMap_, i_};
-	if(TRANS.isTrans_){
+	if(TRANS.hasSecondaryAl_){
 	  vcfWriter v = {vcfStream_, TRANS, i_};
 	}
       }
@@ -235,14 +235,6 @@ void contigs::groupNearbyContigs(){
       groupedContigsVec_.push_back(currentGroup);
       currentGroup = {c};
     }
-  }
-  for(const auto & g : groupedContigsVec_){
-    //std::cout << "found contig grouping of size " << g.size() << std::endl;
-    /*if(g.size() > 1){
-      for(const auto & c : g){
-	std::cout << c.Name << std::endl;
-      }
-    */   
   }
 }
 

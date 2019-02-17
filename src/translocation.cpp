@@ -46,16 +46,6 @@ const std::vector<BamTools::RefData> & translocation::getRefData(){
 
 
 
-BamTools::BamAlignment contigAndGroupOverlap(const BamTools::BamAlignment & contig, const std::vector<BamTools::BamAlignment> & group){
-  BamTools::BamAlignment nullAl;
-
-  for(const auto & c : group){
-    if(util::isNearby(contig, c)){
-      return c;
-    }
-  }
-  return nullAl;
-}
 
 void translocation::populateRefData(){
   refData_ = util::populateRefData(i_.contigBamPath_);
@@ -93,21 +83,118 @@ void translocation::populateT1andT2ClipCoords(){
 }
 
 
+std::vector<BamTools::BamAlignment> translocation::findSecondaryAlignments(const BamTools::BamAlignment & primaryAlignment){
+  std::vector<BamTools::BamAlignment> allAlignments;
+  std::vector<BamTools::BamAlignment> secondaryAlignments;
+
+  auto it = SAMap_.find(primaryAlignment.Name);
+
+  if(it != SAMap_.end()){
+    allAlignments =  it->second;
+    //std::cout << "allAlignments.size() in findSecondaryAlignments() " << allAlignments.size() << std::endl;
+  }
+  
+  for(const auto & a : allAlignments){
+    if(a.Position != primaryAlignment.Position and a.RefID != primaryAlignment.RefID){
+      secondaryAlignments.push_back(a);
+    }
+    //std::cout << "secondaryALignments.size() in findSecondaryAlignments() " << secondaryAlignments.size() << std::endl;
+  }
+
+  return secondaryAlignments;
+}
+
+
+
+
+std::vector<std::vector<BamTools::BamAlignment> > translocation::findAllSecondaryGroupings(std::vector<BamTools::BamAlignment> & als1, std::vector<BamTools::BamAlignment> & als2){
+
+
+  
+  std::vector<std::vector<BamTools::BamAlignment> > allGroups;
+  std::vector<BamTools::BamAlignment> allAlignments;
+
+  if(als1.size() == 0 or als2.size() == 0){
+    return allGroups;
+  }
+
+  for(const auto & a1 : als1){
+    if(util::breakPointHasSupport(a1)){
+      allAlignments.push_back(a1);
+    }
+  }
+  
+  for(const auto & a2 : als2){
+    if(breakpointHasSupport(a1)){
+      util::allAlignments.push_back(a2);
+    }
+  }
+
+  
+
+  std::sort(allAlignments.begin(), allAlignments.end(), BamTools::Algorithms::Sort::ByPosition(BamTools::Algorithms::Sort::DescendingOrder));
+
+  std::vector<BamTools::BamAlignment> currentGroup;
+  currentGroup.push_back(allAlignments[0]);
+  allAlignments.erase(allAlignments.begin());
+  
+  for(const auto & a : allAlignments){
+
+    if(util::isNearby(a, currentGroup.back())){
+      if(a.Name.compare(currentGroup.back().Name) != 0){
+	currentGroup.push_back(a);
+      }
+    }
+    else{
+      allGroups.push_back(currentGroup);
+      currentGroup = {a};
+    }
+  }
+
+  if(currentGroup.size() > 0){
+    allGroups.push_back(currentGroup);
+  }
+  std::cout << "allGroups.size() before return statement in findAllSecondaryGroupings " << allGroups.size() << std::endl;
+  return allGroups;
+}
+
+
 void translocation::populatePrimaryAndSecondaryContigs(){
-  auto SAContigs = util::findContigsWithSecondaryAlignments(groupedContigs_, SAMap_);
+  //std::cout << "groupedCOntigs_.size() " << groupedContigs_.size() << std::endl;
 
-  if(SAContigs.size() != 2){
+  primaryContigs_.first = groupedContigs_[0];
+  primaryContigs_.second = groupedContigs_[1];
+
+  
+
+  secondaryAlignments_.first = translocation::findSecondaryAlignments(primaryContigs_.first);
+  secondaryAlignments_.second = translocation::findSecondaryAlignments(primaryContigs_.second);
+
+  std::vector<std::vector<BamTools::BamAlignment> > allGroups = translocation::findAllSecondaryGroupings(secondaryAlignments_.first, secondaryAlignments_.second);
+
+  std::cout << "allGroups.size() " << allGroups.size() << std::endl;
+
+  if(allGroups.size() > 4){
     hasSecondaryAl_ = false;
-  }
-  else{
-    hasSecondaryAl_ = true;
-    primaryContigs_.first = SAContigs[0].first;
-    primaryContigs_.second = SAContigs[0].second;
-    secondaryContigs_.first = SAContigs[1].first;
-    secondaryContigs_.second = SAContigs[1].second;
+    return;
   }
 
-  std::cout << "hasSecondaryAl_ " << hasSecondaryAl_ << std::endl;
+  for(const auto & g : allGroups){
+    std::cout << "g.size() " << g.size() << std::endl;
+    //std::cout << "printing grouped Secondary Alignments " << std::endl;
+    for(const auto & c : g){
+     std::cout << c.Name << '\t' << c.RefID << '\t' << c.Position << std::endl;
+    }   
+    
+    if(g.size() == 2 and (g[0].Name.compare(g[1].Name) != 0)){
+      secondaryContigs_.first = g[0];
+      secondaryContigs_.second = g[1];
+      std::cout << "FOUND SECONDARYALIGNMENT GROUPINGS" << std::endl;
+      hasSecondaryAl_ = true;
+      return;
+    }
+  }
+  hasSecondaryAl_ = false;
 }
 
 void translocation::populateTransContigs(){
@@ -144,21 +231,18 @@ translocation::translocation(const std::vector<BamTools::BamAlignment> & grouped
   translocation::populateRefData();
   translocation::populatePrimaryAndSecondaryContigs();
   if(hasSecondaryAl_){
-    translocation::populatePrimaryAndSecondaryClipCoords();
+
     translocation::populateClipsConverge();
     translocation::checkIfTrans();
+    translocation::populateTransContigs();
+    translocation::populateT1andT2ClipCoords();
+    translocation::printTransContigs();
+    
   }
   
   std::cout << "hasSecondaryAl_ " << hasSecondaryAl_ << std::endl;
   std::cout << "isTrans_ " << isTrans_ << std::endl;
   
-  
-  if(isTrans_){
-    
-    translocation::populateTransContigs();
-    translocation::populateT1andT2ClipCoords();
-    translocation::printTransContigs();
-  }
 } 
 
 translocation::translocation(const translocation & t){

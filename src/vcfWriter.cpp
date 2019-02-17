@@ -126,7 +126,7 @@ void vcfWriter::populateT1(){
 
   T1_.INFO.SVTYPE = "BND";
   T1_.INFO.SVLEN =  TRANS_.getT1ClipCoords().first.clippedSeq_.size() + TRANS_.getT1ClipCoords().second.clippedSeq_.size();
-  T1_.INFO.SVEND = std::to_string(TRANS_.getT1().second.RefID) + ":" + std::to_string(TRANS_.getT1().second.Position);
+  T1_.INFO.SVEND = util::getChromosomeFromRefID(TRANS_.getT1().second.RefID, TRANS_.getRefData()) + ":" + std::to_string(TRANS_.getT1().second.Position);
   T1_.INFO.RN = TRANS_.getT1().first.Name + "<-->" + TRANS_.getT1().second.Name;
   T1_.INFO.cigar = "TODO";
   T1_.INFO.SB = 0;
@@ -142,7 +142,7 @@ void vcfWriter::populateT2(){
 
   T2_.INFO.SVTYPE = "BND";
   T2_.INFO.SVLEN =  TRANS_.getT2ClipCoords().first.clippedSeq_.size() + TRANS_.getT2ClipCoords().second.clippedSeq_.size();
-  T2_.INFO.SVEND = std::to_string(TRANS_.getT2().second.RefID) + ":" + std::to_string(TRANS_.getT2().second.Position);
+  T2_.INFO.SVEND = util::getChromosomeFromRefID(TRANS_.getT2().second.RefID, TRANS_.getRefData()) + ":" + std::to_string(TRANS_.getT2().second.Position);
   T2_.INFO.RN = TRANS_.getT2().first.Name + "<-->" + TRANS_.getT2().second.Name;
   T2_.INFO.cigar = "TODO";
   T2_.INFO.SB = 0;
