@@ -11,7 +11,7 @@
 #include "api/BamWriter.h"
 
 
-const bool util::breakpointHasSupport(const std::BamTools::BamAlignment &){
+const bool util::breakpointHasSupport(const BamTools::BamAlignment &){
 
   std::string variant;
   std::vector<std::string> kmers;
@@ -38,22 +38,15 @@ bool util::addToGroup(BamTools::BamAlignment & al, std::vector<BamTools::BamAlig
   }
 }
 
-const std::pair<BamTools::BamAlignment, std::vector<BamTools::BamAlignment> >  util::filterOutPrimaryAlignment(const BamTools::BamAlignment & pAl, const std::vector<BamTools::BamAlignment> & allAl){
+const std::vector<BamTools::BamAlignment> util::filterOutPrimaryAlignment(const BamTools::BamAlignment & pAl, const std::vector<BamTools::BamAlignment> & allAl){
   std::vector<BamTools::BamAlignment> sa;
-  BamTools::BamAlignment pa;
-
-
 
   for(const auto & al : allAl){
-    if(al.Position == pAl.Position){
-      pa = al;
-    }
-
-    else{
+    if(al.Position != pAl.Position){
       sa.push_back(al);
     }
   }
-  return std::make_pair(pa, sa);
+  return sa;
 }
 
 const std::vector<BamTools::BamAlignment>  util::pullAllReadsWithName(const std::string & readName, 
@@ -96,27 +89,6 @@ const std::vector<std::pair<BamTools::BamAlignment, BamTools::BamAlignment> > ut
       }
     }
   }
-  return primaryContigs;
-}
-
-const std::vector<std::pair<BamTools::BamAlignment, BamTools::BamAlignment> > util::findContigsWithSecondaryAlignments(const std::vector<BamTools::BamAlignment> & contigs, const std::map<std::string, std::vector<BamTools::BamAlignment> > & SAMap){
-  
-  std::vector<std::pair<BamTools::BamAlignment, std::vector<BamTools::BamAlignment> > > SAVec;
-  std::cout << "Searching if the following contigs have suplemenary alignments" << std::endl;
-
-  for(const auto & c : contigs){
-
-    std::cout << c.Name << '\t' << c.RefID << '\t' << c.Position << std::endl;
-
-    auto allContigs = util::pullAllReadsWithName(c.Name, SAMap);
-
-    auto secondaryContigs = util::filterOutPrimaryAlignment(c, allContigs);
-
-    SAVec.push_back(secondaryContigs);
-  }
-
-  auto primaryContigs = util::checkIfSecondariesAreNearby(SAVec);
-
   return primaryContigs;
 }
 
@@ -166,7 +138,7 @@ const bool util::checkClipsConverge(const BamTools::BamAlignment & al1, const Ba
 }
 
 const bool util::isNearby(const BamTools::BamAlignment & al1, const BamTools::BamAlignment & al2){
-  int32_t maxDist = 150;
+  int32_t maxDist = 1000;
   if(al1.RefID == al2.RefID and std::abs(al1.Position-al2.Position) < maxDist){
     return true;
   }

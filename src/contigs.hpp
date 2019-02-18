@@ -31,6 +31,8 @@ private:
   std::vector<groupedContigs> groupedInsertionContigs_;
   std::vector<groupedContigs> groupedTranslocationContigs_;
   std::vector<groupedContigs> groupedSplitAlignedContigs_;
+  std::vector<std::vector<BamTools::BamAlignment> > transCandidates_;
+
 
 
   std::map<std::string, std::vector<BamTools::BamAlignment> > SAMap_;
@@ -40,7 +42,14 @@ private:
   void groupNearbyContigs();
   void findSplitAlignedContigs();
   void findMobileElementContigs();
-  void filterForInsertionAndTransContigs();
+  void filterForInsertionContigs();
+  void filterForTransContigs();
+  const bool isTransCandidate(const std::vector<BamTools::BamAlignment> &);
+  const bool groupSplitAligns(const std::vector<BamTools::BamAlignment> &);
+  const std::vector<BamTools::BamAlignment> getTransVec(const std::vector<BamTools::BamAlignment> &);
+  const bool compareNames(const std::vector<BamTools::BamAlignment> &, const std::vector<BamTools::BamAlignment> &);
+
+  
   void populateSAMap();
   void alignContigsToMEList();
 

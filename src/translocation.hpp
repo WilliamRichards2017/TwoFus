@@ -1,27 +1,21 @@
 #ifndef __SRC_TRANSLOCATION_HPP__
 #define __SRC_TRANSLOCATION_HPP__
 
-#include "api/BamMultiReader.h"
-#include "api/BamWriter.h"
-
 #include "clipCoords.hpp"
 #include "input.hpp"
 
-
+#include "api/BamMultiReader.h"
+#include "api/BamWriter.h"
 
 
 class translocation{
 public:
   translocation();
-  translocation(const std::vector<BamTools::BamAlignment> &, const std::map<std::string, std::vector<BamTools::BamAlignment> > &, const input &);
+  translocation(const std::vector<BamTools::BamAlignment> &, const input &);
   translocation(const translocation &);
   ~translocation();
 
-
-  const std::map<std::string, std::vector<BamTools::BamAlignment> > & getSAMap();
-
   bool isTrans_ = false;
-  bool hasSecondaryAl_;
 
   const std::pair<BamTools::BamAlignment, BamTools::BamAlignment> & getPrimaryContigs();
   const std::pair<BamTools::BamAlignment, BamTools::BamAlignment> & getSecondaryContigs();
@@ -57,8 +51,7 @@ private:
 
   std::vector<BamTools::RefData> refData_;
 
-  std::vector<BamTools::BamAlignment> groupedContigs_;
-  std::map<std::string, std::vector<BamTools::BamAlignment> > SAMap_;
+  std::vector<BamTools::BamAlignment> contigVec_;
 
   std::pair<clipCoords, clipCoords> primaryClipCoords_;
   std::pair<clipCoords, clipCoords> secondaryClipCoords_;
@@ -67,9 +60,6 @@ private:
 
   std::pair<BamTools::BamAlignment, BamTools::BamAlignment> primaryContigs_;
   std::pair<BamTools::BamAlignment, BamTools::BamAlignment> secondaryContigs_;
-
-  std::pair<std::vector<BamTools::BamAlignment>, std::vector<BamTools::BamAlignment> > secondaryAlignments_;
-  
 
   std::pair<BamTools::BamAlignment, BamTools::BamAlignment> t1_;
   std::pair<BamTools::BamAlignment, BamTools::BamAlignment> t2_;
@@ -82,10 +72,7 @@ private:
   void populatePrimaryAndSecondaryContigs();
   void populatePrimaryAndSecondaryClipCoords();
   void populateT1andT2ClipCoords();
-  void populateLeftAndRightContigs();
 
-  std::vector<BamTools::BamAlignment> findSecondaryAlignments(const BamTools::BamAlignment &);
-  std::vector<std::vector<BamTools::BamAlignment> > findAllSecondaryGroupings(std::vector<BamTools::BamAlignment> & , std::vector<BamTools::BamAlignment> &);
 
   void printTransContigs();
 };

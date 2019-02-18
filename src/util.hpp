@@ -9,12 +9,12 @@ class util{
   
 public:
 
-  static const bool breakpointHasSupport(const std::BamTools::BamAlignment &);
+  static const bool breakpointHasSupport(const BamTools::BamAlignment &);
 
   static bool addToGroup(BamTools::BamAlignment &, std::vector<BamTools::BamAlignment> &);
   static const std::vector<std::pair<BamTools::BamAlignment, BamTools::BamAlignment> > checkIfSecondariesAreNearby(const std::vector<std::pair<BamTools::BamAlignment, std::vector<BamTools::BamAlignment> > > &);
 
-  static const std::pair<BamTools::BamAlignment, std::vector<BamTools::BamAlignment> > filterOutPrimaryAlignment(const BamTools::BamAlignment &, const std::vector<BamTools::BamAlignment> &);
+  static const std::vector<BamTools::BamAlignment> filterOutPrimaryAlignment(const BamTools::BamAlignment &, const std::vector<BamTools::BamAlignment> &);
   static const std::vector<BamTools::BamAlignment> pullAllReadsWithName(const std::string &, const std::map<std::string, std::vector<BamTools::BamAlignment> > &);
 
   static const std::vector<std::pair<BamTools::BamAlignment, BamTools::BamAlignment> > findContigsWithSecondaryAlignments(const std::vector<BamTools::BamAlignment> &, const std::map<std::string, std::vector<BamTools::BamAlignment> > &);

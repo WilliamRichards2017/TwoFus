@@ -52,7 +52,92 @@ void contigs::findAllContigs(){
   reader.Close();
 }
 
-void contigs::filterForInsertionAndTransContigs(){
+const bool contigs::isTransCandidate(const std::vector<BamTools::BamAlignment> & group){
+  if(group.size() != 2){
+    return false;
+  }
+  auto c1 = group[0];
+  auto c2 = group[1];
+
+  
+  auto c1All = util::pullAllReadsWithName(c1.Name, SAMap_);
+  auto c2All = util::pullAllReadsWithName(c2.Name, SAMap_);
+
+  auto c1Sec = util::filterOutPrimaryAlignment(c1, c1All);
+  auto c2Sec = util::filterOutPrimaryAlignment(c2, c2All);
+
+
+  for(const auto & c1s : c1Sec){
+    for(const auto & c2s : c2Sec){
+      if(util::isNearby(c1s, c2s)){
+	return true;
+      }
+    }
+  }
+  return false;
+}
+
+
+void contigs::filterForTransContigs(){
+  for(const auto & g : groupedSplitAlignedContigs_){
+    if(contigs::isTransCandidate(g)){
+      transCandidates_.push_back(g);
+    }
+  }
+  for(const auto & t : transCandidates_){
+    auto transVec = contigs::getTransVec(t);
+    if(transVec.size() == 4){
+      std::cout << "writing trans call for contigs " << std::endl;
+      for(const auto & c : transVec){
+	std::cout << c.Name << '\t' << c.RefID << '\t' << c.Position << std::endl;
+      }
+      translocation t = {transVec, i_};
+      vcfWriter writer = {vcfStream_, t, i_};
+    }
+  }
+}
+
+
+const std::vector<BamTools::BamAlignment> contigs::getTransVec(const std::vector<BamTools::BamAlignment> & tc1){
+
+ 
+  std::vector<BamTools::BamAlignment> transVec;
+  
+  if(tc1.size() != 2){
+    return transVec;
+  }
+  
+  for(const auto & tc2 : transCandidates_){
+
+    if(tc2.size() == 2){
+      if(contigs::compareNames(tc1, tc2)){
+	transVec.push_back(tc1[0]);
+	transVec.push_back(tc1[1]);
+	transVec.push_back(tc2[0]);
+	transVec.push_back(tc2[1]);
+	return transVec;
+      }
+    }
+  } 
+  return transVec;
+}
+
+const bool contigs::compareNames(const std::vector<BamTools::BamAlignment> & tc1, const std::vector<BamTools::BamAlignment> & tc2){
+  bool f = false;
+  bool s = false;
+  
+  if((tc1[0].Name.compare(tc2[0].Name) == 0 and tc1[0].Position != tc2[0].Position) or (tc1[0].Name.compare(tc2[1].Name) == 0 and tc1[0].Position != tc2[2].Position)){
+    f = true;
+  }
+
+  if((tc1[1].Name.compare(tc2[0].Name) == 0 and tc1[1].Position != tc2[0].Position) or (tc1[1].Name.compare(tc2[1].Name) == 0 and tc1[1].Position != tc2[2].Position)){
+    s =true;
+  }
+
+  return (f and 2);
+}
+
+void contigs::filterForInsertionContigs(){
 
   for(const auto & g : groupedSplitAlignedContigs_){
     bool allUnique = true;
@@ -65,31 +150,14 @@ void contigs::filterForInsertionAndTransContigs(){
     }
     
     if(allUnique){
-      if(g.size() > 1 and g.size() < 3){
+      if(g.size() == 2){
 	groupedInsertionContigs_.push_back(g);
 	//insertion INS = {g, i_};
 	//vcfWriter v = {vcfStream_, INS, i_};
       }
     }
-    else{
-      if(g.size() == 2){
-	std::cout << "ENTERING TRANS CONSTRUCTOR FOR " << std::endl;
-	
-	for(const auto & c : g){
-	  std::cout << c.Name << '\t' << c.RefID << '\t' << c.Position << std::endl;
-	}
-
-	groupedTranslocationContigs_.push_back(g);
-	translocation TRANS = {g, SAMap_, i_};
-	if(TRANS.hasSecondaryAl_){
-	  vcfWriter v = {vcfStream_, TRANS, i_};
-	}
-      }
-    }
   }
   std::cout << "found " << groupedInsertionContigs_.size() << " insertion groups" << std::endl;
-  std::cout << "found " << groupedTranslocationContigs_.size() << " translocation groups" << std::endl;
-  
 }
 
 void contigs::alignContigsToMEList(){
@@ -236,6 +304,9 @@ void contigs::groupNearbyContigs(){
       currentGroup = {c};
     }
   }
+  if(currentGroup.size() > 0){
+    groupedContigsVec_.push_back(currentGroup);
+  }
 }
 
 
@@ -256,7 +327,8 @@ contigs::contigs(const input & i) : i_(i){
   //contigs::findMobileElementContigs();
   contigs::findSplitAlignedContigs();
   contigs::populateSAMap();
-  contigs::filterForInsertionAndTransContigs();
+  contigs::filterForInsertionContigs();
+  contigs::filterForTransContigs();
 
   vcfStream_.close();
   

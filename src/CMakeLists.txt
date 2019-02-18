@@ -12,6 +12,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
 
 add_library(twofus_core STATIC
 	clipCoords.cpp
+	contigs.cpp
 	util.cpp
 	input.cpp	
 	MEHead.cpp
@@ -19,7 +20,7 @@ add_library(twofus_core STATIC
 	mobileElement.cpp
 	insertion.cpp
 	translocation.cpp
-	contigs.cpp
+
 	vcfWriter.cpp
 )
 
