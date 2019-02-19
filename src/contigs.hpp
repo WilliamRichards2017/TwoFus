@@ -57,6 +57,8 @@ private:
   
   bool vecHasAlignment(const std::vector<std::pair<BamTools::BamAlignment, MEHit> > &);
   bool isNearby(const BamTools::BamAlignment &, const BamTools::BamAlignment &);
+  bool kmersSupportVariant(const BamTools::BamAlignment &);
+  
   std::pair<BamTools::BamAlignment, MEHit> getMEAlignment(const BamTools::BamAlignment &);
 
   

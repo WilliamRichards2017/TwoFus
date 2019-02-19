@@ -7,7 +7,8 @@ SET(JELLYFISH_LIB)
 
 
 ExternalProject_Add(${JELLYFISH_PROJECT}
-	URL https://github.com/gmarcais/Jellyfish/releases/download/v1.1.12/jellyfish-1.1.12.tar.gz
+        URL  https://github.com/gmarcais/Jellyfish/releases/download/v2.2.5/jellyfish-2.2.5.tar.gz
+
 	CONFIGURE_COMMAND ${PROJECT_SOURCE_DIR}/bin/externals/jellyfish/src/jellyfish_project/configure --prefix=${PROJECT_SOURCE_DIR}/bin/externals/jellyfish/src/jellyfish_project/
 	BUILD_IN_SOURCE 1
 	BUILD_COMMAND make

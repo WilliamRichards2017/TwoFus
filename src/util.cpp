@@ -208,17 +208,22 @@ const int32_t util::countMinKmerDepth(const std::vector<std::pair<std::string, i
   return *std::min_element(kmerCounts.begin(), kmerCounts.end());
 }
 
+
 const std::map<std::string, int32_t> util::countKmersFromJhash(const std::string & jhashPath, const std::vector<std::string> & kmers){
 
   std::string jellyfishPath = "../bin/externals/jellyfish/src/jellyfish_project/bin/jellyfish";
   
   std::map<std::string, int32_t> ret;
   for (const auto & kmer : kmers){
-    std::string cmd = jellyfishPath + " query " + jhashPath + " " + kmer;
-    //std::cout << "executing command: " << cmd << std::endl;
+
+    std::string queryCommand = jellyfishPath + " query " + jhashPath + " " + kmer;
+    std::cout << "executing command: " << queryCommand << std::endl;
+
+    std::string queryOutput = util::exec(queryCommand.c_str());
+    std::cout << "queryOutput is " << queryOutput << std::endl;
     
-    std::string queryOutput = util::exec(cmd.c_str());
-    //std::cout << "command output is: " << queryOutput << std::endl;
+
+
     std::istringstream iss(queryOutput);
     std::vector<std::string> kmerCount((std::istream_iterator<std::string>(iss)), std::istream_iterator<std::string>());
 

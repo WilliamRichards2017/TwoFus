@@ -22,7 +22,18 @@ void clipCoords::setCoords(){
   std::vector<int> genomePositions;
 
   al_.GetSoftClips(clipSizes, readPositions, genomePositions);
-
+  
+  if(clipSizes.size() == 0){
+    refID_ = -1;
+    leftPos_ = -1;
+    rightPos_ = -1;
+    breakPoint_ = -1;
+    globalOffset_ = -1;
+    clipDir_ = ltr;
+    clippedSeq_ = "";
+    return;
+  }
+  
   auto insertionVec = util::getInsertionVec(al_);
 
   clipIndex_ = clipCoords::getLargestClipIndex(clipSizes);
@@ -43,6 +54,7 @@ void clipCoords::setCoords(){
   globalOffset_ = genomePositions[clipIndex_]-readPositions[clipIndex_];
   refID_ = al_.RefID;
 
+  
   /*
   std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
   std::cout << "clipIndex_ is: " << clipIndex_ << std::endl;

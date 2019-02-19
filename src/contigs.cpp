@@ -9,7 +9,7 @@
 #include "/uufs/chpc.utah.edu/common/home/u0401321/TwoFus/bin/externals/minimap2/src/minimap2_project/kseq.h"
 #include "zlib.h"
 
-
+#include "clipCoords.hpp"
 #include "contigs.hpp"
 #include "input.hpp"
 #include "insertion.hpp"
@@ -40,13 +40,54 @@ void contigs::populateSAMap(){
   }
 }
 
+bool contigs::kmersSupportVariant(const BamTools::BamAlignment & contig){
+
+  std::cout << "Inside kmersSupportVariant() for read " << contig.Name << '\t' << contig.RefID << '\t' << contig.Position << std::endl;
+
+  clipCoords cc = {contig};
+
+  if(cc.breakPoint_ == -1){
+    return false;
+  }
+
+  std::cout << "local breakpoint " << cc.breakPoint_ << std::endl;
+
+  int32_t variantStart = std::max(0, cc.breakPoint_-25);
+  int32_t variantEnd = std::min(int(contig.QueryBases.length()), cc.breakPoint_+25);
+  
+  
+  std::cout << "variantStart is " << variantStart << std::endl;
+  std::cout << "variantEnd is  " << variantEnd << std::endl;
+
+  std::string variant = contig.QueryBases.substr(variantStart, variantEnd-1);
+
+  std::vector<std::string> kmers = util::kmerize(variant, 25);
+
+  std::string jhashPath = "";
+
+  auto kmerCounts = util::countKmersFromJhash(i_.kmerPath_, kmers);
+  
+  std::cout << "Variant is " << variant << std::endl;
+  
+  for(const auto & k : kmerCounts){
+    std::cout << k.first << ':' << k.second << std::endl;
+  }
+  
+  
+
+  return true;
+
+}
+
 void contigs::findAllContigs(){
   BamTools::BamReader reader = util::openBamFile(i_.contigBamPath_);
   BamTools::BamAlignment al;
 
   while(reader.GetNextAlignment(al)){
     if(al.RefID != -1){
-      contigVec_.push_back(al);
+      if(contigs::kmersSupportVariant(al)){
+	contigVec_.push_back(al);
+      }
     }
   }
   reader.Close();
@@ -125,12 +166,13 @@ const std::vector<BamTools::BamAlignment> contigs::getTransVec(const std::vector
 const bool contigs::compareNames(const std::vector<BamTools::BamAlignment> & tc1, const std::vector<BamTools::BamAlignment> & tc2){
   bool f = false;
   bool s = false;
-  
-  if((tc1[0].Name.compare(tc2[0].Name) == 0 and tc1[0].Position != tc2[0].Position) or (tc1[0].Name.compare(tc2[1].Name) == 0 and tc1[0].Position != tc2[2].Position)){
+
+    
+  if((tc1[0].Name.compare(tc2[0].Name) == 0 and tc1[0].Position != tc2[0].Position) or (tc1[0].Name.compare(tc2[1].Name) == 0 and tc1[0].Position != tc2[1].Position)){
     f = true;
   }
 
-  if((tc1[1].Name.compare(tc2[0].Name) == 0 and tc1[1].Position != tc2[0].Position) or (tc1[1].Name.compare(tc2[1].Name) == 0 and tc1[1].Position != tc2[2].Position)){
+  if((tc1[1].Name.compare(tc2[0].Name) == 0 and tc1[1].Position != tc2[0].Position) or (tc1[1].Name.compare(tc2[1].Name) == 0 and tc1[1].Position != tc2[1].Position)){
     s =true;
   }
 
