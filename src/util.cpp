@@ -10,6 +10,77 @@
 #include "api/BamMultiReader.h"
 #include "api/BamWriter.h"
 
+const bool util::breakpointOverlapsPeak(const std::pair<int32_t, int32_t> & indices, const int32_t & breakpoint){
+  return(breakpoint >= indices.first-5 and breakpoint <= indices.second+5);
+}
+
+const maxPeak util::getMaxPeak(const std::vector<std::pair<int32_t, int32_t> > & peakVec, const BamTools::BamAlignment & al){
+  maxPeak mp;
+  mp.indices = std::make_pair(-1,-1);
+  mp.value = -34;
+  
+
+  for(const auto & p : peakVec){
+    if(int(al.Qualities[p.first])-33 > mp.value){
+      mp.indices = p;
+      mp.value = int(al.Qualities[p.first])-33;
+    }
+  }
+  return mp;
+}
+
+const std::vector<int32_t> util::getPeakVector(const BamTools::BamAlignment & al){
+  
+  std::vector<int32_t> peakVec;
+  //std::cout << "peakVector : ";
+  for(auto c : al.Qualities){
+    peakVec.push_back(int(c)-33); // ascii conversion
+    //std::cout << peakVec.back() << ", ";
+  }
+  //std::cout << std::endl;
+  return peakVec;  
+}
+
+const std::vector<std::pair<int32_t, int32_t> > util::getPeaks(const BamTools::BamAlignment & al) {
+
+  
+  auto amp = util::getPeakVector(al);
+  int wideStart = -1;                 // The start of any current wide peak
+  
+  int grad = -1;                      // Sign of gradient (almost)
+  //    =  1 for increasing
+  //    =  0 for level AND PREVIOUSLY INCREASING (so potential wide peak)
+  //    = -1 for decreasing OR level, but previously decreasing
+  // A sharp peak is identified by grad=1 -> grad=-1
+  // A wide  peak is identified by grad=0 -> grad=-1
+
+  std::vector<std::pair<int32_t, int32_t> > peakCoords;
+
+  for (int i = 0; i < amp.size() - 1; i++) {
+    if(amp[i+1] < amp[i]){    
+      if(grad == 1){
+	//std::cout << "Sharp peak of " << amp[i] << " at i = " << i << '\n';
+	peakCoords.push_back(std::make_pair(i,i));
+      }
+      else if(grad == 0){
+	peakCoords.push_back(std::make_pair(wideStart,i));
+	//std::cout << "Wide peak of " << amp[i] << " from i = " << wideStart << " to " << i << '\n';
+      }
+      grad = -1;
+    }
+    else if(amp[i+1] == amp[i]){   // Check for start of a wide peak
+      if(grad == 1){
+	wideStart = i;
+	grad = 0;
+      }
+    }
+    else{
+      grad = 1;
+    }
+  }
+  return peakCoords;
+}
+
 
 const bool util::breakpointHasSupport(const BamTools::BamAlignment &){
 
@@ -18,25 +89,6 @@ const bool util::breakpointHasSupport(const BamTools::BamAlignment &){
 
 }
 
-bool util::addToGroup(BamTools::BamAlignment & al, std::vector<BamTools::BamAlignment> & group){
-  std::cout << "group.size() is " << group.size() << std::endl;
-  std::cout << "al.Pos is " << al.RefID << '\t' << al.Position << std::endl;
-
-  if(group.size() == 0){
-    std::cout << "returning true for group.size() == 0" << std::endl;
-    group.push_back(al);
-    return true;
-  }
-  else if(util::isNearby(al, group.back())){
-    group.push_back(al);
-    std::cout << "returning true for isNearby " << std::endl;
-    return true;
-  }
-  else{
-    std::cout << "returning false" << std::endl;
-    return false;
-  }
-}
 
 const std::vector<BamTools::BamAlignment> util::filterOutPrimaryAlignment(const BamTools::BamAlignment & pAl, const std::vector<BamTools::BamAlignment> & allAl){
   std::vector<BamTools::BamAlignment> sa;
@@ -217,10 +269,10 @@ const std::map<std::string, int32_t> util::countKmersFromJhash(const std::string
   for (const auto & kmer : kmers){
 
     std::string queryCommand = jellyfishPath + " query " + jhashPath + " " + kmer;
-    std::cout << "executing command: " << queryCommand << std::endl;
+    //std::cout << "executing command: " << queryCommand << std::endl;
 
     std::string queryOutput = util::exec(queryCommand.c_str());
-    std::cout << "queryOutput is " << queryOutput << std::endl;
+    //std::cout << "queryOutput is " << queryOutput << std::endl;
     
 
 

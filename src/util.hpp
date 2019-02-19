@@ -5,13 +5,23 @@
 
 #include <vector>
 
+
+struct maxPeak{
+  std::pair<int32_t, int32_t> indices;
+  int32_t value;
+};
+
 class util{
   
 public:
 
+  static const bool breakpointOverlapsPeak(const std::pair<int32_t, int32_t> &, const int32_t &);
+  static const maxPeak getMaxPeak(const std::vector<std::pair<int32_t, int32_t> > &, const BamTools::BamAlignment &);
+  static const std::vector<int32_t> getPeakVector(const BamTools::BamAlignment &);
+  static const std::vector<std::pair<int32_t, int32_t> > getPeaks(const BamTools::BamAlignment &);
+
   static const bool breakpointHasSupport(const BamTools::BamAlignment &);
 
-  static bool addToGroup(BamTools::BamAlignment &, std::vector<BamTools::BamAlignment> &);
   static const std::vector<std::pair<BamTools::BamAlignment, BamTools::BamAlignment> > checkIfSecondariesAreNearby(const std::vector<std::pair<BamTools::BamAlignment, std::vector<BamTools::BamAlignment> > > &);
 
   static const std::vector<BamTools::BamAlignment> filterOutPrimaryAlignment(const BamTools::BamAlignment &, const std::vector<BamTools::BamAlignment> &);

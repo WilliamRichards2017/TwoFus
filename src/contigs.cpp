@@ -40,9 +40,17 @@ void contigs::populateSAMap(){
   }
 }
 
-bool contigs::kmersSupportVariant(const BamTools::BamAlignment & contig){
+bool contigs::kmersSupportVariants(const std::vector<BamTools::BamAlignment> & als){
+  for(const auto & al : als){
+    if(! contigs::kmersSupportVariant(al)){
+      std::cout << "kmers do not support variant..." << std::endl;
+      return false;
+    }
+  }
+  return true;
+}
 
-  std::cout << "Inside kmersSupportVariant() for read " << contig.Name << '\t' << contig.RefID << '\t' << contig.Position << std::endl;
+bool contigs::kmersSupportVariant(const BamTools::BamAlignment & contig){
 
   clipCoords cc = {contig};
 
@@ -50,15 +58,8 @@ bool contigs::kmersSupportVariant(const BamTools::BamAlignment & contig){
     return false;
   }
 
-  std::cout << "local breakpoint " << cc.breakPoint_ << std::endl;
-
   int32_t variantStart = std::max(0, cc.breakPoint_-25);
   int32_t variantEnd = std::min(int(contig.QueryBases.length()), cc.breakPoint_+25);
-  
-  
-  std::cout << "variantStart is " << variantStart << std::endl;
-  std::cout << "variantEnd is  " << variantEnd << std::endl;
-
   std::string variant = contig.QueryBases.substr(variantStart, variantEnd-1);
 
   std::vector<std::string> kmers = util::kmerize(variant, 25);
@@ -67,15 +68,44 @@ bool contigs::kmersSupportVariant(const BamTools::BamAlignment & contig){
 
   auto kmerCounts = util::countKmersFromJhash(i_.kmerPath_, kmers);
   
-  std::cout << "Variant is " << variant << std::endl;
-  
-  for(const auto & k : kmerCounts){
-    std::cout << k.first << ':' << k.second << std::endl;
-  }
-  
-  
 
-  return true;
+  
+  auto peakVec = util::getPeaks(contig);
+
+  //  std::cout << "prining out peakVec for breakpoint " << cc.breakPoint_ << std::endl;
+  //for(const auto & p : peakVec){
+  //std::cout << p.first  << '\t' << p.second << std::endl;
+  //}
+
+  auto peak = util::getMaxPeak(peakVec, contig);
+
+  bool b = util::breakpointOverlapsPeak(peak.indices, cc.breakPoint_);
+  
+  if(b){
+    std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+    std::cout << contig.Name << '\t' << contig.RefID << '\t' << contig.Position << std::endl;
+    std::cout << "Max peak is at " << peak.indices.first << "->" << peak.indices.second << " with value of " << peak.value << std::endl;
+    std::cout << "breakpoint at " << cc.breakPoint_ << std::endl;
+    std::cout << std::endl;
+    std::cout << "variantStart is " << variantStart << std::endl;
+    std::cout << "variantEnd is  " << variantEnd << std::endl;
+    std::cout << "Variant is " << variant << std::endl;
+
+    std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+  }
+
+
+  /*
+  for(const auto & p : peakVec){
+    std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+    std::cout << "breakpoint " << cc.breakPoint_ << std::endl;
+    std::cout << "peak coords " << p.first << '\t' << p.second << std::endl;
+    std::cout << "peak values " << int(contig.Qualities[p.first])-33 << '\t' << int(contig.Qualities[p.second])-33 << std::endl;
+    std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+  }
+  */
+  
+  return b;
 
 }
 
@@ -85,9 +115,7 @@ void contigs::findAllContigs(){
 
   while(reader.GetNextAlignment(al)){
     if(al.RefID != -1){
-      if(contigs::kmersSupportVariant(al)){
-	contigVec_.push_back(al);
-      }
+      contigVec_.push_back(al);   
     }
   }
   reader.Close();
@@ -128,12 +156,15 @@ void contigs::filterForTransContigs(){
   for(const auto & t : transCandidates_){
     auto transVec = contigs::getTransVec(t);
     if(transVec.size() == 4){
-      std::cout << "writing trans call for contigs " << std::endl;
-      for(const auto & c : transVec){
-	std::cout << c.Name << '\t' << c.RefID << '\t' << c.Position << std::endl;
+      if(contigs::kmersSupportVariants(transVec)){
+	std::cout << "kmers support variant!!!" << std::endl;
+	std::cout << "writing trans call for contigs " << std::endl;
+	for(const auto & c : transVec){
+	  std::cout << c.Name << '\t' << c.RefID << '\t' << c.Position << std::endl;
+	}
+	translocation t = {transVec, i_};
+	vcfWriter writer = {vcfStream_, t, i_};
       }
-      translocation t = {transVec, i_};
-      vcfWriter writer = {vcfStream_, t, i_};
     }
   }
 }
