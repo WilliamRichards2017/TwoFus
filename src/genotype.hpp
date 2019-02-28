@@ -16,14 +16,14 @@ class genotype{
 
 public:
 
-  genotype(const std::vector<BamTools::BamAlignment> &, const input &, const std::string &, const std::string & bamPath);
-  genotype(const BamTools::BamAlignment &, const input &, const std::string & bamPath);
+  genotype(const std::vector<BamTools::BamAlignment> &, const input &, const std::string &, const std::string &);
+  genotype(const BamTools::BamAlignment &, const input &, const std::string &);
 
 private:
 
 
   std::string bamPath_;
-  BamTool::BamAlignment al_;
+  BamTools::BamAlignment al_;
   std::vector<BamTools::BamAlignment> als_;
 
   BamTools::BamRegion region_;
@@ -41,6 +41,8 @@ private:
   kmers altKmers_;
 
   void populateRefData();
+  void populateRefSequence();
+
 
 };
 

@@ -24,7 +24,6 @@ private:
   input i_;
 
   std::fstream vcfStream_;
-
   std::vector<BamTools::BamAlignment> contigVec_;
   std::vector<groupedContigs> groupedContigsVec_;
 

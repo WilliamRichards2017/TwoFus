@@ -6,7 +6,8 @@
 #include "api/BamMultiReader.h"
 #include "api/BamWriter.h"
 #include "minimap.h"
-#include "/uufs/chpc.utah.edu/common/home/u0401321/TwoFus/bin/externals/minimap2/src/minimap2_project/kseq.h"
+//#include "/uufs/chpc.utah.edu/common/home/u0401321/TwoFus/bin/externals/minimap2/src/minimap2_project/kseq.h"
+#include "kseq.h"
 #include "zlib.h"
 
 #include "clipCoords.hpp"
@@ -396,11 +397,9 @@ void contigs::groupNearbyContigs(){
 }
 
 
-void runGenotypeTest(const std::vector<BamTools::BamAlignment> & contigs){
+void runGenotypeTest(const std::vector<BamTools::BamAlignment> & contigs, const input & i){
   for(const auto & c : contigs){
-    if(c.size > 0){
-      genotype g = {c.front};
-    }
+    genotype g = {c, i, i.probandBamPath_};
   }
 }
 
@@ -419,7 +418,7 @@ contigs::contigs(const input & i) : i_(i){
 
   contigs::findAllContigs();
 
-  runGenotypeTest(contigsVec_)
+  runGenotypeTest(contigVec_, i_);
 
   /*
   contigs::groupNearbyContigs();

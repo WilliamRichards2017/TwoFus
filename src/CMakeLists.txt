@@ -20,7 +20,7 @@ add_library(twofus_core STATIC
 	mobileElement.cpp
 	insertion.cpp
 	translocation.cpp
-
+	genotype.cpp
 	vcfWriter.cpp
 )
 
