@@ -8,6 +8,7 @@
 #include "api/BamMultiReader.h"
 #include "api/BamWriter.h"
 
+#include "genotype.hpp"
 #include "input.hpp"
 
 typedef std::vector<BamTools::BamAlignment> groupedContigs;

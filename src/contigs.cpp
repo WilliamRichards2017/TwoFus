@@ -11,6 +11,7 @@
 
 #include "clipCoords.hpp"
 #include "contigs.hpp"
+#include "genotype.hpp"
 #include "input.hpp"
 #include "insertion.hpp"
 #include "mobileElement.hpp"
@@ -64,7 +65,6 @@ bool contigs::kmersSupportVariant(const BamTools::BamAlignment & contig){
 
   std::vector<std::string> kmers = util::kmerize(variant, 25);
 
-  std::string jhashPath = "";
 
   auto kmerCounts = util::countKmersFromJhash(i_.kmerPath_, kmers);
   
@@ -224,9 +224,11 @@ void contigs::filterForInsertionContigs(){
     
     if(allUnique){
       if(g.size() == 2){
-	groupedInsertionContigs_.push_back(g);
-	//insertion INS = {g, i_};
-	//vcfWriter v = {vcfStream_, INS, i_};
+	if(contigs::kmersSupportVariants(g)){
+	  std::cout << "found kmer support for INSERTION " << std::endl;
+	  insertion INS = {g, i_};
+	  vcfWriter v = {vcfStream_, INS, i_};
+	  }
       }
     }
   }
@@ -352,17 +354,28 @@ void contigs::findMobileElementContigs(){
       alignedContigs.push_back(contigs::getMEAlignment(c));
     }
     if(contigs::vecHasAlignment(alignedContigs)){
-      mobileElement ME = {alignedContigs, i_};
-      vcfWriter writer = {vcfStream_, ME, i_};
+
+
+      std::vector<BamTools::BamAlignment> MEContigs;
+      for(const auto & a : alignedContigs){
+	MEContigs.push_back(a.first);
+      }
+
+      if(contigs::kmersSupportVariants(MEContigs)){
+	mobileElement ME = {alignedContigs, i_};
+	vcfWriter writer = {vcfStream_, ME, i_};
+      }
     }
   }
-
 }
 
 
 void contigs::groupNearbyContigs(){
   //std::vector<std::vector<BamTools::BamAlignment> > contigGroups;
   std::vector<BamTools::BamAlignment> currentGroup;
+  if(contigVec_.size() < 1){
+    return;
+  }
   currentGroup.push_back(contigVec_[0]);
   contigVec_.erase(contigVec_.begin());
 
@@ -383,6 +396,15 @@ void contigs::groupNearbyContigs(){
 }
 
 
+void runGenotypeTest(const std::vector<BamTools::BamAlignment> & contigs){
+  for(const auto & c : contigs){
+    if(c.size > 0){
+      genotype g = {c.front};
+    }
+  }
+}
+
+
 contigs::contigs(const input & i) : i_(i){
 
   std::string vcfFile = "/uufs/chpc.utah.edu/common/home/u0401321/TwoFus/bin/testy.vcf";
@@ -396,13 +418,17 @@ contigs::contigs(const input & i) : i_(i){
   }
 
   contigs::findAllContigs();
+
+  runGenotypeTest(contigsVec_)
+
+  /*
   contigs::groupNearbyContigs();
-  //contigs::findMobileElementContigs();
+  contigs::findMobileElementContigs();
   contigs::findSplitAlignedContigs();
   contigs::populateSAMap();
   contigs::filterForInsertionContigs();
   contigs::filterForTransContigs();
-
+  */
   vcfStream_.close();
   
 }

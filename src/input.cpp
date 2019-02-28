@@ -23,7 +23,7 @@ input::input(const input & i){
 
 input::input(int argc, char ** argv) : argc_(argc), argv_(argv){
   if(argc_ < 4){
-    std::cout << "Failed to provide the minimum number of arguments (3)" << std::endl;
+    std::cout << "Failed to provide the minimum number of arguments (4)" << std::endl;
     std::cout << "Exiting run with non-zero exit status, please provide the proper number of arguments" << std::endl;
     exit (EXIT_FAILURE);
   }
@@ -50,11 +50,12 @@ void input::printArgs(){
 void input::parseArgs(){
 
   probandBamPath_ = std::string(argv_[1]);
+  mobileElementFastaPath_ = std::string(argv_[2]);
+  referencePath_ = std::string(argv_[3]);
+
   contigFastqPath_ = probandBamPath_ + ".generator.V2.overlap.hashcount.fastq";
   contigBamPath_ = contigFastqPath_ + ".bam";
-  mobileElementFastaPath_ = std::string(argv_[2]);
   mobileElementIndexPath_ = mobileElementFastaPath_ + ".fai";
-  referencePath_ = std::string(argv_[3]);
   referenceIndexPath_ = referencePath_ + ".fai";
   vcfOutPath_ = probandBamPath_ + ".generator.V2.overlap.hashcount.fastq.bam.vcf";
   kmerPath_ = probandBamPath_ + ".generator.Jhash";

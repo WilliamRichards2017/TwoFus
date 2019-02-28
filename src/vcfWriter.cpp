@@ -36,7 +36,7 @@ void vcfWriter::writeINSMQ(){
 }
 
 void vcfWriter::writeMEInfo(){
-  vcfStream_ << "NHC=" << vcfLine_.INFO.NHC << ";NTC=" << vcfLine_.INFO.NTC << ";NHR=" << vcfLine_.INFO.NHR << ";NTR=" << vcfLine_.INFO.NTR << ";LT=" << vcfLine_.INFO.LT << ";SB=" << vcfLine_.INFO.SB;
+  vcfStream_ << "RN=" << vcfLine_.INFO.RN << ";NHC=" << vcfLine_.INFO.NHC << ";NTC=" << vcfLine_.INFO.NTC << ";NHR=" << vcfLine_.INFO.NHR << ";NTR=" << vcfLine_.INFO.NTR << ";LT=" << vcfLine_.INFO.LT << ";SB=" << vcfLine_.INFO.SB;
 }
 
 
@@ -106,6 +106,8 @@ void vcfWriter::populateINSInfoField(){
 }
 
 void vcfWriter::populateMEInfoField(){
+
+  vcfLine_.INFO.RN = ME_.getHeadContigs().front().getContig().Name;
   vcfLine_.INFO.NHC = ME_.getHeadContigs().size();
   vcfLine_.INFO.NTC = ME_.getTailContigCount();
   vcfLine_.INFO.NHR = ME_.getHeadContigs().front().getSupportingReads().size();
@@ -192,8 +194,12 @@ vcfWriter::vcfWriter(std::fstream & vcfStream, insertion & INS, input & i) : INS
 vcfWriter::vcfWriter(std::fstream & vcfStream, mobileElement & ME, input & i) : ME_(ME), i_(i), variantType_(mobEl), vcfStream_(vcfStream){
   vcfContig_ = ME_.getHeadContigs().front().getContig();
   vcfWriter::populateMELine();
-  vcfWriter::writeMELine();
-  vcfWriter::printVCFLine();	       
+
+  if(vcfLine_.INFO.NHC > 0 and vcfLine_.INFO.NHR > 0){
+
+    vcfWriter::writeMELine();
+    vcfWriter::printVCFLine();	       
+  }
 }
 
 vcfWriter::vcfWriter(std::fstream & vcfStream, translocation & TRANS, input & i) : TRANS_(TRANS), i_(i), variantType_(trans), vcfStream_(vcfStream){
