@@ -23,6 +23,10 @@ float & mobileElement::getStrandBias(){
   return strandBias_;
 }
 
+MEHead & mobileElement::getMostSupportedHead(){
+  return mostSupportedHead_;
+}
+
 polyTail & mobileElement::getMostSupportedTail(){
   return mostSupportedTail_;
 }

@@ -14,13 +14,14 @@ add_library(twofus_core STATIC
 	clipCoords.cpp
 	contigs.cpp
 	util.cpp
-	input.cpp	
+	input.cpp
+	genotype.cpp	
+	kmers.cpp
 	MEHead.cpp
 	polyTail.cpp
 	mobileElement.cpp
 	insertion.cpp
 	translocation.cpp
-	genotype.cpp
 	vcfWriter.cpp
 )
 

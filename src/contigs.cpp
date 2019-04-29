@@ -6,7 +6,6 @@
 #include "api/BamMultiReader.h"
 #include "api/BamWriter.h"
 #include "minimap.h"
-//#include "/uufs/chpc.utah.edu/common/home/u0401321/TwoFus/bin/externals/minimap2/src/minimap2_project/kseq.h"
 #include "kseq.h"
 #include "zlib.h"
 
@@ -98,12 +97,12 @@ bool contigs::kmersSupportVariant(const BamTools::BamAlignment & contig){
 
   /*
   for(const auto & p : peakVec){
-    std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
-    std::cout << "breakpoint " << cc.breakPoint_ << std::endl;
-    std::cout << "peak coords " << p.first << '\t' << p.second << std::endl;
-    std::cout << "peak values " << int(contig.Qualities[p.first])-33 << '\t' << int(contig.Qualities[p.second])-33 << std::endl;
-    std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
-  }
+  std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+  std::cout << "breakpoint " << cc.breakPoint_ << std::endl;
+  std::cout << "peak coords " << p.first << '\t' << p.second << std::endl;
+  std::cout << "peak values " << int(contig.Qualities[p.first])-33 << '\t' << int(contig.Qualities[p.second])-33 << std::endl;
+  std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+}
   */
   
   return b;
@@ -111,6 +110,7 @@ bool contigs::kmersSupportVariant(const BamTools::BamAlignment & contig){
 }
 
 void contigs::findAllContigs(){
+  std::cout << "contig bam path is: " << i_.contigBamPath_ << std::endl;
   BamTools::BamReader reader = util::openBamFile(i_.contigBamPath_);
   BamTools::BamAlignment al;
 
@@ -219,7 +219,7 @@ void contigs::filterForInsertionContigs(){
     for(const auto & c : g){
       
       if(c.HasTag("SA")){
-	  allUnique = false;
+	allUnique = false;
       }
     }
     
@@ -229,7 +229,7 @@ void contigs::filterForInsertionContigs(){
 	  std::cout << "found kmer support for INSERTION " << std::endl;
 	  insertion INS = {g, i_};
 	  vcfWriter v = {vcfStream_, INS, i_};
-	  }
+	}
       }
     }
   }
@@ -321,7 +321,7 @@ bool contigs::vecHasAlignment(const std::vector<std::pair<BamTools::BamAlignment
   return false;
 }
   
-					
+
 void contigs::findSplitAlignedContigs(){
 
 
@@ -343,7 +343,7 @@ void contigs::findSplitAlignedContigs(){
     }
   }
   std::cout << "Found " << groupedSplitAlignedContigs_.size() << " split aligned contig groups" << std::endl;
-}					
+}
 
 void contigs::findMobileElementContigs(){
 
@@ -396,43 +396,29 @@ void contigs::groupNearbyContigs(){
   }
 }
 
-
-void runGenotypeTest(const std::vector<BamTools::BamAlignment> & contigs, const input & i){
-  for(const auto & c : contigs){
-    genotype g = {c, i, i.probandBamPath_};
-  }
-}
-
-
 contigs::contigs(const input & i) : i_(i){
 
-  std::string vcfFile = "/uufs/chpc.utah.edu/common/home/u0401321/TwoFus/bin/testy.vcf";
+  std::string vcfFile = "/uufs/chpc.utah.edu/common/HIPAA/u0401321/TwoFus/bin/testy.vcf";
   //vcfStream_.open(i_.vcfOutPath_.c_str(), std::fstream::in | std::fstream::out | std::fstream::app);
   vcfStream_.open(vcfFile.c_str(), std::fstream::in | std::fstream::out | std::fstream::app);
 
   if(! vcfStream_.is_open()){
-    //std::cout << "Could not open " << i_.vcfOutPath_ << std::endl;
+    std::cout << "Could not open vcf file" << vcfFile << std::endl;
     std::cout << "Exiting run with non-zero exit status" << std::endl;
     exit(EXIT_FAILURE);
   }
 
   contigs::findAllContigs();
-
-  runGenotypeTest(contigVec_, i_);
-
-  /*
   contigs::groupNearbyContigs();
   contigs::findMobileElementContigs();
   contigs::findSplitAlignedContigs();
   contigs::populateSAMap();
   contigs::filterForInsertionContigs();
   contigs::filterForTransContigs();
-  */
+  
   vcfStream_.close();
   
 }
 
 contigs::~contigs(){
 }
-
-

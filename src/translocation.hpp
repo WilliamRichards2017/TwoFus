@@ -2,6 +2,7 @@
 #define __SRC_TRANSLOCATION_HPP__
 
 #include "clipCoords.hpp"
+#include "genotype.hpp"
 #include "input.hpp"
 
 #include "api/BamMultiReader.h"
@@ -64,6 +65,9 @@ private:
   std::pair<BamTools::BamAlignment, BamTools::BamAlignment> t1_;
   std::pair<BamTools::BamAlignment, BamTools::BamAlignment> t2_;
 
+  genotype probandGT_;
+  std::vector<genotype> parentGTs_;
+
   void populateRefData();
   void populatePrimaryContigs();
   void populateSecondaryContigs();
@@ -72,6 +76,7 @@ private:
   void populatePrimaryAndSecondaryContigs();
   void populatePrimaryAndSecondaryClipCoords();
   void populateT1andT2ClipCoords();
+  void populateGenotypes();
 
 
   void printTransContigs();

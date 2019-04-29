@@ -9,15 +9,20 @@
 
 #include "clipCoords.hpp"
 #include "input.hpp"
+#include "kmers.hpp"
+#include "MEHead.hpp"
+#include "mobileElement.hpp"
 
-typedef std::vector<std::string> kmers;
+
+class mobileElement;
+class MEHead;
 
 class genotype{
 
 public:
 
-  genotype(const std::vector<BamTools::BamAlignment> &, const input &, const std::string &, const std::string &);
-  genotype(const BamTools::BamAlignment &, const input &, const std::string &);
+  genotype();
+  genotype(mobileElement &, const input &, const kmers &);
 
 private:
 
@@ -25,23 +30,23 @@ private:
   std::string bamPath_;
   BamTools::BamAlignment al_;
   std::vector<BamTools::BamAlignment> als_;
-
   BamTools::BamRegion region_;
 
   input i_;
 
-  clipCoords cc_;
+  std::vector<clipCoords> ccs_;
 
-  std::string variant_;
-  std::string refSequence_;
+  std::vector<std::string> variants_;
+  std::vector<std::string> refSequences_;
 
   std::vector<BamTools::RefData> refData_;
 
-  kmers refKmers_;
-  kmers altKmers_;
-
+  void populateVariants();
   void populateRefData();
-  void populateRefSequence();
+  void populateRefSequences();
+  void populateClipCoords();
+  void populateRefKmers();
+  void populateAltKmers();
 
 
 };

@@ -100,7 +100,7 @@ void polyTail::findConsensusTails(){
 }
 
 void polyTail::findSupportingReadsForRegion(){
-  BamTools::BamReader reader = util::openBamFile(i_.probandBamPath_);
+  BamTools::BamReader reader = util::openBamFile(i_.probandMutBamPath_);
   BamTools::BamAlignment al;
 
   if(!reader.SetRegion(region_)){
@@ -119,7 +119,7 @@ void polyTail::findSupportingReadsForRegion(){
 }
 
 void polyTail::findSupportingReadsForContig(){
-  BamTools::BamReader reader = util::openBamFile(i_.probandBamPath_);
+  BamTools::BamReader reader = util::openBamFile(i_.probandMutBamPath_);
   BamTools::BamAlignment al;
 
   BamTools::BamRegion region = BamTools::BamRegion(clipCoords_.refID_, clipCoords_.leftPos_+clipCoords_.globalOffset_ -100, clipCoords_.refID_, clipCoords_.rightPos_+clipCoords_.globalOffset_+100);
@@ -178,9 +178,10 @@ polyTail::polyTail(const BamTools::BamRegion & region, const input & i) : region
   polyTail::findLongestTail();
 }
 
-polyTail::polyTail(const BamTools::BamAlignment & contig, const input & i) : contig_(contig), i_(i), clipCoords_({contig_}), contigCount_(1){
-    polyTail::findSupportingReadsForContig();
-    polyTail::findLongestTail();
+polyTail::polyTail(const BamTools::BamAlignment & contig, const input & i) : contig_(contig), i_(i), contigCount_(1){
+  clipCoords_ = {contig_};
+  polyTail::findSupportingReadsForContig();
+  polyTail::findLongestTail();
 }
 
 polyTail::~polyTail(){

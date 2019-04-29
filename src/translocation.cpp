@@ -40,7 +40,9 @@ const std::vector<BamTools::RefData> & translocation::getRefData(){
   return refData_;
 }
 
-
+void translocation::populateGenotypes(){
+  std::vector<BamTools::BamAlignment> transVec = {primaryContigs_.first, primaryContigs_.second, secondaryContigs_.first, secondaryContigs_.second};
+}
 
 void translocation::populateRefData(){
   refData_ = util::populateRefData(i_.contigBamPath_);

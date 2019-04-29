@@ -61,7 +61,6 @@ private:
   bool kmersSupportVariants(const std::vector<BamTools::BamAlignment> &);
   
   std::pair<BamTools::BamAlignment, MEHit> getMEAlignment(const BamTools::BamAlignment &);
-
   
 };
 

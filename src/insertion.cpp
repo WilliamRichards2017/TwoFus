@@ -31,13 +31,6 @@ const std::pair<std::string, std::string> & insertion::getCigarStrings(){
   return cigarStrings_;
 }
 
-void insertion::populateKmerDepths(){
-  auto kmerCounts = util::countKmersFromJhash(i_.kmerPath_, altKmers_);
-
-  for(const auto & k : kmerCounts){
-    kmerDepths_.push_back(k.second);
-  }
-}
 
 void insertion::populateCigarStrings(){
 
@@ -54,20 +47,6 @@ void insertion::populateCigarStrings(){
   std::cout << "leftCigar String: " << cigarStrings_.first << std::endl;
   std::cout << "rightCigar string: " << cigarStrings_.second << std::endl;
 
-}
-
-void insertion::populateRefKmers(){
-
-  refSequence_ = util::pullRefSequenceFromRegion(leftBreakpoint_, rightContig_.GetEndPosition(), i_.referencePath_, refData_);
-  std::cout << "pulled refSequence_: " << refSequence_ << std::endl;
-  refKmers_ = util::kmerize(refSequence_, 25);
-}
-
-
-void insertion::populateAltKmers(){
-  altKmers_ = util::kmerize(leftVariant_.alt, 25);
-  std::vector<std::string> rightAltKmers = util::kmerize(rightVariant_.alt, 25);
-  altKmers_.insert(std::end(altKmers_), std::begin(rightAltKmers), std::end(rightAltKmers));
 }
 
 // TODO: make sure this works for revComp
@@ -151,8 +130,6 @@ insertion::insertion(const insertion & ins){
   refSequence_ = ins.refSequence_;
   altSequence_ = ins.altSequence_;
   cigarStrings_ = ins.cigarStrings_;
-  refKmers_ = ins.refKmers_;
-  altKmers_ = ins.altKmers_;
   clipCoords_ = ins.clipCoords_;
 
 }
@@ -165,10 +142,7 @@ insertion::insertion(const std::vector<BamTools::BamAlignment> & groupedContigs,
   insertion::populateClipsConverge();
   insertion::populateBreakpoints();
   insertion::populateVariant();
-  insertion::populateRefKmers();
-  insertion::populateAltKmers();
   insertion::populateCigarStrings();
-  insertion::populateKmerDepths();
 }
 
 insertion::~insertion(){

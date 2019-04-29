@@ -13,6 +13,7 @@ class input{
   ~input();
 
   std::string probandBamPath_;
+  std::string probandMutBamPath_;
   std::string contigFastqPath_;
   std::string contigBamPath_;
   std::string mobileElementFastaPath_;
@@ -21,9 +22,13 @@ class input{
   std::string referenceIndexPath_;
   std::string vcfOutPath_;
   std::string kmerPath_;
-
-
+  std::string hashListPath_;
   std::vector<std::string> parentBamPaths_;
+
+  std::string probandRefPath_;
+  std::string probandAltPath_;
+  std::vector<std::string> parentRefPaths_;
+  std::vector<std::string> parentAltPaths_;
 
   void printArgs();
 
@@ -33,8 +38,8 @@ class input{
   char ** argv_;
 
   void parseArgs();
+  void populateKmerPaths();
 
 };
-
 
 #endif // __SRC_INPUT_H__

@@ -7,7 +7,9 @@
 #include "api/BamMultiReader.h"
 #include "api/BamWriter.h"
 
+#include "genotype.hpp"
 #include "input.hpp"
+#include "genotype.hpp"
 #include "MEHead.hpp"
 #include "polyTail.hpp"
 
@@ -37,7 +39,7 @@ private:
   int32_t tailSize_ = 10;
   float strandBias_ = 0.0;
   int32_t tailContigCount_ = 0;
-   input i_;
+  input i_;
   std::vector<std::pair<BamTools::BamAlignment, MEHit> > groupedContigHits_;
 
   BamTools::BamRegion region_;
@@ -50,6 +52,9 @@ private:
   MEHead mostSupportedHead_;
   polyTail mostSupportedTail_;
 
+  // genotype probandGT_;
+  //std::vector<genotype> parentGTs_;
+
   void findHeadWithMostSupport();
   void findTailWithMostSupport();
 
@@ -60,7 +65,7 @@ private:
   void checkForNullTail();
   void sumTailContigCount();
   void calculateStrandBias();
-  //TODO: implement
+  void populateGenotypes();
 
 
 

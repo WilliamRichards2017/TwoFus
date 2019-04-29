@@ -10,6 +10,10 @@ MEHit & MEHead::getMEHit(){
   return MEHit_;
 }
 
+clipCoords & MEHead::getClipCoords(){
+  return clipCoords_;
+}
+
 BamTools::BamAlignment & MEHead::getContig(){
   return contig_;
 }
@@ -36,7 +40,7 @@ bool MEHead::mapReadToMEHead(const BamTools::BamAlignment & al){
 
 void MEHead::findSupportingReads(){
 
-  BamTools::BamReader reader = util::openBamFile(i_.probandBamPath_);
+  BamTools::BamReader reader = util::openBamFile(i_.probandMutBamPath_);
   BamTools::BamAlignment al;
 
   BamTools::BamRegion region = BamTools::BamRegion(clipCoords_.refID_, clipCoords_.leftPos_+clipCoords_.globalOffset_ -100,
@@ -75,7 +79,8 @@ MEHead::MEHead(const MEHead & ME){
   DS_ = ME.DS_;
 }
 
-MEHead::MEHead(const std::pair<BamTools::BamAlignment, MEHit> & contigHit, const input & i) : contig_(contigHit.first), clipCoords_({contig_}), MEHit_(contigHit.second), i_(i){
+MEHead::MEHead(const std::pair<BamTools::BamAlignment, MEHit> & contigHit, const input & i) : contig_(contigHit.first), MEHit_(contigHit.second), i_(i){
+  clipCoords_ = {contig_};
   MEHead::findSupportingReads();
 }
 

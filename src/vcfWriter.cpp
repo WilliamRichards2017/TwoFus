@@ -192,7 +192,13 @@ vcfWriter::vcfWriter(std::fstream & vcfStream, insertion & INS, input & i) : INS
 }
 
 vcfWriter::vcfWriter(std::fstream & vcfStream, mobileElement & ME, input & i) : ME_(ME), i_(i), variantType_(mobEl), vcfStream_(vcfStream){
+
+
+  std::cout << "FOUND ME, invoking KMERS" << std::endl;
+  kmers k = {i_.probandAltPath_, i_.probandRefPath_, i_.parentAltPaths_, i.parentRefPaths_};
+
   vcfContig_ = ME_.getHeadContigs().front().getContig();
+  genotype MEgt = {ME, i, k};
   vcfWriter::populateMELine();
 
   if(vcfLine_.INFO.NHC > 0 and vcfLine_.INFO.NHR > 0){

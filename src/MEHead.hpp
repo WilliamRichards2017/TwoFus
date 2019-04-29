@@ -7,6 +7,8 @@
 #include "clipCoords.hpp"
 #include "input.hpp"
 
+#include <string>
+
 typedef std::pair<std::string, int32_t> MEHit;
 
 struct DS{
@@ -25,6 +27,7 @@ public:
   MEHit & getMEHit();
   BamTools::BamAlignment & getContig();
   const std::vector<BamTools::BamAlignment> & getSupportingReads();
+  clipCoords & getClipCoords();
 
 private:
 

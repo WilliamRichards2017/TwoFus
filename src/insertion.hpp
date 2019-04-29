@@ -8,6 +8,7 @@
 #include "api/BamWriter.h"
 
 #include "clipCoords.hpp"
+#include "genotype.hpp"
 #include "input.hpp"
 
 struct variant{
@@ -56,13 +57,11 @@ private:
   std::string refSequence_;
   std::string altSequence_;
 
+  genotype probandGT_;
+  std::vector<genotype> parentGTs_;
+
   std::pair<std::string, std::string> cigarStrings_;
-
-  std::vector<std::string> refKmers_;
-  std::vector<std::string> altKmers_;
-
   std::pair<clipCoords, clipCoords> clipCoords_;
-
   std::vector<int32_t> kmerDepths_;
 
   void populateLeftAndRightContigs();
@@ -72,7 +71,6 @@ private:
   void populateRefKmers();
   void populateAltKmers();
   void populateCigarStrings();
-  void populateKmerDepths();
   
 };
 

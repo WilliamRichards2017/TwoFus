@@ -26,13 +26,15 @@ public:
 
   std::string clippedSeq_;
 
+  BamTools::BamAlignment al_;
+
+
   void printCoords();
 
  
 
 private:
 
-  BamTools::BamAlignment al_;
   int32_t clipIndex_;
 
   void setCoords();
