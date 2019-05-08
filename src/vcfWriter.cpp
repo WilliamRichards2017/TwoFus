@@ -8,6 +8,7 @@
 #include "mobileElement.hpp"
 #include "translocation.hpp"
 #include "util.hpp"
+#include "variant.hpp"
 
 void vcfWriter::printVCFLine(){
   std::cout << "~~~~~~~~~~~~~~PRINTING VCF LINE~~~~~~~~~~~~~~~~~~" << std::endl;
@@ -194,8 +195,17 @@ vcfWriter::vcfWriter(std::fstream & vcfStream, insertion & INS, input & i) : INS
 vcfWriter::vcfWriter(std::fstream & vcfStream, mobileElement & ME, input & i) : ME_(ME), i_(i), variantType_(mobEl), vcfStream_(vcfStream){
 
 
+  variant v = {ME_.getMostSupportedHead().getContig(), i_};
+
+  std::cout << "BEFORE INVOKING KMERS!!!!" << std::endl;
+
+  std::cout << "probandAltPath is: " << i_.probandAltPath_ << std::endl;
+
+
   std::cout << "FOUND ME, invoking KMERS" << std::endl;
-  kmers k = {i_.probandAltPath_, i_.probandRefPath_, i_.parentAltPaths_, i.parentRefPaths_};
+  kmers k = {v, i_.probandAltPath_, i_.probandRefPath_, i_.parentAltPaths_, i.parentRefPaths_};
+
+
 
   vcfContig_ = ME_.getHeadContigs().front().getContig();
   genotype MEgt = {ME, i, k};

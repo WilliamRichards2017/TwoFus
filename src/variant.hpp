@@ -8,13 +8,20 @@
 #include "api/BamWriter.h"
 
 #include "clipCoords.hpp"
+#include "input.hpp"
 
 class variant{
 
 public:
   variant();
   variant(const variant &);
-  variant(const BamTools::BamAlignment &, const std::string &);
+  variant(const BamTools::BamAlignment &, const input &);
+
+  std::string alt_;
+  std::string ref_;
+  std::vector<std::string> altKmers_;
+  std::vector<std::string> refKmers_;
+
   
 private:
   
@@ -23,13 +30,12 @@ private:
 
   clipCoords cc_;
   BamTools::BamAlignment al_;
-  td::vector<BamTools::RefData> refData_;
+  std::vector<BamTools::RefData> refData_;
 
-  std::string alt_;
-  std::string ref_;
   std::string fullVarSeq_;
 
-  std::string bamPath_;
+
+  input i_;
 
   int32_t breakpoint_ = -1;
   int32_t varRefPos_ = -1;

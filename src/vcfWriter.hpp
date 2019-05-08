@@ -7,6 +7,7 @@
 #include "insertion.hpp"
 #include "mobileElement.hpp"
 #include "translocation.hpp"
+#include "variant.hpp"
 
 enum variantType { mobEl, ins, trans};
 

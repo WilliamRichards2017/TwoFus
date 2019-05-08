@@ -4,12 +4,13 @@
 #include "api/BamMultiReader.h"
 #include "api/BamWriter.h"
 
+#include "util.hpp"
 #include "variant.hpp"
 
 void variant::populateRefData(){
   BamTools::BamReader reader;
-  if (!reader.Open(bamPath_)){
-    std::cout << "Could not open input Bam file" << bamPath_ << std::endl;
+  if (!reader.Open(i_.contigBamPath_)){
+    std::cout << "Could not open input Bam file" << i_.contigBamPath_ << std::endl;
     exit (EXIT_FAILURE);
   }
   refData_ = reader.GetReferenceData();
@@ -17,9 +18,20 @@ void variant::populateRefData(){
 
 
 
-void genotype::populateRefSequences(){
+void variant::populateRefSequence(){
 
-  std::string fastaHackPath = "../bin/externals/fastahack/src/fastahack_project-build/tools/fastahack";                                                                                                      std::string chrom = util::getChromosomeFromRefID(al_.RefID, refData_);                                                                                                                                     std::string cmd = fastaHackPath + " -r " + chrom + ":" + std::to_string(cc_.leftPos_) + ".." + std::to_string(cc_.rightPos_) + ' ' + i_.referencePath_;                                                    refSequence_ = util::exec(cmd.c_str());                                                                                                                                                                  }
+  std::string fastaHackPath = "../bin/externals/fastahack/src/fastahack_project-build/tools/fastahack";
+  std::string chrom = util::getChromosomeFromRefID(al_.RefID, refData_);
+  std::string cmd = fastaHackPath + " -r " + chrom + ":" + std::to_string(cc_.leftPos_ + cc_.globalOffset_) + ".." + std::to_string(cc_.rightPos_ + cc_.globalOffset_) + ' ' + i_.referencePath_;
+
+
+  std::cout << "chrom is: " << chrom << std::endl;
+  std::cout << "cmd to run is: " << cmd << std::endl;
+  
+
+  ref_ = util::exec(cmd.c_str());
+  std::cout << "ref sequence inside variant is: " << ref_ << std::endl;
+}
 
 
 variant::variant(){}
@@ -28,29 +40,37 @@ variant::variant(const variant & v){
   bnd_ = v.bnd_;
   al_ = v.al_;
   alt_ = v.alt_;
-  ref = v.ref_;
+  ref_ = v.ref_;
+  altKmers_ = v.altKmers_;
+  refKmers_ = v.refKmers_;
   fullVarSeq_ = v.fullVarSeq_;
-  RefID_ = v.RefID_;
   breakpoint_ = v.breakpoint_;
 }
 
-variant::variant(const BamTools::BamAlignment & al, const std::string & bamPath) : al_(al), bamPath_(bamPath){
+variant::variant(const BamTools::BamAlignment & al, const input & i) : al_(al), i_(i){
 
   cc_ = {al};
-  breakpoint_ = cc.breakPoint_;
-  globalOffset_ = cc.globalOffset_;
+  breakpoint_ = cc_.breakPoint_;
+  globalOffset_ = cc_.globalOffset_;
   if(breakpoint_ != -1){
     bnd_ = true;
   }
   
-  if(cc_.clipDir == rtl){
-    varRefPos_ = breakpoint_ + globalOffset + 1;
+  if(cc_.clipDir_ == rtl){
+    varRefPos_ = breakpoint_ + globalOffset_ +1;
   }
   else{
-    varRefPos_ = breakpoint_ + globalOffset - 1;
+    varRefPos_ = breakpoint_ + globalOffset_ -1;
   }
   
   alt_ = cc_.clippedSeq_;
+
+  std::cout << "Alt sequence inside variant is: " << alt_ << std::endl;
+
+  variant::populateRefData();
   variant::populateRefSequence();
+
+  altKmers_ = util::kmerize(alt_, 25);
+  refKmers_ = util::kmerize(ref_, 25);
 
 }

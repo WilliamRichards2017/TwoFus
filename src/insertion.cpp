@@ -19,7 +19,7 @@ const std::vector<BamTools::RefData> & insertion::getRefData(){
   return refData_;
 }
 
-const variant & insertion::getInsertionVariant(){
+const var & insertion::getInsertionVariant(){
   return insertionVariant_;
 }
 

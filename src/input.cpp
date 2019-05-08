@@ -1,4 +1,5 @@
 #include <iostream>
+#include <libgen.h>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -21,7 +22,12 @@ input::input(const input & i){
   parentBamPaths_ = i.parentBamPaths_;
   kmerPath_ = i.kmerPath_;
   hashListPath_ = i.hashListPath_;
+  probandAltPath_ = i.probandAltPath_;
+  probandRefPath_ = i.probandRefPath_;
+  parentAltPaths_ = i.parentAltPaths_;
+  parentRefPaths_ = i.parentRefPaths_;
 }
+
 
 input::input(int argc, char ** argv) : argc_(argc), argv_(argv){
   if(argc_ < 5){
@@ -85,9 +91,13 @@ void input::populateKmerPaths(){
   probandAltPath_ = hashListPath_;
   probandRefPath_ = probandBamPath_ + ".generator.V2.overlap.asembly.hash.fastq.ref.fastq.Jhash";
 
-  for(const auto & pp : parentBamPaths_){
-    std::string pa = probandBamPath_ + ".generator.V2.overlap.asembly.hash.fastq." + pp + ".generator.Jhash";
-    std::string pr =probandBamPath_ + ".generator.V2.overlap.asembly.hash.fastq.Ref." + pp + ".generator.Jhash";
+  for(auto & pp : parentBamPaths_){
+
+
+    auto p = std::string(basename(pp.c_str()));
+
+    std::string pa = probandBamPath_ + ".generator.V2.overlap.asembly.hash.fastq." + p + ".generator.Jhash";
+    std::string pr =probandBamPath_ + ".generator.V2.overlap.asembly.hash.fastq.Ref." + p + ".generator.Jhash";
     
     parentRefPaths_.push_back(pr);
     parentAltPaths_.push_back(pa);

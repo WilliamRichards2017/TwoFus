@@ -1,6 +1,7 @@
 #ifndef __SRC_KMERS_HPP__
 #define __SRC_KMERS_HPP__
 
+#include "variant.hpp"
 
 #include <string>
 #include <unordered_map>
@@ -10,7 +11,7 @@ class kmers{
 
 public:
 
-  kmers(const std::string &, const std::string &, const std::vector<std::string> &, const std::vector<std::string> &);
+  kmers(const variant &, const std::string &, const std::string &, const std::vector<std::string> &, const std::vector<std::string> &);
   kmers(const kmers &);
 
   std::unordered_map<std::string, int32_t> probandAltKmers_;
@@ -20,6 +21,11 @@ public:
   std::vector<std::unordered_map<std::string, int32_t> > parentsRefKmers_;
 
 private:
+
+  variant v_;
+
+  std::vector<std::string> altKmers_;
+  std::vector<std::string> refKmers_;
   
   std::string probandAltPath_;
   std::string probandRefPath_;

@@ -11,7 +11,7 @@
 #include "genotype.hpp"
 #include "input.hpp"
 
-struct variant{
+struct var{
   std::string ref;
   std::string alt;
 };
@@ -31,7 +31,7 @@ public:
   const BamTools::BamAlignment & getLeftContig();
   const BamTools::BamAlignment & getRightContig();
   const std::vector<BamTools::RefData> & getRefData();
-  const variant & getInsertionVariant();
+  const var & getInsertionVariant();
   const std::pair<clipCoords, clipCoords> & getClipCoords();
   const std::pair<std::string, std::string> & getCigarStrings();
   
@@ -48,9 +48,9 @@ private:
 
   input i_;
 
-  variant leftVariant_;
-  variant rightVariant_;
-  variant insertionVariant_;
+  var leftVariant_;
+  var rightVariant_;
+  var insertionVariant_;
 
   bool clipsConverge_;
 

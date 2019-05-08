@@ -33,7 +33,8 @@ public:
   static const bool checkClipsConverge(const BamTools::BamAlignment &, const BamTools::BamAlignment &);
   static const bool isNearby(const BamTools::BamAlignment &, const BamTools::BamAlignment &);
   static const int32_t countMinKmerDepth(const std::vector<std::pair<std::string, int32_t> > &);
-  static const std::map<std::string, int32_t> countKmersFromJhash(const std::string &, const std::vector<std::string> &);
+  static const std::unordered_map<std::string, int32_t> countKmersFromJhash(const std::string &, const std::vector<std::string> &);
+  static const std::vector<std::pair<std::string, int32_t> > countKmersFromText(const std::string &, const std::vector<std::string> &);
   static const std::vector<std::string> kmerize(const std::string &, const int32_t &);
   static const std::string getChromosomeFromRefID(const int32_t &, const std::vector<BamTools::RefData> &);
   static const std::string pullRefSequenceFromRegion(const breakpoint &, const int32_t &, const std::string &, const std::vector<BamTools::RefData> &);
@@ -48,6 +49,7 @@ public:
   static BamTools::BamReader openBamFile(const std::string &);
   static std::string exec(char const*);
   static const std::pair<BamTools::BamAlignment, BamTools::BamAlignment> findLeftAndRightContigs(const std::vector<BamTools::BamAlignment> &);
+  static const std::string revComp(const std::string);
 
 private:
   
