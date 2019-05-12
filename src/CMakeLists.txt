@@ -15,6 +15,7 @@ add_library(twofus_core STATIC
 	contigs.cpp
 	util.cpp
 	input.cpp
+	variant.cpp
 	genotype.cpp	
 	kmers.cpp
 	MEHead.cpp
@@ -22,7 +23,6 @@ add_library(twofus_core STATIC
 	mobileElement.cpp
 	insertion.cpp
 	translocation.cpp
-	variant.cpp
 	vcfWriter.cpp
 )
 

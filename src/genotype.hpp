@@ -3,50 +3,32 @@
 
 #include <string>
 #include <vector>
-
-#include "api/BamMultiReader.h"
-#include "api/BamWriter.h"
-
-#include "clipCoords.hpp"
-#include "input.hpp"
 #include "kmers.hpp"
-#include "MEHead.hpp"
-#include "mobileElement.hpp"
-
-
-class mobileElement;
-class MEHead;
 
 class genotype{
 
 public:
 
   genotype();
-  genotype(mobileElement &, const input &, const kmers &);
+  genotype(const genotype &);
+  genotype(const kmers &);
+
+  std::string probandGenotype_ = "1/0";
+  std::vector<std::string> parentGenotypes_;
+  kmers mers_;
+
 
 private:
 
+  bool probandHasRef_ = false;
+  bool probandHasAlt_ = false;
+  
+  std::vector<bool> parentsHaveRef_;
+  std::vector<bool> parentsHaveAlt_;
 
-  std::string bamPath_;
-  BamTools::BamAlignment al_;
-  std::vector<BamTools::BamAlignment> als_;
-  BamTools::BamRegion region_;
-
-  input i_;
-
-  std::vector<clipCoords> ccs_;
-
-  std::vector<std::string> variants_;
-  std::vector<std::string> refSequences_;
-
-  std::vector<BamTools::RefData> refData_;
-
-  void populateVariants();
-  void populateRefData();
-  void populateRefSequences();
-  void populateClipCoords();
-  void populateRefKmers();
-  void populateAltKmers();
+  void populateProbandGT();
+  void populateParentsRefandAlt();
+  void populateParentGTs();
 
 
 };

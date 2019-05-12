@@ -13,6 +13,11 @@ public:
 
   kmers(const variant &, const std::string &, const std::string &, const std::vector<std::string> &, const std::vector<std::string> &);
   kmers(const kmers &);
+  kmers();
+
+
+  std::vector<std::string> altKmers_;
+  std::vector<std::string> refKmers_;
 
   std::unordered_map<std::string, int32_t> probandAltKmers_;
   std::unordered_map<std::string, int32_t> probandRefKmers_;
@@ -20,12 +25,10 @@ public:
   std::vector<std::unordered_map<std::string, int32_t> > parentsAltKmers_;
   std::vector<std::unordered_map<std::string, int32_t> > parentsRefKmers_;
 
+
 private:
 
   variant v_;
-
-  std::vector<std::string> altKmers_;
-  std::vector<std::string> refKmers_;
   
   std::string probandAltPath_;
   std::string probandRefPath_;

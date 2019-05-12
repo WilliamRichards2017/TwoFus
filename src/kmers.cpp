@@ -11,6 +11,9 @@
 #include <unordered_map>
 #include <vector>
 
+kmers::kmers(){
+}
+
 kmers::kmers(const variant & v, const std::string & probandAltPath, const std::string & probandRefPath, const std::vector<std::string> & parentAltPaths, const std::vector<std::string> & parentRefPaths) : v_(v), probandAltPath_(probandAltPath), probandRefPath_(probandRefPath), parentAltPaths_(parentAltPaths), parentRefPaths_(parentRefPaths){
 
   kmers::populateProbandKmers();
@@ -23,7 +26,14 @@ kmers::kmers(const kmers & k){
   probandRefPath_ = k.probandRefPath_;
   parentAltPaths_ = k.parentAltPaths_;
   parentRefPaths_ = k.parentRefPaths_;
+
+  altKmers_ = k.altKmers_;
+  refKmers_ = k.refKmers_;
+  probandAltKmers_ = k.probandAltKmers_;
+  probandRefKmers_ = k.probandRefKmers_;
+  v_ = k.v_;
 }
+
 
 std::unordered_map<std::string, int32_t> kmers::pathToMap(const std::string & path){
 

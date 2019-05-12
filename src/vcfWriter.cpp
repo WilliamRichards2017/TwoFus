@@ -71,7 +71,6 @@ void vcfWriter::writeT(const vcfLine & T){
   vcfStream_ << T.CHROM << '\t' << T.POS << '\t' << T.ID << '\t' << T.REF << '\t' << T.ALT << '\t' << T.QUAL << '\t';
   vcfWriter::writeTInfoField(T);
   vcfStream_ << std::endl;
-
 }
 
 void vcfWriter::writeTInfoField(const vcfLine & T){
@@ -80,6 +79,13 @@ void vcfWriter::writeTInfoField(const vcfLine & T){
   vcfStream_ << ";cigar=" << T.INFO.cigar << ";VT=" << T.INFO.VT << ";CVT=" << T.INFO.CVT << ";SB=" << T.INFO.SB;
 }
 
+void vcfWriter::writeGenotype(const genotype & G){
+  vcfStream_ << G.probandGenotype_ << "\t";
+  for(const auto & parentGT : G.parentGenotypes_){
+    vcfStream_ << parentGT << "\t";
+  }
+  vcfStream_ << std::endl;
+}
 
 
 void vcfWriter::populateMEFormatField(){
@@ -185,35 +191,41 @@ void vcfWriter::populateTRANSLine(){
 
 
 vcfWriter::vcfWriter(std::fstream & vcfStream, insertion & INS, input & i) : INS_(INS), i_(i), variantType_(ins), vcfStream_(vcfStream){
+
+
   vcfContig_ = INS_.getLeftContig();
+
+  variant v = {vcfContig_, i_};
+  //todo: refactor constructor to i_ lol
+  kmers k = {v, i_.probandAltPath_, i_.probandRefPath_, i_.parentAltPaths_, i.parentRefPaths_};
+  genotype g = {k};
+
+
   vcfWriter::populateINSLine();
   vcfWriter::writeINSLine();
+  vcfWriter::writeGenotype(g);
   vcfWriter::printVCFLine();
-
 }
+
+
+
+
 
 vcfWriter::vcfWriter(std::fstream & vcfStream, mobileElement & ME, input & i) : ME_(ME), i_(i), variantType_(mobEl), vcfStream_(vcfStream){
 
 
   variant v = {ME_.getMostSupportedHead().getContig(), i_};
-
-  std::cout << "BEFORE INVOKING KMERS!!!!" << std::endl;
-
-  std::cout << "probandAltPath is: " << i_.probandAltPath_ << std::endl;
-
-
-  std::cout << "FOUND ME, invoking KMERS" << std::endl;
   kmers k = {v, i_.probandAltPath_, i_.probandRefPath_, i_.parentAltPaths_, i.parentRefPaths_};
-
-
+  genotype g = {k};
+  std::cout <<"proabnd genotype is: " << g.probandGenotype_ << std::endl;
 
   vcfContig_ = ME_.getHeadContigs().front().getContig();
-  genotype MEgt = {ME, i, k};
   vcfWriter::populateMELine();
 
   if(vcfLine_.INFO.NHC > 0 and vcfLine_.INFO.NHR > 0){
 
     vcfWriter::writeMELine();
+    vcfWriter::writeGenotype(g); 
     vcfWriter::printVCFLine();	       
   }
 }
@@ -221,6 +233,6 @@ vcfWriter::vcfWriter(std::fstream & vcfStream, mobileElement & ME, input & i) : 
 vcfWriter::vcfWriter(std::fstream & vcfStream, translocation & TRANS, input & i) : TRANS_(TRANS), i_(i), variantType_(trans), vcfStream_(vcfStream){
   vcfWriter::populateTRANSLine();
   vcfWriter::writeT1andT2();
-
   vcfWriter::printVCFLine();
+  
 }

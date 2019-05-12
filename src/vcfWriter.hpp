@@ -5,6 +5,7 @@
 
 #include "input.hpp"
 #include "insertion.hpp"
+#include "genotype.hpp"
 #include "mobileElement.hpp"
 #include "translocation.hpp"
 #include "variant.hpp"
@@ -166,6 +167,8 @@ private:
   void writeT1andT2();
   void writeT(const vcfLine &);
   void writeTInfoField(const vcfLine &);
+
+  void writeGenotype(const genotype &);
 
   void printVCFLine();
 };

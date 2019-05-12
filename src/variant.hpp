@@ -34,15 +34,20 @@ private:
 
   std::string fullVarSeq_;
 
+  int32_t leftPos_;
 
   input i_;
 
   int32_t breakpoint_ = -1;
   int32_t varRefPos_ = -1;
   int32_t globalOffset_ = -1;
-  
+
+  int32_t altAllele_ = 0;
+  int32_t refAllele = 0;
+
   void populateRefData();
   void populateRefSequence();
+
 
 };
 
