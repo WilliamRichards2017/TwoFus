@@ -27,41 +27,18 @@ kmers::kmers(const kmers & k){
   parentAltPaths_ = k.parentAltPaths_;
   parentRefPaths_ = k.parentRefPaths_;
 
-  altKmers_ = k.altKmers_;
-  refKmers_ = k.refKmers_;
   probandAltKmers_ = k.probandAltKmers_;
   probandRefKmers_ = k.probandRefKmers_;
+
+  parentsAltKmers_ = k.parentsAltKmers_;
+  parentsRefKmers_ = k.parentsRefKmers_;
+
   v_ = k.v_;
 }
 
 
-std::unordered_map<std::string, int32_t> kmers::pathToMap(const std::string & path){
-
-
-  std::cout << "Inside pathToMap for path: " << path << std::endl;
-
-  std::string line;
-  std::ifstream kmersFile (path);
-  std::unordered_map<std::string, int32_t> kmerMap;
-
-  if (kmersFile.is_open()) {
-    while (getline (kmersFile,line)){
-
-      std::istringstream iss(line);
-      std::vector<std::string> kmerCount((std::istream_iterator<std::string>(iss)), std::istream_iterator<std::string>());
-
-      kmerMap[kmerCount[0]] = std::stoi(kmerCount[1]);
-    }
-    kmersFile.close();
-  } else{
-    std::cout << "could not open kmer hashlist " << path << std::endl;
-  }
-  return kmerMap;
-}
-
 void kmers::populateProbandKmers(){
 
-  std::cout << "inside populateProbandKmers" << std::endl;
   auto pak = util::countKmersFromText(probandAltPath_, v_.altKmers_);
   auto prk = util::countKmersFromText(probandRefPath_, v_.refKmers_);
 
@@ -73,12 +50,6 @@ void kmers::populateProbandKmers(){
     probandRefKmers_.insert(p);
   }
 
-  std::cout << "printing proband ref kmer counts" << std::endl;
-  for(const auto & r : probandRefKmers_){
-    std::cout << r.first << ", " << r.second << std::endl;
-  }
-
-
   //std::cout << "probandAltKmers_.size(): " << probandAltKmers_.size() << std::endl;
   //std::cout << "probandRefKmers_.size(): " << probandRefKmers_.size() << std::endl;
 
@@ -86,20 +57,31 @@ void kmers::populateProbandKmers(){
 
 void kmers::populateParentsKmers(){
 
+  std::cout << "Inside populateParentsKmers()" << std::endl;
+
+
+  std::cout << " parentAltPaths_.size() " << parentAltPaths_.size() << std::endl;
+ 
   for(const auto & pa : parentAltPaths_){
+    std::cout << "parent alt path: " << pa << std::endl;
     //parentsAltKmers_.push_back(kmers::pathToMap(pa));
 
     std::unordered_map<std::string, int32_t> akcm;
 
+
+    std::cout << "altKmers_.size(): " << v_.altKmers_.size() << std::endl;
     auto akcv = util::countKmersFromText(pa, v_.altKmers_);
+
+    std::cout << "akcv.size(): " << akcv.size() << std::endl;
+    
     for(const auto & k : akcv){
       akcm.insert(k);
     }
     parentsAltKmers_.push_back(akcm);
+    std::cout << "akcm.size(): " << akcm.size() << std::endl;
   }
 
   for(const auto & pr : parentRefPaths_){
-    //parentsAltKmers_.push_back(kmers::pathToMap(pa));
 
     std::unordered_map<std::string, int32_t> rkcm;
 
@@ -108,22 +90,6 @@ void kmers::populateParentsKmers(){
       rkcm.insert(k);
     }
     parentsRefKmers_.push_back(rkcm);
-  }
-
-
-
-  for(unsigned i = 0; i < parentsRefKmers_.size(); ++i){
-    std::cout << "printing out parent ref kmer" << std::endl;
-    for(const auto & prk : parentsRefKmers_[i]){
-      std::cout << prk.first << ", " << prk.second << std::endl;
-    }
-
-    std::cout << "printing out parent alt kmers" << std::endl;
-    for(const auto & pak : parentsAltKmers_[i]){
-      std::cout << pak.first << ", " << pak.second << std::endl;
-    }
-
-    std::cout << "parent ref kmers size: " << parentsRefKmers_[i].size() << std::endl;
   }
 
 }

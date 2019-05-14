@@ -492,22 +492,29 @@ std::string util::exec(char const* cmd) {
   return result;
 }
 
-const std::string util::revComp (const std::string sequence){
-  std::string newString = "";
-  //cout << "Start - " << Sequence << "\n";
-  for(int i = sequence.size()-1; i>=0; i+= -1) {
-    char C = sequence.c_str()[i];
-    if (C == 'A')
-      {newString += 'T';}
-    else if (C == 'C')
-      {newString += 'G';}
-    else if (C == 'G')
-      {newString += 'C';}
-    else if (C == 'T')
-      {newString += 'A';}
-    else if (C == 'N')
-      {newString += 'N';}
-    else {std::cout << "ERROR IN RevComp - " << C << std::endl;}
-  }
-  return newString;
+const std::string util::revComp (std::string sequence){
+  auto lambda = [](const char c) {
+    switch (c) {
+    case 'A':
+    case 'a':
+    return 'T';
+    case 'G':
+    case 'g':
+    return 'C';
+    case 'C':
+    case 'c':
+    return 'G';
+    case 'T':
+    case 't':
+    return 'A';
+    case 'N':
+    case 'n': 
+    return 'N';
+    default:
+    std::cout << "Invalid nucleotide in revComp: " << c << std::endl;
+    }
+  };
+
+  std::transform(sequence.cbegin(), sequence.cend(), sequence.begin(), lambda);
+  return sequence;
 }

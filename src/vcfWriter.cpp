@@ -37,20 +37,21 @@ void vcfWriter::writeINSMQ(){
 }
 
 void vcfWriter::writeMEInfo(){
-  vcfStream_ << "RN=" << vcfLine_.INFO.RN << ";NHC=" << vcfLine_.INFO.NHC << ";NTC=" << vcfLine_.INFO.NTC << ";NHR=" << vcfLine_.INFO.NHR << ";NTR=" << vcfLine_.INFO.NTR << ";LT=" << vcfLine_.INFO.LT << ";SB=" << vcfLine_.INFO.SB;
+  vcfStream_ << "RN=" << vcfLine_.INFO.RN << ";NHC=" << vcfLine_.INFO.NHC << ";NTC=" << vcfLine_.INFO.NTC << ";NHR=" << vcfLine_.INFO.NHR << ";NTR=" << vcfLine_.INFO.NTR << ";LT=" << vcfLine_.INFO.LT << ";VT=" << vcfLine_.INFO.VT << ";SB=" << vcfLine_.INFO.SB;
 }
 
 
 void vcfWriter::writeINSInfo(){
   vcfStream_ << "SVTYPE=" << vcfLine_.INFO.SVTYPE << ";SVLEN=" << vcfLine_.INFO.SVLEN << ";END=" << vcfLine_.INFO.END << ";RN=" << vcfLine_.INFO.RN;
   vcfWriter::writeINSMQ();
-  vcfStream_ << ";cigar=" << vcfLine_.INFO.cigar << ";VT=" << vcfLine_.INFO.VT << ";CVT=" << vcfLine_.INFO.CVT << ";SB=" << vcfLine_.INFO.SB;
+  vcfStream_ << ";cigar=" << vcfLine_.INFO.cigar << ";VT=" << vcfLine_.INFO.VT << ";SB=" << vcfLine_.INFO.SB;
 }
 
 void vcfWriter::writeMELine(){
   vcfWriter::writeShared();
   vcfWriter::writeMEInfo();
   vcfWriter::writeHD();
+  vcfWriter::writeGenotype(); 
   vcfStream_ << std::endl;
 }
 
@@ -58,6 +59,7 @@ void vcfWriter::writeINSLine(){
   vcfWriter::writeShared();
   vcfWriter::writeINSInfo();
   vcfWriter::writeHD();
+  vcfWriter::writeGenotype();
   vcfStream_ << std::endl;
 }
 
@@ -79,12 +81,13 @@ void vcfWriter::writeTInfoField(const vcfLine & T){
   vcfStream_ << ";cigar=" << T.INFO.cigar << ";VT=" << T.INFO.VT << ";CVT=" << T.INFO.CVT << ";SB=" << T.INFO.SB;
 }
 
-void vcfWriter::writeGenotype(const genotype & G){
-  vcfStream_ << G.probandGenotype_ << "\t";
-  for(const auto & parentGT : G.parentGenotypes_){
-    vcfStream_ << parentGT << "\t";
+void vcfWriter::writeGenotype(){
+  vcfStream_ << gt_.probandGenotype_ << ":" << gt_.probandRefCount_ << ":" << gt_.probandAltCount_ << ":" << gt_.probandDepth_ << "\t";
+
+
+  for(unsigned i = 0; i < gt_.parentGenotypes_.size(); ++i){
+    vcfStream_ << gt_.parentGenotypes_[i] << ":" << gt_.parentRefCounts_[i] << ":" << gt_.parentAltCounts_[i] << ":" << gt_.parentDepths_[i] << "\t";
   }
-  vcfStream_ << std::endl;
 }
 
 
@@ -96,12 +99,13 @@ void vcfWriter::populateINSFormatField(){
 
 
 void vcfWriter::populateINSInfoField(){
-  vcfLine_.INFO.SVTYPE = "largeINS";
+  vcfLine_.INFO.SVTYPE = "INS";
   vcfLine_.INFO.SVLEN = INS_.getInsertionVariant().alt.length();
   vcfLine_.INFO.END = INS_.getClipCoords().second.rightPos_ + INS_.getClipCoords().second.globalOffset_;
   vcfLine_.INFO.RN = INS_.getLeftContig().Name + "<-->" + INS_.getRightContig().Name;
   vcfLine_.INFO.MQ = {INS_.getLeftContig().MapQuality, INS_.getRightContig().MapQuality};
   vcfLine_.INFO.cigar = INS_.getCigarStrings().first + "<-->" + INS_.getCigarStrings().second;
+  vcfLine_.INFO.VT = "largeInsertion";
   //TODO: combine SBs, write util function to calculate SB from two contigs
 
 
@@ -121,6 +125,7 @@ void vcfWriter::populateMEInfoField(){
   vcfLine_.INFO.NTR = ME_.getTailContigs().front().getSupportingReads().size();
   vcfLine_.INFO.SB = ME_.getStrandBias();
   vcfLine_.INFO.LT = ME_.getMostSupportedTail().getLongestTail();
+  vcfLine_.INFO.VT = "mobileElement";
 }
 
 void vcfWriter::populateT1(){
@@ -138,7 +143,13 @@ void vcfWriter::populateT1(){
   T1_.INFO.SVEND = util::getChromosomeFromRefID(TRANS_.getT1().second.RefID, TRANS_.getRefData()) + ":" + std::to_string(TRANS_.getT1().second.Position);
   T1_.INFO.RN = TRANS_.getT1().first.Name + "<-->" + TRANS_.getT1().second.Name;
   T1_.INFO.cigar = "TODO";
-  T1_.INFO.SB = 0;
+
+  std::vector<std::string> contigNames;
+  contigNames.push_back(TRANS_.getT1().first.Name);
+  contigNames.push_back(TRANS_.getT1().second.Name);
+
+  T1_.INFO.SB = util::calculateStrandBiasFromContigNames(contigNames);
+
 }
 
 void vcfWriter::populateT2(){
@@ -154,7 +165,11 @@ void vcfWriter::populateT2(){
   T2_.INFO.SVEND = util::getChromosomeFromRefID(TRANS_.getT2().second.RefID, TRANS_.getRefData()) + ":" + std::to_string(TRANS_.getT2().second.Position);
   T2_.INFO.RN = TRANS_.getT2().first.Name + "<-->" + TRANS_.getT2().second.Name;
   T2_.INFO.cigar = "TODO";
-  T2_.INFO.SB = 0;
+
+  std::vector<std::string> contigNames;
+  contigNames.push_back(TRANS_.getT2().first.Name);
+  contigNames.push_back(TRANS_.getT2().second.Name);
+  T2_.INFO.SB = util::calculateStrandBiasFromContigNames(contigNames);
 
 }
 
@@ -163,8 +178,14 @@ void vcfWriter::populateINSLine(){
   vcfLine_.CHROM = util::getChromosomeFromRefID(vcfContig_.RefID, INS_.getRefData());
   vcfLine_.POS = vcfContig_.Position;
   vcfLine_.ID = "INS";
+  if(gt_.isDenovo_){
+    vcfLine_.ID += "-DeNovo";
+  }
+  else{
+    vcfLine_.ID += "-Inherited";
+  }
   vcfLine_.REF = "N";
-  vcfLine_.ALT = "INS:Large";
+  vcfLine_.ALT = "INS";
   vcfLine_.QUAL = std::max(INS_.getLeftContig().MapQuality, INS_.getRightContig().MapQuality);
   vcfWriter::populateINSInfoField();
 }
@@ -173,6 +194,13 @@ void vcfWriter::populateMELine(){
   vcfLine_.CHROM = util::getChromosomeFromRefID(vcfContig_.RefID, ME_.getRefData());
   vcfLine_.POS = vcfContig_.Position;
   vcfLine_.ID = "ME";
+  if(gt_.isDenovo_){
+    vcfLine_.ID+= "-DeNovo";
+  }
+  else{
+    vcfLine_.ID+= "-Inherited";
+  }
+
   vcfLine_.REF = "N";
   vcfLine_.ALT = "ME:"+ME_.getHeadContigs().front().getMEHit().first;
   vcfLine_.QUAL = ME_.getHeadContigs().front().getMEHit().second;
@@ -198,12 +226,11 @@ vcfWriter::vcfWriter(std::fstream & vcfStream, insertion & INS, input & i) : INS
   variant v = {vcfContig_, i_};
   //todo: refactor constructor to i_ lol
   kmers k = {v, i_.probandAltPath_, i_.probandRefPath_, i_.parentAltPaths_, i.parentRefPaths_};
-  genotype g = {k};
+  gt_ = {k};
 
 
   vcfWriter::populateINSLine();
   vcfWriter::writeINSLine();
-  vcfWriter::writeGenotype(g);
   vcfWriter::printVCFLine();
 }
 
@@ -213,11 +240,16 @@ vcfWriter::vcfWriter(std::fstream & vcfStream, insertion & INS, input & i) : INS
 
 vcfWriter::vcfWriter(std::fstream & vcfStream, mobileElement & ME, input & i) : ME_(ME), i_(i), variantType_(mobEl), vcfStream_(vcfStream){
 
-
   variant v = {ME_.getMostSupportedHead().getContig(), i_};
   kmers k = {v, i_.probandAltPath_, i_.probandRefPath_, i_.parentAltPaths_, i.parentRefPaths_};
-  genotype g = {k};
-  std::cout <<"proabnd genotype is: " << g.probandGenotype_ << std::endl;
+
+  std::cout << "inside vcfWriter" << std::endl;
+  std::cout << "k.parentsAltKmers_.size(): " << k.parentsAltKmers_.size() << std::endl;
+  for(const auto pak : k.parentsAltKmers_){
+    std::cout << "pak.size(): " << pak.size() << std::endl;
+  }
+
+  gt_ = {k};
 
   vcfContig_ = ME_.getHeadContigs().front().getContig();
   vcfWriter::populateMELine();
@@ -225,7 +257,6 @@ vcfWriter::vcfWriter(std::fstream & vcfStream, mobileElement & ME, input & i) : 
   if(vcfLine_.INFO.NHC > 0 and vcfLine_.INFO.NHR > 0){
 
     vcfWriter::writeMELine();
-    vcfWriter::writeGenotype(g); 
     vcfWriter::printVCFLine();	       
   }
 }

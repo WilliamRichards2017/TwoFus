@@ -141,6 +141,8 @@ private:
   vcfLine T1_;
   vcfLine T2_;
 
+  genotype gt_;
+
   void populateMELine();
   void populateMEInfoField();
   void populateMEFormatField();
@@ -168,7 +170,7 @@ private:
   void writeT(const vcfLine &);
   void writeTInfoField(const vcfLine &);
 
-  void writeGenotype(const genotype &);
+  void writeGenotype();
 
   void printVCFLine();
 };
