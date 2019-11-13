@@ -398,8 +398,8 @@ void contigs::groupNearbyContigs(){
 
 contigs::contigs(const input & i) : i_(i){
 
-  std::string vcfFile = "/uufs/chpc.utah.edu/common/HIPAA/u0401321/TwoFus/bin/testy.vcf";
-  //vcfStream_.open(i_.vcfOutPath_.c_str(), std::fstream::in | std::fstream::out | std::fstream::app);
+//   std::string vcfFile = "/uufs/chpc.utah.edu/common/HIPAA/u0401321/TwoFus/bin/testy.vcf";
+  vcfStream_.open(i_.vcfOutPath_.c_str(), std::fstream::in | std::fstream::out | std::fstream::app);
   vcfStream_.open(vcfFile.c_str(), std::fstream::in | std::fstream::out | std::fstream::app);
 
   if(! vcfStream_.is_open()){
