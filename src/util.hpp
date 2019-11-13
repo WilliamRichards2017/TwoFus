@@ -50,6 +50,7 @@ public:
   static std::string exec(char const*);
   static const std::pair<BamTools::BamAlignment, BamTools::BamAlignment> findLeftAndRightContigs(const std::vector<BamTools::BamAlignment> &);
   static const std::string revComp(std::string);
+  static const std::string replaceDoubleGenerator(std::string);
 
 private:
   

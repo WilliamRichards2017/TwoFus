@@ -68,18 +68,27 @@ void input::printArgs(){
 void input::parseArgs(){
 
   probandBamPath_ = std::string(argv_[1]);
+
   probandMutBamPath_ = probandBamPath_ + ".generator.Mutations.fastq.bam";
+  probandMutBamPath_ = util::replaceDoubleGenerator(probandMutBamPath_);
 
   mobileElementFastaPath_ = std::string(argv_[2]);
   referencePath_ = std::string(argv_[3]);
   hashListPath_ = std::string(argv_[4]);
 
   contigFastqPath_ = probandBamPath_ + ".generator.V2.overlap.hashcount.fastq";
+  contigFastqPath_ = util::replaceDoubleGenerator(contigFastqPath_);
+
   contigBamPath_ = contigFastqPath_ + ".bam";
   mobileElementIndexPath_ = mobileElementFastaPath_ + ".fai";
   referenceIndexPath_ = referencePath_ + ".fai";
+
   vcfOutPath_ = probandBamPath_ + ".generator.V2.overlap.hashcount.fastq.bam.vcf";
+  vcfOutPath_ = util::replaceDoubleGenerator(vcfOutPath_);
+
   kmerPath_ = probandBamPath_ + ".generator.Jhash";
+  kmerPath_ = util::replaceDoubleGenerator(kmerPath_);
+
 
   for(unsigned u = 5; u < argc_; ++u){
     parentBamPaths_.push_back(std::string(argv_[u]));
@@ -91,13 +100,20 @@ void input::populateKmerPaths(){
   probandAltPath_ = hashListPath_;
   probandRefPath_ = probandBamPath_ + ".generator.V2.overlap.asembly.hash.fastq.ref.fastq.Jhash";
 
+  probandRefPath_ = util::replaceDoubleGenerator(probandRefPath_);
+
+
   for(auto & pp : parentBamPaths_){
 
 
     auto p = std::string(basename(pp.c_str()));
 
     std::string pa = probandBamPath_ + ".generator.V2.overlap.asembly.hash.fastq." + p + ".generator.Jhash";
+    pa = util::replaceDoubleGenerator(pa);
+
     std::string pr =probandBamPath_ + ".generator.V2.overlap.asembly.hash.fastq.Ref." + p + ".generator.Jhash";
+    pr = util::replaceDoubleGenerator(pa);
+
     
     parentRefPaths_.push_back(pr);
     parentAltPaths_.push_back(pa);
