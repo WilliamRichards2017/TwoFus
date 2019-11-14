@@ -14,22 +14,25 @@ const bool util::breakpointOverlapsPeak(const std::pair<int32_t, int32_t> & indi
   return(breakpoint >= indices.first-5 and breakpoint <= indices.second+5);
 }
 
-void replaceAll( string &s, const string &search, const string &replace ) {
+const std::string replaceAll(const std::string &s, const std::string &search, const std::string &replace ) {
+  std::string str = s;
   for( size_t pos = 0; ; pos += replace.length() ) {
     // Locate the substring to replace
-    pos = s.find( search, pos );
-    if( pos == string::npos ) break;
+    pos = str.find( search, pos );
+    if( pos == std::string::npos ) break;
     // Replace by erasing and inserting
-    s.erase( pos, search.length() );
-    s.insert( pos, replace );
+    str.erase( pos, search.length() );
+    str.insert( pos, replace );
   }
+  return str;
 }
 
-const std::string util::replaceDoubleGenerator(str){
+const std::string util::replaceDoubleGenerator(const std::string & str){
 
   std::string replace = replaceAll(str, "generator.generator", "generator");
 
   std::cout << "replace: " << replace << std::endl;
+  return replace;
 }
 
 const maxPeak util::getMaxPeak(const std::vector<std::pair<int32_t, int32_t> > & peakVec, const BamTools::BamAlignment & al){

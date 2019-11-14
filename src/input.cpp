@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "input.hpp"
+#include "util.hpp"
 
 input::input(){
 }
