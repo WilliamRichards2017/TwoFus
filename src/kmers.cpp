@@ -55,6 +55,25 @@ void kmers::populateProbandKmers(){
 
 }
 
+bool kmers::hashlistHasKmer(std::string kmer){
+
+
+  auto it = probandAltKmers_.find(kmer);
+  if (it != probandAltKmers_.end()){
+
+    if(it-> second > 0){
+    std::cout << "found parent kmer in proband Hashlist" << kmer << std::endl;
+    std::cout << "count of kmers is -> " << it->second << std::endl;
+    return true;
+    }
+  }
+
+  std::cout << "did not find kmer in hashList" << std::endl;
+
+  return false;
+
+}
+
 void kmers::populateParentsKmers(){
 
   std::cout << "Inside populateParentsKmers()" << std::endl;
@@ -73,9 +92,13 @@ void kmers::populateParentsKmers(){
     auto akcv = util::countKmersFromText(pa, v_.altKmers_);
 
     std::cout << "akcv.size(): " << akcv.size() << std::endl;
+
+
     
     for(const auto & k : akcv){
-      akcm.insert(k);
+      if(hashlistHasKmer(k.first)){
+	akcm.insert(k);
+      }
     }
     parentsAltKmers_.push_back(akcm);
     std::cout << "akcm.size(): " << akcm.size() << std::endl;

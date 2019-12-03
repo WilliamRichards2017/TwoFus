@@ -115,7 +115,7 @@ void input::populateKmerPaths(){
     pa = util::replaceDoubleGenerator(pa);
 
     std::string pr =probandBamPath_ + ".generator.V2.overlap.asembly.hash.fastq.Ref." + p + ".generator.Jhash";
-    pr = util::replaceDoubleGenerator(pa);
+    pr = util::replaceDoubleGenerator(pr);
 
     
     parentRefPaths_.push_back(pr);

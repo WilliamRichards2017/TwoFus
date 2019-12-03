@@ -34,6 +34,8 @@ private:
   void populateProbandKmers();
   void populateParentsKmers();
 
+  bool hashlistHasKmer(std::string);
+
 };
 
 #endif
