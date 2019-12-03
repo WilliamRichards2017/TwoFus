@@ -84,7 +84,9 @@ void input::parseArgs(){
   mobileElementIndexPath_ = mobileElementFastaPath_ + ".fai";
   referenceIndexPath_ = referencePath_ + ".fai";
 
-  vcfOutPath_ = probandBamPath_ + ".generator.V2.overlap.hashcount.fastq.bam.vcf";
+
+  vcfOutPath_ = "testy.vcf";
+  //vcfOutPath_ = probandBamPath_ + ".generator.V2.overlap.hashcount.fastq.bam.vcf";
   vcfOutPath_ = util::replaceDoubleGenerator(vcfOutPath_);
 
   kmerPath_ = probandBamPath_ + ".generator.Jhash";
