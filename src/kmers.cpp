@@ -66,6 +66,9 @@ bool kmers::hashlistHasKmer(std::string kmer){
     std::cout << "count of kmers is -> " << it->second << std::endl;
     return true;
     }
+    else{
+      return false;
+    }
   }
 
   std::cout << "did not find kmer in hashList" << std::endl;
